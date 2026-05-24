@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'ng-zorro-antd/ng-zorro-antd.css';
+
+:root {
+  --primary-color: #2a72fa;
+  --bg-color: #f7f9fc;
+  --text-dark: #1f2937;
+  --text-gray: #6b7280;
+  --border-color: #e5e7eb;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
+}
+
+body {
+  background-color: var(--bg-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ant-layout {
+  background: var(--bg-color);
+  min-height: 100vh;
+}
+
+.ant-layout-sider {
+  background: white;
+  border-right: 1px solid var(--border-color);
+}
+
+.ant-layout-header {
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 24px;
+}
+
+.ant-menu {
+  color: var(--text-gray);
+  border-right: none;
+}
+
+.ant-menu-item-selected {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border-radius: 8px;
+  margin: 4px 16px !important;
+  width: calc(100% - 32px) !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item {
+  border-radius: 8px;
+  margin: 4px 16px !important;
+  width: calc(100% - 32px) !important;
+}
+
+.ant-menu-item:hover:not(.ant-menu-item-selected) {
+  background-color: var(--bg-color);
+}
