@@ -8,6 +8,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -51,7 +52,7 @@ import { FormsModule } from '@angular/forms';
             <li nz-menu-item>Profile</li>
             <li nz-menu-item>Settings</li>
             <li nz-menu-divider></li>
-            <li nz-menu-item>Logout</li>
+            <li nz-menu-item (click)="logout()">Logout</li>
           </ul>
         </nz-dropdown-menu>
       </div>
@@ -134,4 +135,10 @@ import { FormsModule } from '@angular/forms';
 export class HeaderComponent {
   @Input() isCollapsed = false;
   @Output() toggle = new EventEmitter<void>();
+  constructor(private router: Router) {}
+
+  logout(): void {
+    // For now, simply navigate to the login page
+    this.router.navigate(['/login']);
+  }
 }
