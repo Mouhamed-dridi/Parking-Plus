@@ -600,9 +600,8 @@ export class DashboardComponent implements OnInit {
   ];
 
   trafficData = [
-    { label: 'DG Cars', count: 8, pct: 53, change: '0.59%', trend: 'up', color: '#818cf8' },
-    { label: 'Pickups', count: 9, pct: 38, change: '4.23%', trend: 'up', color: '#f59e0b' },
-    { label: 'Delivery Vans', count: 7, pct: 27, change: '5.88%', trend: 'down', color: '#10b981' }
+    { label: 'Cars', count: 17, pct: 65, change: '2.50%', trend: 'up', color: '#818cf8' },
+    { label: 'Delivery Vans', count: 7, pct: 35, change: '5.88%', trend: 'down', color: '#10b981' }
   ];
 
   chartLegend = [
@@ -655,18 +654,18 @@ export class DashboardComponent implements OnInit {
   ];
 
   topVehicles: TopVehicle[] = [
-    { name: 'Isuzu D-Max', type: 'Pickup', image: '/images/cars/pickup/dmax.png', trips: 34, status: 'In Road' },
-    { name: 'Mercedes J Class', type: 'DG Cars', image: '/images/cars/DGcars/jclass.png', trips: 28, status: 'Free' },
+    { name: 'Ford Transit Connect', type: 'Delivery', image: '/images/cars/deliver/caddy.webp', trips: 34, status: 'In Road' },
+    { name: 'Mercedes E Class', type: 'Car', image: '/images/cars/DGcars/jclass.png', trips: 28, status: 'Free' },
     { name: 'VW Caddy', type: 'Delivery', image: '/images/cars/deliver/caddy.webp', trips: 22, status: 'In Road' },
-    { name: 'Porsche Taycan', type: 'DG Cars', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif', trips: 19, status: 'Maintenance' },
-    { name: 'Toyota Hilux', type: 'Pickup', image: '/images/cars/pickup/hylex.png', trips: 16, status: 'Free' }
+    { name: 'Porsche Taycan', type: 'Car', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif', trips: 19, status: 'Maintenance' },
+    { name: 'Audi A4', type: 'Car', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif', trips: 16, status: 'Free' }
   ];
 
   activities: ActivityItem[] = [
-    { icon: 'car', iconColor: '#818cf8', title: 'New Booking Requested', desc: 'Ahmed Benali requested an Isuzu D-Max', time: '12:24 PM' },
-    { icon: 'environment', iconColor: '#10b981', title: 'Vehicle Dispatched', desc: 'Mercedes J Class departed from Dallas Hub', time: '11:58 AM' },
+    { icon: 'car', iconColor: '#818cf8', title: 'New Booking Requested', desc: 'Ahmed Benali requested a Ford Transit Connect', time: '12:24 PM' },
+    { icon: 'environment', iconColor: '#10b981', title: 'Vehicle Dispatched', desc: 'Mercedes E Class departed from Dallas Hub', time: '11:58 AM' },
     { icon: 'warning', iconColor: '#f59e0b', title: 'Maintenance Alert', desc: 'Porsche Taycan scheduled for service', time: '10:45 AM' },
-    { icon: 'check-circle', iconColor: '#10b981', title: 'Trip Completed', desc: 'Isuzu D-Max returned from Memphis', time: '09:30 AM' },
+    { icon: 'check-circle', iconColor: '#10b981', title: 'Trip Completed', desc: 'Ford Transit Connect returned from Memphis', time: '09:30 AM' },
     { icon: 'idcard', iconColor: '#3b82f6', title: 'New Driver Registered', desc: 'Yassine Dridi added to the system', time: '08:12 AM' }
   ];
 

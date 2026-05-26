@@ -34,10 +34,8 @@ interface VipCar {
         </li>
         <li nz-submenu nzTitle="Cars / Vehicles" nzIcon="car" nzOpen>
           <ul>
-            <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'pickup'}"><span nz-icon nzType="carry-out" nzTheme="outline"></span> Pickup</li>
+            <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'car'}"><span nz-icon nzType="car" nzTheme="outline"></span> Cars</li>
             <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'delivery'}"><span nz-icon nzType="shopping-cart" nzTheme="outline"></span> Delivery</li>
-            <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'trucks'}"><span nz-icon nzType="deployment-unit" nzTheme="outline"></span> Trucks</li>
-            <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'DG cars'}"><span nz-icon nzType="thunderbolt" nzTheme="outline"></span> DG cars</li>
           </ul>
         </li>
 

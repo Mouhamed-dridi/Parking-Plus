@@ -95,32 +95,7 @@ interface ChatMessage {
             </div>
           </div>
 
-          <!-- TRUCK CAPACITY -->
-          <div class="capacity-card">
-            <div class="card-header">
-              <h3>Current truck capacity</h3>
-              <a href="#" class="view-details">View details</a>
-            </div>
-            <div class="truck-viz">
-              <div class="truck-container">
-                <img src="/images/gps/truck.webp" class="truck-base" />
-              </div>
-            </div>
-            <div class="capacity-stats">
-              <div class="stat-row">
-                <span class="stat-label">Current Load Weight</span>
-                <span class="stat-value">15,000 lbs</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Max Load</span>
-                <span class="stat-value">20,000 lbs</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Load Category</span>
-                <span class="stat-value">Electronics</span>
-              </div>
-            </div>
-          </div>
+
         </div>
 
         <div class="bottom-row">
@@ -202,7 +177,7 @@ interface ChatMessage {
 
             <!-- PHOTO REPORTS -->
             <div class="photo-reports-section">
-              <h3>Cargo photo reports</h3>
+              <h3>Delivery photo reports</h3>
               <div class="photo-grid">
                 <div class="photo-card">
                   <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=300" />
@@ -325,11 +300,10 @@ interface ChatMessage {
     .top-row, .bottom-row { display: flex; gap: 24px; }
     
     /* CARDS */
-    .map-card, .capacity-card, .details-section, .chat-card {
+    .map-card, .details-section, .chat-card {
       background: white; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .map-card { flex: 2; height: 400px; display: flex; flex-direction: column; }
-    .capacity-card { width: 340px; }
+    .map-card { flex: 1; height: 400px; display: flex; flex-direction: column; }
     .details-section { flex: 2; }
     .chat-card { width: 340px; display: flex; flex-direction: column; height: 500px; }
 
@@ -355,14 +329,7 @@ interface ChatMessage {
     }
     @keyframes pulse { 0% { scale: 0.5; opacity: 1; } 100% { scale: 1.5; opacity: 0; } }
 
-    /* TRUCK VIZ */
-    .truck-viz { height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-    .truck-container { position: relative; width: 240px; }
-    .truck-base { width: 100%; }
-    .capacity-stats { display: flex; flex-direction: column; gap: 12px; }
-    .stat-row { display: flex; justify-content: space-between; font-size: 13px; }
-    .stat-label { color: #64748b; font-weight: 500; }
-    .stat-value { color: #1e293b; font-weight: 700; }
+
 
     /* TIMELINE */
     .tracking-timeline { padding: 10px 0; }
@@ -437,11 +404,11 @@ interface ChatMessage {
 })
 export class GpsComponent {
   vehicles: TrackingVehicle[] = [
-    { id: '#AP-35602-AZ', model: 'Mercedes Benz Actros', status: 'In Transit', image: '/images/cars/trucks/truck.png', active: true },
-    { id: '#OH-44459-KC', model: 'Iveco Eurocargo', status: 'In Transit', image: 'https://images.unsplash.com/photo-1591768793355-74d7f8d38446?auto=format&fit=crop&q=80&w=100' },
-    { id: '#CE-87990-IS', model: 'Volvo VNL', status: 'In Transit', image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=100' },
-    { id: '#JY-36844-IU', model: 'Kenworth T680', status: 'In Transit', image: 'https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?auto=format&fit=crop&q=80&w=100' },
-    { id: '#YU-49266-LG', model: 'Scania R Series', status: 'Stopped', image: 'https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=100' }
+    { id: '#AP-35602-AZ', model: 'VW Caddy', status: 'In Transit', image: '/images/cars/deliver/caddy.webp', active: true },
+    { id: '#OH-44459-KC', model: 'Renault Dokker Van', status: 'In Transit', image: '/images/cars/deliver/docker.webp' },
+    { id: '#CE-87990-IS', model: 'Peugeot Partner', status: 'In Transit', image: '/images/cars/deliver/partiner.webp' },
+    { id: '#JY-36844-IU', model: 'Peugeot Partner Pro', status: 'In Transit', image: '/images/cars/deliver/partnier.avif' },
+    { id: '#YU-49266-LG', model: 'Mercedes E Class', status: 'Stopped', image: '/images/cars/DGcars/jclass.png' }
   ];
 
   messages: ChatMessage[] = [

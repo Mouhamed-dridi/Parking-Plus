@@ -5,21 +5,20 @@
       <h2>ParkingPlus</h2>
     </div>
 
-    <div class="header-section">
-      <h3>Sign in to your account</h3>
-      <p>Welcome back! Please enter your details.</p>
+    <div class="error-banner" *ngIf="errorMessage">
+      <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+      <span>{{ errorMessage }}</span>
     </div>
 
     <form class="login-form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">Email</label>
         <input 
-          type="email" 
+          type="text" 
           id="email" 
           name="email"
           placeholder="Enter your email" 
           [(ngModel)]="email" 
-          required 
           autocomplete="email"
         />
       </div>
@@ -33,7 +32,6 @@
             name="password"
             placeholder="••••••••" 
             [(ngModel)]="password" 
-            required 
             autocomplete="current-password"
           />
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
@@ -42,21 +40,10 @@
         </div>
       </div>
 
-      <div class="form-actions-row">
-        <label nz-checkbox [(ngModel)]="rememberMe" name="rememberMe" class="custom-checkbox">
-          Remember for 30 days
-        </label>
-        <a href="#" class="forgot-link">Forgot password?</a>
-      </div>
-
-      <button type="submit" class="submit-btn" [class.loading]="isLoading" [disabled]="isLoading || !email || !password">
+      <button type="submit" class="submit-btn" [class.loading]="isLoading" [disabled]="isLoading">
         <span *ngIf="!isLoading">Sign In</span>
         <span *ngIf="isLoading" nz-icon nzType="loading" nzTheme="outline"></span>
       </button>
     </form>
-
-    <div class="footer-section">
-      <p>Don't have an account? <a href="#">Sign up</a></p>
-    </div>
   </div>
 </div>

@@ -117,7 +117,7 @@ export class ListingComponent implements OnInit {
     {
       id: 1,
       name: 'Blue Audi (PSD)',
-      type: 'DG cars',
+      type: 'Car',
       transmission: 'Auto',
       fuel: 'Diesel',
       price: 348.98,
@@ -127,7 +127,7 @@ export class ListingComponent implements OnInit {
     {
       id: 2,
       name: 'Bentley',
-      type: 'DG cars',
+      type: 'Car',
       transmission: 'Auto',
       fuel: 'Diesel',
       price: 789.345,
@@ -137,7 +137,7 @@ export class ListingComponent implements OnInit {
     {
       id: 3,
       name: 'Porsche Tayce',
-      type: 'DG cars',
+      type: 'Car',
       transmission: 'Auto',
       fuel: 'Diesel',
       price: 1234.70,
@@ -146,43 +146,13 @@ export class ListingComponent implements OnInit {
     },
     {
       id: 4,
-      name: 'Mercedes J Class',
-      type: 'DG cars',
+      name: 'Mercedes E Class',
+      type: 'Car',
       transmission: 'Auto',
       fuel: 'Diesel',
       price: 908.234,
       image: '/images/cars/DGcars/jclass.png',
       driver: { name: 'Zahidul', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' }
-    },
-    {
-      id: 5,
-      name: 'Isuzu D-Max',
-      type: 'Pickup',
-      transmission: 'Manual',
-      fuel: 'Diesel',
-      price: 150.00,
-      image: '/images/cars/pickup/dmax.png',
-      driver: { name: '', avatar: '' }
-    },
-    {
-      id: 6,
-      name: 'Tata Xenon',
-      type: 'Pickup',
-      transmission: 'Manual',
-      fuel: 'Diesel',
-      price: 180.00,
-      image: '/images/cars/pickup/tata-xenon-south-africa.avif',
-      driver: { name: '', avatar: '' }
-    },
-    {
-      id: 7,
-      name: 'Toyota Hilux',
-      type: 'Pickup',
-      transmission: 'Manual',
-      fuel: 'Diesel',
-      price: 200.00,
-      image: '/images/cars/pickup/hylex.png',
-      driver: { name: '', avatar: '' }
     },
     {
       id: 8,

@@ -67,9 +67,9 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
           <div class="bio-card">
             <h3>Bio</h3>
             <p>
-              I have about 18+ years of experience in heavy vehicle operation and logistics management. 
+              I have about 18+ years of experience in commercial delivery vehicle operation and fleet logistics. 
               12+ years of experience in international long-haul transport across the MENA region. 
-              Most of my past works are mainly in Oil & Gas transport, high-priority cargo delivery...
+              Most of my past works are mainly in corporate transport and high-priority delivery...
               <span class="show-more">Show more</span>
             </p>
             <div class="social-icons">
@@ -130,7 +130,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
               <div class="exp-label">Expertise</div>
               <div class="exp-tags">
                 <span class="tag orange">Logistics</span>
-                <span class="tag blue">Heavy Vehicles</span>
+                <span class="tag blue">Delivery Vehicles</span>
               </div>
             </div>
             <div class="exp-item">
@@ -146,7 +146,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
                 <div class="history-card">
                   <div class="h-icon"><span nz-icon nzType="car"></span></div>
                   <div class="h-info">
-                    <div class="h-title">Tata Xenon (Pickup)</div>
+                    <div class="h-title">VW Caddy (Delivery Van)</div>
                     <div class="h-date">Jan 2023 - Present • 1 yr 4 mos</div>
                   </div>
                   <span class="status-badge active">Current</span>
@@ -154,7 +154,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
                 <div class="history-card">
                   <div class="h-icon"><span nz-icon nzType="car"></span></div>
                   <div class="h-info">
-                    <div class="h-title">Isuzu D-Max (Pickup)</div>
+                    <div class="h-title">Renault Dokker Van (Delivery Van)</div>
                     <div class="h-date">Mar 2020 - Dec 2022 • 2 yrs 10 mos</div>
                   </div>
                 </div>
@@ -290,10 +290,10 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
         <div class="fiche-container">
           <div class="fiche-header">
             <h2>FICHE TECHNIQUE</h2>
-            <h3>TATA XENON PICKUP 2.2L DICOR</h3>
+            <h3>VW CADDY CARGO 2.0 TDI</h3>
             <div class="header-line"></div>
             <div class="fiche-image-container">
-              <img src="/images/cars/pickup/tata-xenon-south-africa.avif" alt="Tata Xenon" (error)="onCarImageError($event)"/>
+              <img src="/images/cars/deliver/caddy.webp" alt="VW Caddy" (error)="onCarImageError($event)"/>
             </div>
           </div>
 
@@ -303,7 +303,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
               <div class="fiche-section">
                 <h4>CARACTÉRISTIQUES</h4>
                 <div class="fiche-row"><span>DISPONIBILITÉ</span><span>Immédiate</span></div>
-                <div class="fiche-row"><span>CARROSSERIE</span><span>Pickup Double Cabine</span></div>
+                <div class="fiche-row"><span>CARROSSERIE</span><span>Fourgonnette</span></div>
                 <div class="fiche-row"><span>GARANTIE</span><span>3 ans ou 100 000 km</span></div>
                 <div class="fiche-row"><span>NOMBRE DE PLACES</span><span>5</span></div>
                 <div class="fiche-row"><span>NOMBRE DE PORTES</span><span>4</span></div>
@@ -313,7 +313,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
                 <h4>TRANSMISSION</h4>
                 <div class="fiche-row"><span>BOÎTE</span><span>Manuelle</span></div>
                 <div class="fiche-row"><span>NOMBRE DE RAPPORTS</span><span>5</span></div>
-                <div class="fiche-row"><span>TRANSMISSION</span><span>4x2 / 4x4</span></div>
+                <div class="fiche-row"><span>TRANSMISSION</span><span>Traction</span></div>
               </div>
             </div>
 
@@ -324,17 +324,17 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
                 <div class="fiche-row"><span>NOMBRE DE CYLINDRES</span><span>4</span></div>
                 <div class="fiche-row"><span>ENERGIE</span><span>Diesel</span></div>
                 <div class="fiche-row"><span>PUISSANCE FISCALE</span><span>8 cv</span></div>
-                <div class="fiche-row"><span>PUISSANCE (CH.DIN)</span><span>140 ch</span></div>
+                <div class="fiche-row"><span>PUISSANCE (CH.DIN)</span><span>102 ch</span></div>
                 <div class="fiche-row"><span>COUPLE</span><span>320 nm 1700 tr/min</span></div>
-                <div class="fiche-row"><span>CYLINDRÉE</span><span>2179 cm³</span></div>
+                <div class="fiche-row"><span>CYLINDRÉE</span><span>1968 cm³</span></div>
               </div>
 
               <div class="fiche-section">
                 <h4>DIMENSIONS</h4>
-                <div class="fiche-row"><span>LONGUEUR</span><span>5125 mm</span></div>
-                <div class="fiche-row"><span>LARGEUR</span><span>1860 mm</span></div>
-                <div class="fiche-row"><span>HAUTEUR</span><span>1765 mm</span></div>
-                <div class="fiche-row"><span>VOLUME DU COFFRE</span><span>N/A</span></div>
+                <div class="fiche-row"><span>LONGUEUR</span><span>4500 mm</span></div>
+                <div class="fiche-row"><span>LARGEUR</span><span>1855 mm</span></div>
+                <div class="fiche-row"><span>HAUTEUR</span><span>1833 mm</span></div>
+                <div class="fiche-row"><span>VOLUME DU COFFRE</span><span>3.1 m³</span></div>
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 interface Car {
   id: number;
   name: string;
-  type: 'DG cars' | 'Pickup' | 'Delivery';
+  type: 'Car' | 'Delivery Car';
   transmission: 'Auto' | 'Manual';
   fuel: 'Diesel' | 'Petrol' | 'Electric';
   image: string;
@@ -26,7 +26,7 @@ interface Car {
       <div class="page-header">
         <div class="header-titles">
           <h1 nz-typography>Request a Vehicle</h1>
-          <p nz-typography class="subtitle">Book a vehicle for company cargo delivery, client visits, or logistics</p>
+          <p nz-typography class="subtitle">Book a vehicle for company deliveries or client visits</p>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ interface Car {
 
                 <div class="form-item span-full">
                   <label class="required-label">Purpose of Request</label>
-                  <textarea class="custom-textarea" placeholder="Describe the cargo, delivery goals, or dispatch reason..." [(ngModel)]="bookingData.purpose" rows="3"></textarea>
+                  <textarea class="custom-textarea" placeholder="Describe the delivery goals or dispatch reason..." [(ngModel)]="bookingData.purpose" rows="3"></textarea>
                 </div>
               </div>
             </div>
@@ -979,7 +979,7 @@ export class RequestCarComponent {
   currentStep = 1;
   bookingSubmitted = false;
   bookingRefId = '';
-  selectedCategory = 'DG cars';
+  selectedCategory = 'Car';
 
   bookingData: {
     name: string;
@@ -1008,24 +1008,21 @@ export class RequestCarComponent {
   };
 
   categories = [
-    { label: 'DG Cars', value: 'DG cars', icon: 'car' },
-    { label: 'Pickups', value: 'Pickup', icon: 'audit' },
-    { label: 'Delivery Vans', value: 'Delivery', icon: 'shop' }
+    { label: 'Cars', value: 'Car', icon: 'car' },
+    { label: 'Delivery Vans', value: 'Delivery Car', icon: 'shop' }
   ];
 
   cars: Car[] = [
-    { id: 1, name: 'Blue Audi (PSD)', type: 'DG cars', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/DGcars/a5 audi.png' },
-    { id: 2, name: 'Bentley Bentayga', type: 'DG cars', transmission: 'Auto', fuel: 'Petrol', image: '/images/cars/DGcars/bdw.avif' },
-    { id: 3, name: 'Porsche Taycan', type: 'DG cars', transmission: 'Auto', fuel: 'Electric', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif' },
-    { id: 4, name: 'Mercedes J Class', type: 'DG cars', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/DGcars/jclass.png' },
-    { id: 5, name: 'Isuzu D-Max', type: 'Pickup', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/pickup/dmax.png' },
-    { id: 6, name: 'Tata Xenon Pickup', type: 'Pickup', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/pickup/tata-xenon-south-africa.avif' },
-    { id: 7, name: 'Toyota Hilux 4x4', type: 'Pickup', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/pickup/hylex.png' },
-    { id: 8, name: 'VW Caddy Cargo', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/caddy.webp' },
-    { id: 9, name: 'Renault Dokker Van', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/docker.webp' },
-    { id: 10, name: 'Peugeot Partner', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partiner.webp' },
-    { id: 11, name: 'Peugeot Partner Pro', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partnier.avif' }
+    { id: 1, name: 'Blue Audi (PSD)', type: 'Car', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/DGcars/a5 audi.png' },
+    { id: 2, name: 'Bentley Bentayga', type: 'Car', transmission: 'Auto', fuel: 'Petrol', image: '/images/cars/DGcars/bdw.avif' },
+    { id: 3, name: 'Porsche Taycan', type: 'Car', transmission: 'Auto', fuel: 'Electric', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif' },
+    { id: 4, name: 'Mercedes E Class', type: 'Car', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/DGcars/jclass.png' },
+    { id: 8, name: 'VW Caddy Cargo', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/caddy.webp' },
+    { id: 9, name: 'Renault Dokker Van', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/docker.webp' },
+    { id: 10, name: 'Peugeot Partner', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partiner.webp' },
+    { id: 11, name: 'Peugeot Partner Pro', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partnier.avif' }
   ];
+
 
   filteredCars: Car[] = [];
 
@@ -1115,7 +1112,7 @@ export class RequestCarComponent {
       departureTime: '',
       arrivalTime: ''
     };
-    this.selectedCategory = 'DG cars';
+    this.selectedCategory = 'Car';
     this.filterCars();
   }
 }
