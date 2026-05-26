@@ -22,7 +22,7 @@
 ## 🛠️ Upcoming Enhancements (Ideas to Discuss)
 | Feature | Description | Priority | Owner | Status |
 |---------|-------------|----------|-------|--------|
-| **User Authentication** | Add OAuth2 / SSO, role‑based access control. | High | — | Not Started |
+| **User Authentication** | Add OAuth2 / SSO, role‑based access control. | High | — | Partial (UI Implemented) |
 | **Print Request** | Ability to print a nicely formatted request‑car page. | Medium | — | Completed |
 | **Driver License & VIP Card** | Toggle options for driver profile (license present, VIP card). | Medium | — | Partial |
 | **Dynamic Pricing (future)** | If pricing ever needed, integrate a configurable Pricing Service. | Low | — | Not Started |

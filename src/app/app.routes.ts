@@ -4,13 +4,17 @@ import { MainLayoutComponent } from './core/components/layout/main-layout.compon
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: '',
     component: MainLayoutComponent,
     children: [
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      },
       {
         path: 'listing',
         loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent)

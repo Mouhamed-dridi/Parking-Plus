@@ -1,0 +1,62 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-section">
+      <div class="logo-icon">P</div>
+      <h2>ParkingPlus</h2>
+    </div>
+
+    <div class="header-section">
+      <h3>Sign in to your account</h3>
+      <p>Welcome back! Please enter your details.</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          placeholder="Enter your email" 
+          [(ngModel)]="email" 
+          required 
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input-wrapper">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            name="password"
+            placeholder="••••••••" 
+            [(ngModel)]="password" 
+            required 
+            autocomplete="current-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            <span nz-icon [nzType]="showPassword ? 'eye-invisible' : 'eye'" nzTheme="outline"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-actions-row">
+        <label nz-checkbox [(ngModel)]="rememberMe" name="rememberMe" class="custom-checkbox">
+          Remember for 30 days
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="submit-btn" [class.loading]="isLoading" [disabled]="isLoading || !email || !password">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading" nz-icon nzType="loading" nzTheme="outline"></span>
+      </button>
+    </form>
+
+    <div class="footer-section">
+      <p>Don't have an account? <a href="#">Sign up</a></p>
+    </div>
+  </div>
+</div>

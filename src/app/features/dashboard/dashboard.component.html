@@ -1,0 +1,124 @@
+<div class="db">
+  <div class="db-header">
+    <div>
+      <h1 class="db-title">Dashboard</h1>
+      <p class="db-subtitle">Your fleet overview at a glance</p>
+    </div>
+    <div class="db-actions">
+      <div class="date-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        May 1 — May 30, 2026
+      </div>
+      <button class="btn-primary">Export</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card" *ngFor="let k of kpis">
+      <div class="kpi-icon" [style.background]="k.color + '15'" [style.color]="k.color">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <ng-container [ngSwitch]="k.icon">
+            <ng-container *ngSwitchCase="'car'"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></ng-container>
+            <ng-container *ngSwitchCase="'users'"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></ng-container>
+            <ng-container *ngSwitchCase="'parking'"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></ng-container>
+            <ng-container *ngSwitchCase="'clock'"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></ng-container>
+          </ng-container>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-label">{{ k.label }}</span>
+        <span class="kpi-value">{{ k.value }}</span>
+        <span class="kpi-change" [class.up]="k.up">{{ k.change }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2col">
+    <div class="card">
+      <div class="card-h">
+        <h3>Fleet Activity</h3>
+        <span class="card-badge">Monthly</span>
+      </div>
+      <div class="chart-legend-row">
+        <span class="legend-dot" *ngFor="let l of [
+          {label:'Dispatches',color:'#6366F1',key:'dispatch'},
+          {label:'Parking Occupancy',color:'#F59E0B',key:'occupancy'},
+          {label:'Driver Availability',color:'#10B981',key:'drivers'}
+        ]" (mouseenter)="activeLegend = l.key" (mouseleave)="activeLegend = ''" [class.active]="activeLegend === l.key">
+          <span class="dot" [style.background]="l.color"></span>
+          {{ l.label }}
+        </span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg viewBox="0 0 600 240" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible">
+          <line *ngFor="let y of [40,80,120,160,200]" [attr.y1]="y" [attr.y2]="y" x1="40" x2="580" stroke="#F3F4F6"/>
+          <text x="30" y="44" text-anchor="end" class="axis-lbl">80</text>
+          <text x="30" y="84" text-anchor="end" class="axis-lbl">60</text>
+          <text x="30" y="124" text-anchor="end" class="axis-lbl">40</text>
+          <text x="30" y="164" text-anchor="end" class="axis-lbl">20</text>
+          <text x="30" y="204" text-anchor="end" class="axis-lbl">0</text>
+          <rect *ngFor="let b of barData; let i = index" [attr.x]="50 + i*44" [attr.y]="200 - b" width="20" [attr.height]="b" fill="#6366F1" rx="4" [attr.opacity]="!activeLegend || activeLegend === 'dispatch' ? 0.8 : 0.1"/>
+          <path [attr.d]="occLinePath" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" [attr.opacity]="!activeLegend || activeLegend === 'occupancy' ? 1 : 0.1"/>
+          <path [attr.d]="drvLinePath" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" [attr.opacity]="!activeLegend || activeLegend === 'drivers' ? 1 : 0.1"/>
+          <text *ngFor="let m of months; let i = index" [attr.x]="60 + i*44" y="225" text-anchor="middle" class="axis-lbl" style="font-size:9px">{{ m }}</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Fleet by Category</h3><span class="card-badge">View all</span></div>
+      <div class="cat-list">
+        <div class="cat-item" *ngFor="let c of fleetData">
+          <div class="cat-top"><span>{{ c.label }}</span><span class="cat-count">{{ c.count }}</span></div>
+          <div class="bar-track"><div class="bar-fill" [style.width.%]="c.pct" [style.background]="c.color"></div></div>
+        </div>
+      </div>
+      <div class="util-box">
+        <div class="util-h">Fleet Utilization</div>
+        <div class="util-val">1,350 <span>hrs</span></div>
+        <div class="util-change">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          0.25% from last month
+        </div>
+        <div class="mini-sparkline">
+          <svg viewBox="0 0 300 50" preserveAspectRatio="none" style="width:100%;height:50px">
+            <path d="M0,40 C30,32 60,8 90,16 C120,24 150,4 180,12 C210,20 240,32 270,24 C285,20 300,28 300,28 L300,50 L0,50 Z" fill="#EEF2FF"/>
+            <path d="M0,40 C30,32 60,8 90,16 C120,24 150,4 180,12 C210,20 240,32 270,24 C285,20 300,28 300,28" fill="none" stroke="#6366F1" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2col">
+    <div class="card">
+      <div class="card-h"><h3>Parking Occupancy</h3></div>
+      <div class="occ-body">
+        <div class="donut-wrap">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#F3F4F6" stroke-width="10"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="10" stroke-dasharray="251.2" stroke-dashoffset="100.5" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="donut-text"><span class="donut-pct">60%</span><span class="donut-lbl">Occupied</span></div>
+        </div>
+        <div class="occ-details">
+          <div class="occ-row"><span class="occ-color" style="background:#6366F1"></span><span>Occupied</span><span class="occ-val">6 spots</span></div>
+          <div class="occ-row"><span class="occ-color" style="background:#F3F4F6"></span><span>Available</span><span class="occ-val">4 spots</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Recent Activity</h3></div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let a of recentActivity">
+          <div class="activity-dot"></div>
+          <div class="activity-body">
+            <span class="activity-action">{{ a.action }}</span>
+            <span class="activity-meta">{{ a.vehicle }} · {{ a.time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
