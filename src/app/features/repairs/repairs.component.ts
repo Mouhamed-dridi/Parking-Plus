@@ -220,6 +220,12 @@ interface Repair {
               </nz-select>
             </div>
             <div class="form-group">
+              <label>Driver</label>
+              <nz-select [(ngModel)]="newFix.driverId" nzPlaceHolder="Select driver" style="width:100%;">
+                <nz-option *ngFor="let d of driverOptions" [nzLabel]="d.label" [nzValue]="d.id"></nz-option>
+              </nz-select>
+            </div>
+            <div class="form-group">
               <label>Urgency <span class="req">*</span></label>
               <nz-select [(ngModel)]="newFix.priority" nzPlaceHolder="Select priority" style="width:100%;">
                 <nz-option nzLabel="High - Critical" nzValue="High"></nz-option>
@@ -771,6 +777,7 @@ export class RepairsComponent {
 
   newFix = {
     carId: '',
+    driverId: '',
     priority: '',
     reactionType: '',
     provider: '',
@@ -778,6 +785,17 @@ export class RepairsComponent {
   };
 
   selectedFiles: File[] = [];
+
+  driverOptions = [
+    { id: 'd1', label: 'Ahmed Sayeb' },
+    { id: 'd2', label: 'Karim Lazrak' },
+    { id: 'd3', label: 'Sami Bouzid' },
+    { id: 'd4', label: 'Yassin Fikri' },
+    { id: 'd5', label: 'Mehdi Benali' },
+    { id: 'd6', label: 'Omar El Fassi' },
+    { id: 'd7', label: 'Hicham Bennis' },
+    { id: 'd8', label: 'Nabil El Khayat' },
+  ];
 
   carOptions = [
     { id: '1', label: 'Toyota Camry LE - 1234 ABC' },
@@ -928,7 +946,7 @@ export class RepairsComponent {
 
     this.repairs.unshift(newRepair);
     this.showReportModal = false;
-    this.newFix = { carId: '', priority: '', reactionType: '', provider: '', issue: '' };
+    this.newFix = { carId: '', driverId: '', priority: '', reactionType: '', provider: '', issue: '' };
     this.selectedFiles = [];
   }
 }
