@@ -230,23 +230,18 @@ interface Repair {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Repair Type <span class="req">*</span></label>
-              <nz-select [(ngModel)]="newFix.repairType" nzPlaceHolder="Select type" style="width:100%;">
-                <nz-option nzLabel="Mechanical" nzValue="Mechanical"></nz-option>
-                <nz-option nzLabel="Electrical" nzValue="Electrical"></nz-option>
-                <nz-option nzLabel="Body Damage" nzValue="Body Damage"></nz-option>
-                <nz-option nzLabel="Tire" nzValue="Tire"></nz-option>
-                <nz-option nzLabel="Other" nzValue="Other"></nz-option>
+              <label>Reaction Type <span class="req">*</span></label>
+              <nz-select [(ngModel)]="newFix.reactionType" nzPlaceHolder="Select problem type" style="width:100%;">
+                <nz-option nzLabel="Problem Engine" nzValue="Problem Engine"></nz-option>
+                <nz-option nzLabel="Problem in System" nzValue="Problem in System"></nz-option>
+                <nz-option nzLabel="Change Tire (Pneu)" nzValue="Change Tire (Pneu)"></nz-option>
+                <nz-option nzLabel="Problem with Equipment" nzValue="Problem with Equipment"></nz-option>
+                <nz-option nzLabel="Other issues" nzValue="Other issues"></nz-option>
               </nz-select>
             </div>
             <div class="form-group">
-              <label>Assigned Garage</label>
-              <nz-select [(ngModel)]="newFix.garage" nzPlaceHolder="Select garage" style="width:100%;">
-                <nz-option nzLabel="AutoPro Main" nzValue="AutoPro Main"></nz-option>
-                <nz-option nzLabel="SpeedFix Center" nzValue="SpeedFix Center"></nz-option>
-                <nz-option nzLabel="Elite Garage" nzValue="Elite Garage"></nz-option>
-                <nz-option nzLabel="City Motors" nzValue="City Motors"></nz-option>
-              </nz-select>
+              <label>Provider / Support</label>
+              <input nz-input [(ngModel)]="newFix.provider" placeholder="Type provider or support name" />
             </div>
           </div>
           <div class="form-group">
@@ -255,10 +250,18 @@ interface Repair {
           </div>
           <div class="form-group">
             <label>Photos / Attachments</label>
-            <div class="upload-area" (click)="triggerUpload()">
-              <span nz-icon nzType="camera" nzTheme="outline" class="upload-icon"></span>
-              <span class="upload-text">Click to upload photos or drag & drop</span>
-              <span class="upload-hint">PNG, JPG up to 10MB</span>
+            <div class="upload-area" (click)="fileInput.click()">
+              <input #fileInput type="file" multiple accept="image/*,.pdf,.doc,.docx" style="display:none" (change)="onFilesSelected($event)" />
+              <span nz-icon nzType="paper-clip" nzTheme="outline" class="upload-icon"></span>
+              <span class="upload-text">Click to upload photos & documents</span>
+              <span class="upload-hint">Images (PNG, JPG) &amp; Documents (PDF, DOC) up to 10MB</span>
+              <div class="file-list" *ngIf="selectedFiles.length > 0">
+                <div class="file-chip" *ngFor="let f of selectedFiles">
+                  <span nz-icon [nzType]="getFileIcon(f.name)" nzTheme="outline"></span>
+                  <span class="file-name">{{ f.name }}</span>
+                  <span class="file-size">{{ (f.size / 1024).toFixed(0) }} KB</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -721,6 +724,13 @@ interface Repair {
     .upload-icon { font-size: 28px; color: #9ca3af; }
     .upload-text { font-size: 14px; color: #6b7280; font-weight: 500; }
     .upload-hint { font-size: 12px; color: #9ca3af; }
+    .file-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; width: 100%; }
+    .file-chip {
+      display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+      background: #f1f5f9; border-radius: 8px; font-size: 12px; color: #374151;
+    }
+    .file-name { font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-size { color: #9ca3af; font-size: 11px; }
 
     .modal-footer {
       display: flex;
@@ -762,10 +772,12 @@ export class RepairsComponent {
   newFix = {
     carId: '',
     priority: '',
-    repairType: '',
-    garage: '',
+    reactionType: '',
+    provider: '',
     issue: ''
   };
+
+  selectedFiles: File[] = [];
 
   carOptions = [
     { id: '1', label: 'Toyota Camry LE - 1234 ABC' },
@@ -866,12 +878,23 @@ export class RepairsComponent {
     alert('Exporting repair list as CSV...');
   }
 
-  triggerUpload(): void {
-    alert('File upload dialog would open here');
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.selectedFiles = Array.from(input.files);
+    }
+  }
+
+  getFileIcon(name: string): string {
+    const ext = name.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return 'file-pdf';
+    if (['doc', 'docx'].includes(ext || '')) return 'file-text';
+    if (['png', 'jpg', 'jpeg', 'webp', 'avif'].includes(ext || '')) return 'file-image';
+    return 'paper-clip';
   }
 
   isFormValid(): boolean {
-    return !!(this.newFix.carId && this.newFix.priority && this.newFix.repairType && this.newFix.issue);
+    return !!(this.newFix.carId && this.newFix.priority && this.newFix.reactionType && this.newFix.issue);
   }
 
   formatCost(n: number): string {
@@ -892,12 +915,12 @@ export class RepairsComponent {
       year: 2024,
       image: '',
       issue: this.newFix.issue,
-      repairType: this.newFix.repairType,
+      repairType: this.newFix.reactionType,
       status: 'Waiting',
       reportedDate: new Date().toISOString().slice(0, 10),
       startDate: '',
       expectedDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
-      garage: this.newFix.garage || 'TBD',
+      garage: this.newFix.provider || 'TBD',
       technician: 'Unassigned',
       estimatedCost: 0,
       priority: this.newFix.priority as 'High' | 'Medium' | 'Low',
@@ -905,6 +928,7 @@ export class RepairsComponent {
 
     this.repairs.unshift(newRepair);
     this.showReportModal = false;
-    this.newFix = { carId: '', priority: '', repairType: '', garage: '', issue: '' };
+    this.newFix = { carId: '', priority: '', reactionType: '', provider: '', issue: '' };
+    this.selectedFiles = [];
   }
 }

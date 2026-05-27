@@ -21,10 +21,16 @@ import { CarService, CarDetail } from '../../core/services/car.service';
         <h1 nz-typography>Listing</h1>
         <p nz-typography class="subtitle">Get you latest update for the last 7 days</p>
       </div>
-      <button nz-button nzType="primary" class="add-btn" (click)="showAddModal = true">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Add Car
-      </button>
+      <div class="header-actions">
+        <button nz-button nzType="default" class="report-btn" (click)="goToRepairs()">
+          <span nz-icon nzType="warning" nzTheme="outline"></span>
+          Report a Problem
+        </button>
+        <button nz-button nzType="primary" class="add-btn" (click)="showAddModal = true">
+          <span nz-icon nzType="plus" nzTheme="outline"></span>
+          Add Car
+        </button>
+      </div>
     </div>
 
     <div class="listing-content">
@@ -139,6 +145,24 @@ import { CarService, CarDetail } from '../../core/services/car.service';
       font-size: 14px;
     }
 
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .report-btn {
+      border-radius: 8px;
+      height: 40px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+    .report-btn:hover {
+      color: #b91c1c !important;
+      border-color: #f87171 !important;
+    }
     .add-btn {
       background-color: #6366f1;
       border-color: #6366f1;
@@ -359,6 +383,10 @@ export class ListingComponent implements OnInit {
         this.cars = this.allCars;
       }
     });
+  }
+
+  goToRepairs(): void {
+    this.router.navigate(['/repairs']);
   }
 
   viewCar(id: number): void {

@@ -7,12 +7,13 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="gps-container">
-      <div class="map-area">
-        <img src="/images/gps/mapX.png" class="map-img" />
+      <div class="map-area" (wheel)="onWheel($event)">
+        <img src="/images/gps/mapX.png" class="map-img" [style.transform]="'scale(' + zoom + ')'" />
+        <div class="zoom-indicator">{{ zoom | number:'1.1-1' }}x</div>
         <div class="map-controls">
-          <button><i class="fa-solid fa-plus"></i></button>
-          <button><i class="fa-solid fa-minus"></i></button>
-          <button><i class="fa-solid fa-expand"></i></button>
+          <button (click)="zoomIn()"><i class="fa-solid fa-plus"></i></button>
+          <button (click)="zoomOut()"><i class="fa-solid fa-minus"></i></button>
+          <button (click)="resetZoom()"><i class="fa-solid fa-expand"></i></button>
         </div>
       </div>
       <div class="info-bar">
@@ -61,6 +62,21 @@ import { CommonModule } from '@angular/common';
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform-origin: center center;
+      transition: transform 0.15s ease;
+    }
+    .zoom-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      pointer-events: none;
+      user-select: none;
     }
     .map-controls {
       position: absolute;
@@ -120,4 +136,27 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class GpsComponent {}
+export class GpsComponent {
+  zoom = 1;
+  private readonly minZoom = 0.5;
+  private readonly maxZoom = 5;
+  private readonly step = 0.25;
+
+  zoomIn() {
+    this.zoom = Math.min(this.maxZoom, +(this.zoom + this.step).toFixed(2));
+  }
+
+  zoomOut() {
+    this.zoom = Math.max(this.minZoom, +(this.zoom - this.step).toFixed(2));
+  }
+
+  resetZoom() {
+    this.zoom = 1;
+  }
+
+  onWheel(e: WheelEvent) {
+    e.preventDefault();
+    if (e.deltaY < 0) this.zoomIn();
+    else this.zoomOut();
+  }
+}
