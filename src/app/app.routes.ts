@@ -20,6 +20,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent)
       },
       {
+        path: 'listing/:id',
+        loadComponent: () => import('./features/car-details/car-details.component').then(m => m.CarDetailsComponent)
+      },
+      {
         path: 'drivers',
         loadComponent: () => import('./features/drivers/drivers.component').then(m => m.DriversComponent)
       },
@@ -38,6 +42,18 @@ export const routes: Routes = [
       {
         path: 'request-car',
         loadComponent: () => import('./features/request-car/request-car.component').then(m => m.RequestCarComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'reports',
+        loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent)
+      },
+      {
+        path: 'repairs',
+        loadComponent: () => import('./features/repairs/repairs.component').then(m => m.RepairsComponent)
       },
       {
         path: 'dashboard',

@@ -55,7 +55,7 @@ interface VipCar {
           <span nz-icon nzType="calendar" nzTheme="outline"></span>
           <span *ngIf="!isCollapsed">Booking Car Request</span>
         </li>
-        <li nz-menu-item nzMatchRouter>
+        <li nz-menu-item nzMatchRouter routerLink="/repairs">
           <span nz-icon nzType="tool" nzTheme="outline"></span>
           <span *ngIf="!isCollapsed">Maintenance</span>
         </li>
@@ -65,11 +65,11 @@ interface VipCar {
     <div class="menu-section">
       <span class="menu-label" *ngIf="!isCollapsed">System</span>
       <ul nz-menu nzMode="inline" [nzTheme]="'light'" [nzSelectable]="true">
-        <li nz-menu-item nzMatchRouter>
+        <li nz-menu-item nzMatchRouter routerLink="/reports">
           <span nz-icon nzType="file-text" nzTheme="outline"></span>
           <span *ngIf="!isCollapsed">Reports</span>
         </li>
-        <li nz-menu-item nzMatchRouter>
+        <li nz-menu-item nzMatchRouter routerLink="/settings">
           <span nz-icon nzType="setting" nzTheme="outline"></span>
           <span *ngIf="!isCollapsed">Settings</span>
         </li>
