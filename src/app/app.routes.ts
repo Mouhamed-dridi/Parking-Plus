@@ -32,14 +32,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/driver-profile/driver-profile.component').then(m => m.DriverProfileComponent)
       },
       {
-        path: 'parking-state',
-        loadComponent: () => import('./features/parking-state/parking-state.component').then(m => m.ParkingStateComponent)
-      },
-      {
-        path: 'gps',
-        loadComponent: () => import('./features/gps/gps.component').then(m => m.GpsComponent)
-      },
-      {
         path: 'request-car',
         loadComponent: () => import('./features/request-car/request-car.component').then(m => m.RequestCarComponent)
       },

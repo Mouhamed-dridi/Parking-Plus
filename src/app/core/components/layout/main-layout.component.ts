@@ -11,7 +11,6 @@ import { HeaderComponent } from '../header/header.component';
   imports: [CommonModule, RouterModule, NzLayoutModule, SidebarComponent, HeaderComponent],
   template: `
     <nz-layout class="app-layout">
-      <!-- Sidebar -->
       <nz-sider
         class="menu-sidebar"
         nzCollapsible
@@ -23,17 +22,11 @@ import { HeaderComponent } from '../header/header.component';
         <app-sidebar [isCollapsed]="isCollapsed"></app-sidebar>
       </nz-sider>
 
-      <!-- Main Content Area -->
       <nz-layout>
-        <!-- Header -->
         <nz-header>
-          <app-header 
-            [isCollapsed]="isCollapsed" 
-            (toggle)="isCollapsed = !isCollapsed">
-          </app-header>
+          <app-header [isCollapsed]="isCollapsed" (toggle)="isCollapsed = !isCollapsed"></app-header>
         </nz-header>
 
-        <!-- Dynamic Content -->
         <nz-content>
           <div class="inner-content">
             <router-outlet></router-outlet>
@@ -48,28 +41,33 @@ import { HeaderComponent } from '../header/header.component';
     }
 
     .menu-sidebar {
-      background: white;
-      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+      background: var(--bg-surface) !important;
+      box-shadow: 1px 0 0 var(--border-muted);
       z-index: 10;
     }
 
     nz-header {
-      background: white;
+      background: var(--bg-surface) !important;
       padding: 0 24px;
-      height: 72px;
-      line-height: 72px;
-      border-bottom: 1px solid var(--border-color);
+      height: 64px;
+      line-height: 64px;
+      border-bottom: 1px solid var(--border-muted);
       z-index: 9;
     }
 
     nz-content {
-      background: var(--bg-color);
-      margin: 24px;
+      background: var(--bg-base);
+      margin: 0;
+      padding: 24px;
       overflow-y: auto;
     }
 
     .inner-content {
-      min-height: calc(100vh - 120px);
+      min-height: calc(100vh - 112px);
+    }
+
+    ::ng-deep .ant-layout-sider-zero-width-trigger {
+      display: none;
     }
   `]
 })

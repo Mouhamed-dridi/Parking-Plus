@@ -1,8 +1,13 @@
 <div class="login-container">
+  <div class="bg-mesh"></div>
+
   <div class="login-card">
     <div class="logo-section">
-      <div class="logo-icon">P</div>
-      <h2>ParkingPlus</h2>
+      <div class="logo-icon">
+        <span nz-icon nzType="car" nzTheme="outline"></span>
+      </div>
+      <h2>ParkPlus</h2>
+      <p class="logo-tagline">Parking Management Platform</p>
     </div>
 
     <div class="error-banner" *ngIf="errorMessage">
@@ -44,6 +49,8 @@
         <span *ngIf="!isLoading">Sign In</span>
         <span *ngIf="isLoading" nz-icon nzType="loading" nzTheme="outline"></span>
       </button>
+
+      <p class="form-hint">Demo: admin / admin</p>
     </form>
   </div>
 </div>

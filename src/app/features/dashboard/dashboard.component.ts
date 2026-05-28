@@ -266,7 +266,7 @@ interface Region {
         <div class="card">
           <div class="card-header-row">
             <h3 class="card-title">Parking Slots</h3>
-            <a class="view-all" routerLink="/parking-state">View All ▾</a>
+            <span class="view-all" style="color:var(--text-muted);font-size:12px;">Recent</span>
           </div>
           <div class="slots-grid">
             <div class="slot-item" *ngFor="let s of parkingSlots" [class.slot-occupied]="s.status === 'occupied'" [class.slot-available]="s.status === 'available'" [class.slot-ai]="s.status === 'ai-suggested'" [title]="s.vehicle || 'Available'">
