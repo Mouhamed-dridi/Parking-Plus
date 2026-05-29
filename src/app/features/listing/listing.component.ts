@@ -34,7 +34,7 @@ import { CarService, CarDetail } from '../../core/services/car.service';
     </div>
 
     <div class="listing-content">
-      <div class="section-header">
+      <div class="section-header" *ngIf="!isUsedCarPage">
         <h2 nz-typography>Available Cars</h2>
         <button nz-button nzType="default" class="filter-btn">
           <span nz-icon nzType="filter" nzTheme="outline"></span>
@@ -42,12 +42,27 @@ import { CarService, CarDetail } from '../../core/services/car.service';
         </button>
       </div>
 
-      <div nz-row [nzGutter]="[24, 24]" class="car-grid" *ngIf="cars.length > 0">
+      <div class="section-header" *ngIf="isUsedCarPage">
+        <h2 nz-typography>Used Cars</h2>
+        <button nz-button nzType="default" class="filter-btn">
+          <span nz-icon nzType="filter" nzTheme="outline"></span>
+          Filter by
+        </button>
+      </div>
+
+      <div nz-row [nzGutter]="[24, 24]" class="car-grid" *ngIf="!isUsedCarPage && cars.length > 0">
         <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12" nzXl="12" *ngFor="let car of cars" class="car-col" (click)="viewCar(car.id)">
           <app-car-card [car]="car"></app-car-card>
         </div>
       </div>
-      <div class="empty-state" *ngIf="cars.length === 0">
+
+      <div nz-row [nzGutter]="[24, 24]" class="car-grid" *ngIf="isUsedCarPage">
+        <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12" nzXl="12" *ngFor="let car of usedCars" class="car-col" (click)="viewCar(car.id)">
+          <app-car-card [car]="car"></app-car-card>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isUsedCarPage && cars.length === 0">
         <span nz-icon nzType="car" nzTheme="outline" class="empty-icon"></span>
         <p>No cars in this category yet.</p>
         <button nz-button nzType="primary" (click)="showAddModal = true">Add the first car</button>
@@ -360,6 +375,8 @@ export class ListingComponent implements OnInit {
   private carService = inject(CarService);
 
   cars: CarDetail[] = [];
+  usedCars: CarDetail[] = [];
+  isUsedCarPage = false;
   showAddModal = false;
   imagePreview: string | null = null;
 
@@ -375,14 +392,68 @@ export class ListingComponent implements OnInit {
 
   ngOnInit() {
     this.allCars = this.carService.getCars();
-    this.route.queryParams.subscribe(params => {
-      const category = params['category'];
-      if (category) {
-        this.cars = this.allCars.filter(c => c.type.toLowerCase() === category.toLowerCase());
-      } else {
-        this.cars = this.allCars;
+    const vehicleType = this.route.snapshot.data['vehicleType'] as string | undefined;
+    if (vehicleType === 'Used') {
+      this.isUsedCarPage = true;
+      this.usedCars = this.getUsedCars();
+    } else if (vehicleType) {
+      this.cars = this.allCars.filter(c => c.type?.toLowerCase() === vehicleType.toLowerCase());
+    } else {
+      this.cars = this.allCars;
+    }
+  }
+
+  getUsedCars(): CarDetail[] {
+    return [
+      {
+        id: 101,
+        name: 'Hyundai Elantra 2022',
+        type: 'Used',
+        transmission: 'Auto',
+        fuel: 'Petrol',
+        price: 18500,
+        status: 'Free',
+        image: '/images/cars/usedfor_cars/hyd.jpg',
+        driver: { name: '', avatar: '' },
+        specs: this.carService.defaultSpecs('Hyundai Elantra', '45000 KM', '2022', 'Petrol', 'Tunis', 'Auto', 'Used')
+      },
+      {
+        id: 102,
+        name: 'Kia Sportage 2023',
+        type: 'Used',
+        transmission: 'Auto',
+        fuel: 'Diesel',
+        price: 24000,
+        status: 'Free',
+        image: '/images/cars/usedfor_cars/kia.png',
+        driver: { name: '', avatar: '' },
+        specs: this.carService.defaultSpecs('Kia Sportage', '30000 KM', '2023', 'Diesel', 'Sfax', 'Auto', 'Used')
+      },
+      {
+        id: 103,
+        name: 'VW Passat 2021',
+        type: 'Used',
+        transmission: 'Auto',
+        fuel: 'Diesel',
+        price: 21000,
+        status: 'Free',
+        image: '/images/cars/usedfor_cars/passat.avif',
+        driver: { name: '', avatar: '' },
+        specs: this.carService.defaultSpecs('VW Passat', '55000 KM', '2021', 'Diesel', 'Sousse', 'Auto', 'Used')
+      },
+      {
+        id: 104,
+        name: 'Skoda Octavia 2022',
+        type: 'Used',
+        transmission: 'Manual',
+        fuel: 'Petrol',
+        price: 16500,
+        status: 'Free',
+        image: '/images/cars/usedfor_cars/skoda.webp',
+        driver: { name: '', avatar: '' },
+        specs: this.carService.defaultSpecs('Skoda Octavia', '40000 KM', '2022', 'Petrol', 'Nabeul', 'Manual', 'Used')
       }
-    });
+    ];
   }
 
   goToRepairs(): void {
@@ -423,6 +494,7 @@ export class ListingComponent implements OnInit {
       transmission: this.newCar.transmission,
       fuel: this.newCar.fuel,
       price: 0,
+      status: 'Free',
       image: this.imagePreview || '/images/cars/default-car.png',
       driver: { name: this.newCar.driverName || '', avatar: '' },
       specs: this.carService.defaultSpecs(this.newCar.name, '-', '2025', this.newCar.fuel, '-', this.newCar.transmission, this.newCar.type)

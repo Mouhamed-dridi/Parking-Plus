@@ -1,149 +1,117 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+
+interface MenuItem {
+  label: string;
+  icon: string;
+  route?: string;
+  children?: { label: string; icon: string; route: string }[];
+}
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, NzLayoutModule, NzMenuModule, NzIconModule],
+  imports: [CommonModule, RouterModule, NzIconModule],
   template: `
-    <div class="sidebar-inner">
-      <div class="logo">
-        <div class="logo-icon">
-          <span nz-icon nzType="car" nzTheme="outline"></span>
+    <div class="sidebar h-full bg-white border-r border-[#e0e0e0] flex flex-col select-none">
+      <!-- Logo -->
+      <div class="h-14 flex items-center gap-3 px-4 border-b border-[#e0e0e0]">
+        <div class="w-8 h-8 bg-[#1a73e8] text-white flex items-center justify-center text-sm font-bold rounded-sm">
+          P
         </div>
-        <h2 *ngIf="!isCollapsed">ParkPlus</h2>
+        <h2 *ngIf="!isCollapsed" class="text-[15px] font-semibold text-[#202124] m-0 tracking-tight">ParkPlus</h2>
       </div>
 
-      <div class="menu-section">
-        <span class="menu-label" *ngIf="!isCollapsed">Menu</span>
-        <ul nz-menu nzMode="inline" [nzTheme]="'light'" [nzSelectable]="true">
-          <li nz-menu-item nzMatchRouter routerLink="/dashboard">
-            <span nz-icon nzType="appstore" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Dashboard</span>
-          </li>
-          <li nz-submenu nzTitle="Cars / Vehicles" nzIcon="car" nzOpen>
-            <ul>
-              <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'car'}"><span nz-icon nzType="car" nzTheme="outline"></span> Cars</li>
-              <li nz-menu-item nzMatchRouter routerLink="/listing" [queryParams]="{category: 'delivery'}"><span nz-icon nzType="shopping-cart" nzTheme="outline"></span> Delivery</li>
-            </ul>
-          </li>
-
-          <li nz-menu-item nzMatchRouter routerLink="/drivers">
-            <span nz-icon nzType="idcard" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Drivers</span>
-          </li>
-          <li nz-menu-item nzMatchRouter routerLink="/request-car">
-            <span nz-icon nzType="calendar" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Booking</span>
-          </li>
-          <li nz-menu-item nzMatchRouter routerLink="/repairs">
-            <span nz-icon nzType="tool" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Maintenance</span>
-          </li>
-        </ul>
+      <!-- Section: Menu -->
+      <div class="py-2" *ngIf="!isCollapsed">
+        <div class="text-[11px] font-bold text-[#5f6368] uppercase tracking-[0.05em] px-4 py-2">Menu</div>
+        <div *ngFor="let item of menuItems" class="flex flex-col">
+          <a *ngIf="!item.children"
+             [routerLink]="item.route"
+             routerLinkActive="active-nav"
+             #rla="routerLinkActive"
+             [class.active-nav]="rla.isActive"
+             class="flex items-center h-10 px-4 gap-3 text-[13px] text-[#5f6368] hover:bg-[#f1f3f4] cursor-pointer no-underline transition-colors relative">
+            <span class="flex items-center justify-center w-5 h-5 flex-shrink-0">
+              <span nz-icon [nzType]="item.icon" nzTheme="outline" class="text-[16px]"></span>
+            </span>
+            <span class="flex-1 truncate">{{ item.label }}</span>
+          </a>
+          <!-- Submenu item -->
+          <div *ngIf="item.children">
+            <div class="flex items-center h-10 px-4 gap-3 text-[13px] text-[#5f6368] cursor-default">
+              <span class="flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <span nz-icon [nzType]="item.icon" nzTheme="outline" class="text-[16px]"></span>
+              </span>
+              <span class="flex-1 truncate">{{ item.label }}</span>
+              <span nz-icon nzType="chevron-down" nzTheme="outline" class="text-[12px] text-[#9aa0a6]"></span>
+            </div>
+            <div class="ml-2">
+              <a *ngFor="let child of item.children"
+                 [routerLink]="child.route"
+                 routerLinkActive="active-nav"
+                 #rla2="routerLinkActive"
+                 [class.active-nav]="rla2.isActive"
+                 class="flex items-center h-9 pl-11 pr-4 gap-3 text-[13px] text-[#5f6368] hover:bg-[#f1f3f4] cursor-pointer no-underline transition-colors relative">
+                <span nz-icon [nzType]="child.icon" nzTheme="outline" class="text-[14px]"></span>
+                <span class="flex-1 truncate">{{ child.label }}</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="menu-section">
-        <span class="menu-label" *ngIf="!isCollapsed">System</span>
-        <ul nz-menu nzMode="inline" [nzTheme]="'light'" [nzSelectable]="true">
-          <li nz-menu-item nzMatchRouter routerLink="/reports">
-            <span nz-icon nzType="file-text" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Reports</span>
-          </li>
-          <li nz-menu-item nzMatchRouter routerLink="/settings">
-            <span nz-icon nzType="setting" nzTheme="outline"></span>
-            <span *ngIf="!isCollapsed">Settings</span>
-          </li>
-        </ul>
+      <!-- Section: System -->
+      <div class="py-2 border-t border-[#e0e0e0]" *ngIf="!isCollapsed">
+        <div class="text-[11px] font-bold text-[#5f6368] uppercase tracking-[0.05em] px-4 py-2">System</div>
+        <a *ngFor="let item of systemItems"
+           [routerLink]="item.route"
+           routerLinkActive="active-nav"
+           #rla3="routerLinkActive"
+           [class.active-nav]="rla3.isActive"
+           class="flex items-center h-10 px-4 gap-3 text-[13px] text-[#5f6368] hover:bg-[#f1f3f4] cursor-pointer no-underline transition-colors relative">
+          <span class="flex items-center justify-center w-5 h-5 flex-shrink-0">
+            <span nz-icon [nzType]="item.icon" nzTheme="outline" class="text-[16px]"></span>
+          </span>
+          <span class="flex-1 truncate">{{ item.label }}</span>
+        </a>
       </div>
     </div>
   `,
   styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border-muted);
-    }
-
-    .sidebar-inner {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow-y: auto;
-      padding: 0 0 16px;
-    }
-
-    .logo {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 10px;
-      border-bottom: 1px solid var(--border-muted);
-      margin-bottom: 16px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      color: white;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .logo h2 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      letter-spacing: -0.3px;
-    }
-
-    .menu-section {
-      margin-bottom: 8px;
-    }
-
-    .menu-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      padding: 0 20px;
-      margin-bottom: 6px;
-      display: block;
-      font-weight: 600;
-    }
-
-    ::ng-deep .ant-menu {
-      border-right: none !important;
-      background: transparent !important;
-    }
-
-    ::ng-deep .ant-menu-item {
-      border-radius: 6px !important;
-      margin: 2px 12px !important;
-    }
-
-    ::ng-deep .ant-menu-submenu-title {
-      border-radius: 6px !important;
-      margin: 2px 12px !important;
-      width: calc(100% - 24px) !important;
+    :host { display: flex; flex-direction: column; height: 100%; }
+    .sidebar { width: 100%; overflow-y: auto; overflow-x: hidden; }
+    .active-nav { background: #e8f0fe !important; color: #1a73e8 !important; }
+    .active-nav::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #1a73e8;
     }
   `]
 })
 export class SidebarComponent {
   @Input() isCollapsed = false;
+
+  menuItems: MenuItem[] = [
+    { label: 'Dashboard', icon: 'appstore', route: '/dashboard' },
+    { label: 'Vehicles', icon: 'car', children: [
+      { label: 'Cars', icon: 'car', route: '/listing' },
+      { label: 'Delivery', icon: 'shopping-cart', route: '/delivery-cars' },
+      { label: 'Used Cars', icon: 'car', route: '/used-car' },
+    ]},
+    { label: 'Drivers', icon: 'idcard', route: '/drivers' },
+    { label: 'Booking', icon: 'calendar', route: '/request-car' },
+    { label: 'Maintenance', icon: 'tool', route: '/repairs' },
+  ];
+
+  systemItems: MenuItem[] = [
+    { label: 'Reports', icon: 'file-text', route: '/reports' },
+    { label: 'Settings', icon: 'setting', route: '/settings' },
+  ];
 }

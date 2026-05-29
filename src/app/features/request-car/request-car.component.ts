@@ -5,12 +5,14 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import jsPDF from 'jspdf';
 
 interface Car {
   id: number;
   name: string;
-  type: 'Car' | 'Delivery Car';
+  type: 'Car' | 'Delivery Car' | 'Used Car';
   transmission: 'Auto' | 'Manual';
   fuel: 'Diesel' | 'Petrol' | 'Electric';
   image: string;
@@ -19,7 +21,7 @@ interface Car {
 @Component({
   selector: 'app-request-car',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzGridModule, NzButtonModule, NzIconModule, NzInputModule, NzTypographyModule],
+  imports: [CommonModule, FormsModule, NzGridModule, NzButtonModule, NzIconModule, NzInputModule, NzSelectModule, NzTypographyModule],
   template: `
     <div class="page-container" *ngIf="!bookingSubmitted">
       <!-- HEADER -->
@@ -45,11 +47,17 @@ interface Car {
             <div class="step-indicator" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
               <span class="step-num" *ngIf="currentStep <= 2">2</span>
               <span class="step-check" *ngIf="currentStep > 2"><span nz-icon nzType="check"></span></span>
-              <span class="step-text">Choose Vehicle</span>
+              <span class="step-text">Car Type</span>
             </div>
             <div class="step-line" [class.filled]="currentStep > 2"></div>
             <div class="step-indicator" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
-              <span class="step-num">3</span>
+              <span class="step-num" *ngIf="currentStep <= 3">3</span>
+              <span class="step-check" *ngIf="currentStep > 3"><span nz-icon nzType="check"></span></span>
+              <span class="step-text">Pick Vehicle</span>
+            </div>
+            <div class="step-line" [class.filled]="currentStep > 3"></div>
+            <div class="step-indicator" [class.active]="currentStep >= 4">
+              <span class="step-num">4</span>
               <span class="step-text">Route & Time</span>
             </div>
           </div>
@@ -79,11 +87,18 @@ interface Car {
                 </div>
 
                 <div class="form-item">
-                  <label>Department / Group</label>
-                  <nz-input-group [nzPrefix]="teamIcon">
-                    <input type="text" nz-input placeholder="e.g. Logistics, Sales, Tech" [(ngModel)]="bookingData.department" name="department" />
+                  <label>Department</label>
+                  <nz-select [(ngModel)]="bookingData.department" nzPlaceHolder="Select a department" name="department" style="width: 100%;">
+                    <nz-option *ngFor="let dept of departments" [nzLabel]="dept" [nzValue]="dept"></nz-option>
+                  </nz-select>
+                </div>
+
+                <div class="form-item">
+                  <label class="required-label">Phone Number</label>
+                  <nz-input-group [nzPrefix]="phoneIcon">
+                    <input type="tel" nz-input placeholder="e.g. +216 55 123 456" [(ngModel)]="bookingData.phone" name="phone" />
                   </nz-input-group>
-                  <ng-template #teamIcon><span nz-icon nzType="team" style="color: #94a3b8;"></span></ng-template>
+                  <ng-template #phoneIcon><span nz-icon nzType="phone" style="color: #94a3b8;"></span></ng-template>
                 </div>
 
                 <!-- DRIVER MANDATORY PERMITS -->
@@ -92,27 +107,25 @@ interface Car {
                   <div class="toggle-cards-row">
                     <!-- License Card -->
                     <div class="toggle-card" [class.active]="bookingData.hasLicense" (click)="bookingData.hasLicense = !bookingData.hasLicense">
+                      <div class="toggle-indicator">
+                        <span nz-icon nzType="check-circle" nzTheme="fill" *ngIf="bookingData.hasLicense"></span>
+                      </div>
                       <div class="toggle-card-icon"><span nz-icon nzType="idcard" nzTheme="outline"></span></div>
                       <div class="toggle-card-text">
                         <span class="card-title">Driver License</span>
                         <span class="card-status">{{ bookingData.hasLicense ? 'Valid License' : 'No License' }}</span>
                       </div>
-                      <div class="toggle-indicator">
-                        <span nz-icon nzType="check-circle" nzTheme="fill" *ngIf="bookingData.hasLicense"></span>
-                        <span nz-icon nzType="close-circle" nzTheme="fill" *ngIf="!bookingData.hasLicense" class="off"></span>
-                      </div>
                     </div>
 
                     <!-- Shell Card -->
                     <div class="toggle-card" [class.active]="bookingData.hasShellCard" (click)="bookingData.hasShellCard = !bookingData.hasShellCard">
+                      <div class="toggle-indicator">
+                        <span nz-icon nzType="check-circle" nzTheme="fill" *ngIf="bookingData.hasShellCard"></span>
+                      </div>
                       <div class="toggle-card-icon"><span nz-icon nzType="credit-card" nzTheme="outline"></span></div>
                       <div class="toggle-card-text">
                         <span class="card-title">VIP Shell Card</span>
                         <span class="card-status">{{ bookingData.hasShellCard ? 'Card Assigned' : 'No Shell Card' }}</span>
-                      </div>
-                      <div class="toggle-indicator">
-                        <span nz-icon nzType="check-circle" nzTheme="fill" *ngIf="bookingData.hasShellCard"></span>
-                        <span nz-icon nzType="close-circle" nzTheme="fill" *ngIf="!bookingData.hasShellCard" class="off"></span>
                       </div>
                     </div>
                   </div>
@@ -125,66 +138,70 @@ interface Car {
               </div>
             </div>
 
-            <!-- STEP 2: CHOOSE VEHICLE -->
+            <!-- STEP 2: CHOOSE CAR TYPE -->
             <div class="step-content" *ngIf="currentStep === 2">
-              <h2 class="step-title">Select a Fleet Vehicle</h2>
-              <p class="step-desc">Choose a vehicle category and browse the available, corporate-maintained fleet.</p>
-
-              <!-- Category Pills -->
-              <div class="categories-container">
-                <div class="category-pill" 
-                     *ngFor="let cat of categories" 
-                     [class.active]="selectedCategory === cat.value"
-                     (click)="setCategory(cat.value)">
-                  <span nz-icon [nzType]="cat.icon" nzTheme="outline"></span>
-                  <span>{{ cat.label }}</span>
+              <h2 class="step-title">Choose Vehicle Type</h2>
+              <p class="step-desc">Select the category of vehicle you need for your trip.</p>
+              <div class="type-cards">
+                <div class="type-card" [class.active]="selectedCategory === 'Delivery Car'" (click)="selectedCategory = 'Delivery Car'">
+                  <span nz-icon nzType="shop" nzTheme="outline" class="type-icon"></span>
+                  <span class="type-label">Delivery Vans</span>
+                  <span class="type-count">{{ deliveryCars.length }} available</span>
+                </div>
+                <div class="type-card" [class.active]="selectedCategory === 'Used Car'" (click)="selectedCategory = 'Used Car'">
+                  <span nz-icon nzType="car" nzTheme="outline" class="type-icon"></span>
+                  <span class="type-label">Used Cars</span>
+                  <span class="type-count">{{ usedCars.length }} available</span>
                 </div>
               </div>
+            </div>
 
-              <!-- Cars Grid -->
-              <div class="cars-scroll-grid">
-                <div class="vehicle-card" 
-                     *ngFor="let car of filteredCars" 
-                     [class.selected]="bookingData.selectedCar?.id === car.id"
-                     (click)="selectCar(car)">
-                  <div class="card-image-wrap">
-                    <img [src]="car.image" [alt]="car.name" />
-                    <div class="selected-badge" *ngIf="bookingData.selectedCar?.id === car.id">
-                      <span nz-icon nzType="check-circle" nzTheme="fill"></span> Selected
+            <!-- STEP 3: PICK VEHICLE -->
+            <div class="step-content" *ngIf="currentStep === 3">
+              <h2 class="step-title">{{ selectedCategory === 'Used Car' ? 'Select a Used Car' : 'Select a Delivery Van' }}</h2>
+              <p class="step-desc">Pick a specific vehicle from the {{ selectedCategory === 'Used Car' ? 'used car' : 'delivery van' }} fleet.</p>
+              <div class="cat-panel">
+                <div class="cat-grid">
+                  <div class="vehicle-card"
+                       *ngFor="let car of filteredByCategory"
+                       [class.selected]="bookingData.selectedCar?.id === car.id"
+                       (click)="selectCar(car)">
+                    <div class="card-image-wrap">
+                      <img [src]="car.image" [alt]="car.name" />
+                      <div class="selected-badge" *ngIf="bookingData.selectedCar?.id === car.id">
+                        <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="card-details">
-                    <span class="car-type-badge">{{ car.type }}</span>
-                    <h3 class="car-name">{{ car.name }}</h3>
-                    <div class="car-meta">
-                      <span><span nz-icon nzType="interaction"></span> {{ car.transmission }}</span>
-                      <span><span nz-icon nzType="dashboard"></span> {{ car.fuel }}</span>
+                    <div class="card-details">
+                      <h3 class="car-name">{{ car.name }}</h3>
+                      <div class="car-meta">
+                        <span><span nz-icon nzType="interaction"></span> {{ car.transmission }}</span>
+                        <span><span nz-icon nzType="dashboard"></span> {{ car.fuel }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- STEP 3: ROUTE & TRAVEL SCHEDULER -->
-            <div class="step-content" *ngIf="currentStep === 3">
+            <!-- STEP 4: ROUTE & TRAVEL SCHEDULER -->
+            <div class="step-content" *ngIf="currentStep === 4">
               <h2 class="step-title">Route & Time Logistics</h2>
               <p class="step-desc">Define your starting base, destination, and dispatch windows.</p>
 
               <div class="form-grid">
                 <div class="form-item">
                   <label class="required-label">Source / Origin Address</label>
-                  <nz-input-group [nzPrefix]="sourceIcon">
-                    <input type="text" nz-input placeholder="e.g. Dallas Corporate Hub" [(ngModel)]="bookingData.source" />
-                  </nz-input-group>
-                  <ng-template #sourceIcon><span nz-icon nzType="environment" style="color: #3b82f6;"></span></ng-template>
+                  <nz-select [(ngModel)]="bookingData.source" nzPlaceHolder="Select a region" style="width: 100%;">
+                    <nz-option *ngFor="let r of tunisianRegions" [nzLabel]="r" [nzValue]="r"></nz-option>
+                  </nz-select>
                 </div>
 
                 <div class="form-item">
                   <label class="required-label">Destination Address</label>
-                  <nz-input-group [nzPrefix]="destIcon">
-                    <input type="text" nz-input placeholder="e.g. Manhattan Terminal" [(ngModel)]="bookingData.destination" />
-                  </nz-input-group>
-                  <ng-template #destIcon><span nz-icon nzType="environment" style="color: #ef4444;"></span></ng-template>
+                  <nz-select [(ngModel)]="bookingData.destination" nzPlaceHolder="Select a region" style="width: 100%;">
+                    <nz-option *ngFor="let r of tunisianRegions" [nzLabel]="r" [nzValue]="r"></nz-option>
+                  </nz-select>
                 </div>
 
                 <div class="form-item">
@@ -206,14 +223,14 @@ interface Car {
               </button>
               <div style="flex-grow: 1;"></div>
               <button nz-button nzType="primary" class="nav-btn next" 
-                      *ngIf="currentStep < 3" 
+                      *ngIf="currentStep < 4" 
                       [disabled]="!isStepValid(currentStep)"
                       (click)="nextStep()">
                 Continue <span nz-icon nzType="arrow-right"></span>
               </button>
               <button nz-button nzType="primary" class="nav-btn submit-btn" 
-                      *ngIf="currentStep === 3" 
-                      [disabled]="!isStepValid(3)"
+                      *ngIf="currentStep === 4" 
+                      [disabled]="!isStepValid(4)"
                       (click)="submitBooking()">
                 Confirm & Request <span nz-icon nzType="send"></span>
               </button>
@@ -223,7 +240,7 @@ interface Car {
       </div>
     </div>
 
-    <!-- SUCCESS GLASS RECEIPT VIEW -->
+    <!-- SUCCESS RECEIPT VIEW -->
     <div class="success-screen" *ngIf="bookingSubmitted">
       <div class="success-card">
         <div class="success-header">
@@ -234,7 +251,7 @@ interface Car {
           <p class="sub">Your vehicle request is registered and pending corporate dispatcher approval.</p>
         </div>
 
-        <div class="receipt-glass">
+        <div class="receipt-card">
           <div class="receipt-top-row">
             <div>
               <span class="r-logo">P+</span>
@@ -248,6 +265,11 @@ interface Car {
               <span class="r-lbl">REQUESTER</span>
               <span class="r-val">{{ bookingData.name }}</span>
               <span class="r-sub">{{ bookingData.email }}</span>
+              <span class="r-sub">{{ bookingData.phone }}</span>
+            </div>
+            <div class="r-item">
+              <span class="r-lbl">DEPARTMENT</span>
+              <span class="r-val">{{ bookingData.department }}</span>
             </div>
             <div class="r-item">
               <span class="r-lbl">VEHICLE ASSIGNED</span>
@@ -256,14 +278,14 @@ interface Car {
             </div>
             <div class="r-item">
               <span class="r-lbl">DRIVER LICENSE STATUS</span>
-              <span class="r-val" [style.color]="bookingData.hasLicense ? '#10b981' : '#ef4444'">
+              <span class="r-val" [style.color]="bookingData.hasLicense ? '#34a853' : '#d93025'">
                 <span nz-icon [nzType]="bookingData.hasLicense ? 'check-circle' : 'close-circle'"></span>
                 {{ bookingData.hasLicense ? ' Valid License' : ' No Valid License' }}
               </span>
             </div>
             <div class="r-item">
               <span class="r-lbl">VIP SHELL FUEL CARD</span>
-              <span class="r-val" [style.color]="bookingData.hasShellCard ? '#3b82f6' : '#64748b'">
+              <span class="r-val" [style.color]="bookingData.hasShellCard ? '#1a73e8' : '#5f6368'">
                 <span nz-icon [nzType]="bookingData.hasShellCard ? 'check-circle' : 'close-circle'"></span>
                 {{ bookingData.hasShellCard ? ' VIP Fuel Card' : ' No Fuel Card' }}
               </span>
@@ -286,11 +308,7 @@ interface Car {
             </div>
           </div>
 
-          <div class="receipt-divider">
-            <span class="notch left"></span>
-            <span class="d-line"></span>
-            <span class="notch right"></span>
-          </div>
+          <div class="receipt-divider"><span class="d-line"></span></div>
 
           <div class="receipt-footer">
             <div class="barcode-wrap">
@@ -312,666 +330,123 @@ interface Car {
     </div>
   `,
   styles: [`
-    .page-container {
-      background: #f8fafc;
-      min-height: 100vh;
-      padding: 32px;
-      font-family: 'Inter', sans-serif;
-    }
+    .page-container { min-height: 100vh; padding: 24px 28px; }
+    .page-header { margin-bottom: 24px; }
+    h1 { font-size: 22px; margin: 0; color: #202124; font-weight: 600; }
+    .subtitle { color: #5f6368; margin: 4px 0 0; font-size: 13px; }
+    .booking-layout { margin-top: 12px; display: flex; justify-content: center; width: 100%; }
+    .form-container { max-width: 860px; width: 100%; }
 
-    .page-header {
-      margin-bottom: 32px;
-    }
+    .stepper-header { display: flex; align-items: center; background: #fff; padding: 16px 24px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+    .step-indicator { display: flex; align-items: center; gap: 8px; color: #9aa0a6; font-weight: 500; font-size: 13px; }
+    .step-num { width: 24px; height: 24px; background: #f1f3f4; color: #9aa0a6; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .step-check { width: 24px; height: 24px; background: #34a853; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .step-indicator.active { color: #1a73e8; }
+    .step-indicator.active .step-num { background: #1a73e8; color: #fff; }
+    .step-indicator.completed { color: #202124; }
+    .step-line { flex: 1; height: 2px; background: #e0e0e0; margin: 0 12px; }
+    .step-line.filled { background: #1a73e8; }
 
-    h1 {
-      font-size: 32px;
-      margin: 0;
-      color: var(--text-dark);
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
+    .form-card { background: #fff; padding: 28px; border: 1px solid #e0e0e0; min-height: 440px; display: flex; flex-direction: column; }
+    .step-title { font-size: 18px; font-weight: 600; color: #202124; margin: 0 0 6px 0; }
+    .step-desc { font-size: 13px; color: #5f6368; margin: 0 0 24px 0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; flex-grow: 1; }
+    .form-item { display: flex; flex-direction: column; gap: 6px; }
+    .form-item.span-full { grid-column: span 2; }
+    label { font-size: 11px; font-weight: 500; color: #5f6368; text-transform: uppercase; }
+    .required-label::after { content: ' *'; color: #d93025; font-size: 11px; }
 
-    .subtitle {
-      color: #94a3b8;
-      margin: 8px 0 0 0;
-      font-size: 14px;
-    }
+    .custom-textarea { border: 1px solid #e0e0e0; padding: 10px 12px; font-size: 13px; color: #202124; background: #f8f9fa; outline: none; resize: vertical; }
+    .custom-textarea:focus { border-color: #1a73e8; background: #fff; }
+    .custom-datetime { border: 1px solid #e0e0e0; padding: 10px 12px; font-size: 13px; color: #202124; background: #f8f9fa; outline: none; height: 36px; }
+    .custom-datetime:focus { border-color: #1a73e8; background: #fff; }
+    .form-card input[nz-input] { height: 36px; }
 
-    .booking-layout {
-      margin-top: 16px;
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
+    .toggle-cards-row { display: flex; gap: 10px; }
+    .toggle-card { flex: 1; border: 1px solid #e0e0e0; padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: #f8f9fa; position: relative; }
+    .toggle-card:hover { border-color: #ccc; }
+    .toggle-card.active { border-color: #1a73e8; background: #e8f0fe; }
+    .toggle-card-icon { font-size: 20px; color: #9aa0a6; display: flex; align-items: center; flex-shrink: 0; }
+    .toggle-card.active .toggle-card-icon { color: #1a73e8; }
+    .toggle-card-text { display: flex; flex-direction: column; flex-grow: 1; min-width: 0; }
+    .toggle-card-text .card-title { font-size: 12px; font-weight: 600; color: #202124; }
+    .toggle-card-text .card-status { font-size: 11px; color: #5f6368; font-weight: 400; margin-top: 2px; }
+    .toggle-card.active .toggle-card-text .card-status { color: #1a73e8; }
+    .toggle-indicator { position: absolute; top: 6px; right: 6px; font-size: 16px; color: #34a853; display: flex; align-items: center; opacity: 0; }
+    .toggle-card.active .toggle-indicator { opacity: 1; }
 
-    .form-container {
-      max-width: 860px;
-      width: 100%;
-    }
+    .form-footer { display: flex; align-items: center; margin-top: auto; padding-top: 24px; border-top: 1px solid #e0e0e0; }
+    .nav-btn { height: 36px; font-weight: 500; display: flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; background: #fff; color: #5f6368; }
+    .nav-btn:hover { background: #f1f3f4; }
+    .nav-btn.next { background: #1a73e8 !important; border-color: #1a73e8 !important; color: #fff !important; }
+    .nav-btn.next:hover { background: #1557b0 !important; }
+    .nav-btn.submit-btn { background: #1a73e8 !important; border-color: #1a73e8 !important; color: #fff !important; }
+    .nav-btn.submit-btn:hover { background: #1557b0 !important; }
 
-    /* STEPPER */
-    .stepper-header {
-      display: flex;
-      align-items: center;
-      background: white;
-      border-radius: 12px;
-      padding: 18px 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-      border: 1px solid #f1f5f9;
-    }
+    .type-cards { display: flex; gap: 16px; margin-top: 12px; }
+    .type-card { flex: 1; border: 1px solid #e0e0e0; padding: 32px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; background: #fff; }
+    .type-card:hover { border-color: #ccc; background: #f8f9fa; }
+    .type-card.active { border-color: #1a73e8; background: #e8f0fe; }
+    .type-icon { font-size: 36px; color: #5f6368; }
+    .type-card.active .type-icon { color: #1a73e8; }
+    .type-label { font-size: 16px; font-weight: 600; color: #202124; }
+    .type-count { font-size: 12px; color: #5f6368; }
 
-    .step-indicator {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #94a3b8;
-      font-weight: 600;
-      font-size: 14px;
-    }
+    .cat-panel { border: 1px solid #e0e0e0; padding: 12px; max-height: 280px; overflow-y: auto; }
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .vehicle-card { border: 1px solid #e0e0e0; padding: 10px; display: flex; gap: 10px; cursor: pointer; background: #fff; }
+    .vehicle-card:hover { border-color: #ccc; background: #f8f9fa; }
+    .vehicle-card.selected { border-color: #1a73e8; background: #e8f0fe; }
+    .card-image-wrap { width: 80px; height: 56px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+    .card-image-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .selected-badge { position: absolute; top: -4px; left: -4px; background: #34a853; color: #fff; font-size: 9px; padding: 2px; display: flex; align-items: center; }
+    .card-details { display: flex; flex-direction: column; justify-content: center; min-width: 0; flex-grow: 1; }
+    .car-name { font-size: 12px; font-weight: 600; color: #202124; margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .car-meta { display: flex; gap: 6px; font-size: 10px; color: #9aa0a6; }
+    .car-meta span { display: flex; align-items: center; gap: 2px; }
 
-    .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      transition: all 0.3s;
-    }
+    .success-screen { background: #f8f9fa; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+    .success-card { max-width: 580px; width: 100%; text-align: center; }
+    .success-header { margin-bottom: 28px; }
+    .check-container { font-size: 56px; color: #34a853; margin-bottom: 12px; }
+    .success-header h1 { font-size: 22px; font-weight: 600; color: #202124; margin: 0 0 6px; }
+    .success-header .sub { color: #5f6368; font-size: 13px; margin: 0; }
 
-    .step-check {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #10b981;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-    }
+    .receipt-card { background: #fff; border: 1px solid #e0e0e0; padding: 28px; text-align: left; }
+    .receipt-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .r-logo { background: #1a73e8; color: #fff; font-weight: 600; font-size: 13px; padding: 4px 8px; margin-right: 8px; }
+    .r-comp { font-weight: 600; color: #202124; font-size: 14px; }
+    .receipt-id { font-family: monospace; font-size: 11px; font-weight: 600; color: #5f6368; background: #f1f3f4; padding: 4px 10px; }
 
-    .step-indicator.active {
-      color: var(--primary-color);
-    }
-    .step-indicator.active .step-num {
-      background: #eff6ff;
-      color: var(--primary-color);
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
-    }
+    .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .r-item { display: flex; flex-direction: column; }
+    .r-item.span-2 { grid-column: span 2; }
+    .r-lbl { font-size: 9px; font-weight: 500; color: #5f6368; text-transform: uppercase; margin-bottom: 4px; }
+    .r-val { font-size: 14px; font-weight: 600; color: #202124; display: flex; align-items: center; gap: 4px; }
+    .r-sub { font-size: 11px; color: #5f6368; margin-top: 2px; }
+    .italic-desc { font-style: italic; color: #5f6368; font-weight: 400; line-height: 1.5; }
 
-    .step-indicator.completed {
-      color: #1e293b;
-    }
+    .receipt-divider { margin: 24px 0; }
+    .d-line { display: block; border-top: 1px dashed #e0e0e0; }
 
-    .step-line {
-      flex: 1;
-      height: 2px;
-      background: #f1f5f9;
-      margin: 0 16px;
-      transition: all 0.3s;
-    }
-    .step-line.filled {
-      background: #cbd5e1;
-    }
+    .receipt-footer { display: flex; justify-content: center; }
+    .barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .visual-barcode { width: 160px; height: 36px; background: repeating-linear-gradient(90deg,#000,#000 2px,transparent 2px,transparent 5px,#000 5px,#000 7px); }
+    .barcode-text { font-family: monospace; font-size: 10px; color: #5f6368; font-weight: 500; }
 
-    /* FORM CARD */
-    .form-card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-      border: 1px solid #f1f5f9;
-      min-height: 480px;
-      display: flex;
-      flex-direction: column;
-    }
+    .success-actions { display: flex; justify-content: center; gap: 12px; margin-top: 28px; }
+    .action-btn { height: 40px; padding: 0 20px; font-weight: 500; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .outline-btn { background: #fff; border: 1px solid #e0e0e0; color: #5f6368; }
+    .outline-btn:hover { background: #f1f3f4; }
+    .fill-btn { background: #1a73e8; border: 1px solid #1a73e8; color: #fff; }
+    .fill-btn:hover { background: #1557b0; }
 
-    .step-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 8px 0;
-    }
-
-    .step-desc {
-      font-size: 13px;
-      color: #94a3b8;
-      margin: 0 0 28px 0;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      flex-grow: 1;
-    }
-
-    .form-item {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .form-item.span-full {
-      grid-column: span 2;
-    }
-
-    label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .required-label::after {
-      content: ' *';
-      color: #ef4444;
-    }
-
-    .custom-textarea {
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 14px;
-      color: #1e293b;
-      background: #f8fafc;
-      transition: all 0.2s;
-      outline: none;
-      resize: vertical;
-    }
-    .custom-textarea:focus {
-      border-color: var(--primary-color);
-      background: white;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
-    }
-
-    .custom-datetime {
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 14px;
-      color: #1e293b;
-      background: #f8fafc;
-      transition: all 0.2s;
-      outline: none;
-      height: 40px;
-    }
-    .custom-datetime:focus {
-      border-color: var(--primary-color);
-      background: white;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
-    }
-
-    .form-card input[nz-input] {
-      height: 40px;
-      border-radius: 8px;
-      background: #f8fafc;
-    }
-    .form-card input[nz-input]:focus {
-      background: white;
-    }
-
-    /* DRIVER LICENSE & VIP CARDS ROW */
-    .toggle-cards-row {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-    }
-    .toggle-card {
-      flex: 1;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      background: #fafafa;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .toggle-card:hover {
-      border-color: #cbd5e1;
-      background: white;
-    }
-    .toggle-card.active {
-      border-color: var(--primary-color);
-      background: #eff6ff;
-    }
-    .toggle-card-icon {
-      font-size: 20px;
-      color: #64748b;
-      display: flex;
-      align-items: center;
-    }
-    .toggle-card.active .toggle-card-icon {
-      color: var(--primary-color);
-    }
-    .toggle-card-text {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      min-width: 0;
-    }
-    .toggle-card-text .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #1e293b;
-    }
-    .toggle-card-text .card-status {
-      font-size: 10px;
-      color: #64748b;
-      font-weight: 500;
-      margin-top: 2px;
-    }
-    .toggle-card.active .toggle-card-text .card-status {
-      color: var(--primary-color);
-      font-weight: 600;
-    }
-    .toggle-indicator {
-      font-size: 16px;
-      color: #10b981;
-      display: flex;
-      align-items: center;
-    }
-    .toggle-indicator .off {
-      color: #94a3b8;
-    }
-
-    .form-footer {
-      display: flex;
-      align-items: center;
-      margin-top: auto;
-      padding-top: 32px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .nav-btn {
-      height: 42px;
-      border-radius: 8px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .nav-btn.next, .nav-btn.submit-btn {
-      background: var(--primary-color);
-      border-color: var(--primary-color);
-    }
-    .nav-btn.next:hover, .nav-btn.submit-btn:hover {
-      background: #1d4ed8 !important;
-      border-color: #1d4ed8 !important;
-    }
-    .nav-btn.submit-btn {
-      background: #10b981;
-      border-color: #10b981;
-    }
-    .nav-btn.submit-btn:hover {
-      background: #059669 !important;
-      border-color: #059669 !important;
-    }
-
-    /* STEP 2 CATEGORIES */
-    .categories-container {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .category-pill {
-      padding: 10px 18px;
-      border-radius: 20px;
-      background: #f1f5f9;
-      color: #475569;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-    .category-pill:hover {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-    .category-pill.active {
-      background: var(--primary-color);
-      color: white;
-      box-shadow: 0 4px 12px rgba(42, 114, 250, 0.2);
-    }
-
-    /* VEHICLE GRID */
-    .cars-scroll-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-height: 330px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .vehicle-card {
-      border: 1.5px solid #f1f5f9;
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      gap: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #fafafa;
-    }
-    .vehicle-card:hover {
-      border-color: #cbd5e1;
-      background: white;
-      transform: translateY(-1px);
-    }
-    .vehicle-card.selected {
-      border-color: var(--primary-color);
-      background: #eff6ff;
-    }
-
-    .card-image-wrap {
-      width: 110px;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      position: relative;
-    }
-    .card-image-wrap img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    .selected-badge {
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      background: #10b981;
-      color: white;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .card-details {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-width: 0;
-      flex-grow: 1;
-    }
-    .car-type-badge {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #94a3b8;
-    }
-    .car-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 2px 0 6px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .car-meta {
-      display: flex;
-      gap: 8px;
-      font-size: 10px;
-      color: #64748b;
-    }
-    .car-meta span {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    /* SUCCESS SCREEN */
-    .success-screen {
-      background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-    }
-    .success-card {
-      max-width: 580px;
-      width: 100%;
-      text-align: center;
-    }
-    .success-header {
-      margin-bottom: 30px;
-    }
-    .check-container {
-      font-size: 64px;
-      color: #10b981;
-      margin-bottom: 12px;
-    }
-    .success-header h1 {
-      font-size: 26px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0 0 8px;
-    }
-    .success-header .sub {
-      color: #64748b;
-      font-size: 14px;
-      margin: 0;
-    }
-
-    /* GLASS RECEIPT */
-    .receipt-glass {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(16px) saturate(120%);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-      text-align: left;
-    }
-    .receipt-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .r-logo {
-      background: var(--primary-color);
-      color: white;
-      font-weight: 800;
-      font-size: 14px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      margin-right: 8px;
-    }
-    .r-comp {
-      font-weight: 800;
-      color: #0f172a;
-      font-size: 15px;
-    }
-    .receipt-id {
-      font-family: monospace;
-      font-size: 12px;
-      font-weight: 700;
-      color: #64748b;
-      background: rgba(0,0,0,0.04);
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-
-    .receipt-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 16px;
-    }
-    .r-item {
-      display: flex;
-      flex-direction: column;
-    }
-    .r-item.span-2 {
-      grid-column: span 2;
-    }
-    .r-lbl {
-      font-size: 9px;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .r-val {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .r-sub {
-      font-size: 11px;
-      color: #64748b;
-      margin-top: 2px;
-    }
-    .italic-desc {
-      font-style: italic;
-      color: #475569;
-      font-weight: 500;
-      line-height: 1.5;
-    }
-
-    .receipt-divider {
-      display: flex;
-      align-items: center;
-      position: relative;
-      margin: 28px 0;
-    }
-    .receipt-divider .notch {
-      width: 16px;
-      height: 16px;
-      background: #eff6ff; /* matches screen gradient */
-      border-radius: 50%;
-      position: absolute;
-    }
-    .receipt-divider .notch.left { left: -41px; clip-path: circle(50% at 100% 50%); }
-    .receipt-divider .notch.right { right: -41px; clip-path: circle(50% at 0% 50%); }
-    .receipt-divider .d-line {
-      flex: 1;
-      border-top: 1.5px dashed rgba(0,0,0,0.1);
-    }
-
-    .receipt-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-    
-    .barcode-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .visual-barcode {
-      width: 180px;
-      height: 40px;
-      background: repeating-linear-gradient(
-        90deg,
-        #000,
-        #000 2px,
-        transparent 2px,
-        transparent 5px,
-        #000 5px,
-        #000 7px
-      );
-    }
-    .barcode-text {
-      font-family: monospace;
-      font-size: 10px;
-      color: #64748b;
-      font-weight: 600;
-    }
-
-    .success-actions {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 32px;
-    }
-    .action-btn {
-      height: 48px;
-      padding: 0 24px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .outline-btn {
-      background: white;
-      border: 1.5px solid #cbd5e1;
-      color: #475569;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .outline-btn:hover {
-      background: #f8fafc;
-      border-color: #94a3b8;
-    }
-    .fill-btn {
-      background: var(--primary-color);
-      border: none;
-      color: white;
-      box-shadow: 0 4px 14px rgba(42, 114, 250, 0.25);
-    }
-    .fill-btn:hover {
-      background: #1d4ed8;
-      box-shadow: 0 6px 20px rgba(42, 114, 250, 0.35);
-    }
-
-    /* Print styles to ensure official request document format when printed */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      .success-screen, .success-screen * {
-        visibility: visible;
-      }
-      .success-screen {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white !important;
-      }
-      .success-actions {
-        display: none !important;
-      }
-      .receipt-glass {
-        border: none !important;
-        box-shadow: none !important;
-        background: white !important;
-        backdrop-filter: none !important;
-      }
-      .receipt-divider .notch {
-        display: none !important;
-      }
+      body * { visibility: hidden; }
+      .success-screen, .success-screen * { visibility: visible; }
+      .success-screen { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; }
+      .success-actions { display: none !important; }
+      .receipt-card { border: none !important; background: #fff !important; }
     }
   `]
 })
@@ -981,9 +456,47 @@ export class RequestCarComponent {
   bookingRefId = '';
   selectedCategory = 'Car';
 
+  departments = [
+    'HR',
+    'Maintenance',
+    'DG',
+    'Logistics',
+    'Finance',
+    'IT',
+    'Sales',
+    'Marketing',
+    'Operations',
+    'Admin'
+  ];
+
+  tunisianRegions = [
+    'Tunis',
+    'Sfax',
+    'Sousse',
+    'Nabeul',
+    'Gabès',
+    'Bizerte',
+    'Kairouan',
+    'Monastir',
+    'Médenine',
+    'Kasserine',
+    'Mahdia',
+    'Gafsa',
+    'Tozeur',
+    'Béja',
+    'Jendouba',
+    'Kef',
+    'Siliana',
+    'Sidi Bouzid',
+    'Tataouine',
+    'Médénine',
+    'Djerba'
+  ];
+
   bookingData: {
     name: string;
     email: string;
+    phone: string;
     department: string;
     purpose: string;
     hasLicense: boolean;
@@ -996,6 +509,7 @@ export class RequestCarComponent {
   } = {
     name: '',
     email: '',
+    phone: '',
     department: '',
     purpose: '',
     hasLicense: true,
@@ -1007,12 +521,7 @@ export class RequestCarComponent {
     arrivalTime: ''
   };
 
-  categories = [
-    { label: 'Cars', value: 'Car', icon: 'car' },
-    { label: 'Delivery Vans', value: 'Delivery Car', icon: 'shop' }
-  ];
-
-  cars: Car[] = [
+  allCars: Car[] = [
     { id: 1, name: 'Blue Audi (PSD)', type: 'Car', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/DGcars/a5 audi.png' },
     { id: 2, name: 'Bentley Bentayga', type: 'Car', transmission: 'Auto', fuel: 'Petrol', image: '/images/cars/DGcars/bdw.avif' },
     { id: 3, name: 'Porsche Taycan', type: 'Car', transmission: 'Auto', fuel: 'Electric', image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif' },
@@ -1020,31 +529,24 @@ export class RequestCarComponent {
     { id: 8, name: 'VW Caddy Cargo', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/caddy.webp' },
     { id: 9, name: 'Renault Dokker Van', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/docker.webp' },
     { id: 10, name: 'Peugeot Partner', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partiner.webp' },
-    { id: 11, name: 'Peugeot Partner Pro', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partnier.avif' }
+    { id: 11, name: 'Peugeot Partner Pro', type: 'Delivery Car', transmission: 'Manual', fuel: 'Diesel', image: '/images/cars/deliver/partnier.avif' },
+    { id: 12, name: 'Hyundai Elantra 2022', type: 'Used Car', transmission: 'Auto', fuel: 'Petrol', image: '/images/cars/usedfor_cars/hyd.jpg' },
+    { id: 13, name: 'Kia Sportage 2023', type: 'Used Car', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/usedfor_cars/kia.png' },
+    { id: 14, name: 'VW Passat 2021', type: 'Used Car', transmission: 'Auto', fuel: 'Diesel', image: '/images/cars/usedfor_cars/passat.avif' },
+    { id: 15, name: 'Skoda Octavia 2022', type: 'Used Car', transmission: 'Manual', fuel: 'Petrol', image: '/images/cars/usedfor_cars/skoda.webp' }
   ];
 
-
-  filteredCars: Car[] = [];
-
-  constructor() {
-    this.filterCars();
-  }
-
-  setCategory(val: string) {
-    this.selectedCategory = val;
-    this.filterCars();
-  }
-
-  filterCars() {
-    this.filteredCars = this.cars.filter(car => car.type.toLowerCase() === this.selectedCategory.toLowerCase());
-  }
+  get cars(): Car[] { return this.allCars.filter(c => c.type === 'Car'); }
+  get deliveryCars(): Car[] { return this.allCars.filter(c => c.type === 'Delivery Car'); }
+  get usedCars(): Car[] { return this.allCars.filter(c => c.type === 'Used Car'); }
+  get filteredByCategory(): Car[] { return this.allCars.filter(c => c.type === this.selectedCategory); }
 
   selectCar(car: Car) {
     this.bookingData.selectedCar = car;
   }
 
   nextStep() {
-    if (this.currentStep < 3) {
+    if (this.currentStep < 4) {
       this.currentStep++;
     }
   }
@@ -1060,9 +562,12 @@ export class RequestCarComponent {
       return !!(this.bookingData.name.trim() && this.bookingData.email.trim() && this.bookingData.purpose.trim() && this.bookingData.hasLicense);
     }
     if (step === 2) {
-      return !!this.bookingData.selectedCar;
+      return !!this.selectedCategory;
     }
     if (step === 3) {
+      return !!this.bookingData.selectedCar;
+    }
+    if (step === 4) {
       return !!(this.bookingData.source.trim() && this.bookingData.destination.trim() && this.bookingData.departureTime && this.bookingData.arrivalTime);
     }
     return false;
@@ -1092,16 +597,99 @@ export class RequestCarComponent {
   }
 
   printReceipt() {
-    window.print();
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFillColor(15, 118, 110);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Park+ Logistics', 20, 18);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Vehicle Booking Request', 20, 28);
+    doc.text('REF: #' + this.bookingRefId, pageWidth - 20, 28, { align: 'right' });
+
+    doc.setTextColor(51, 51, 51);
+    let y = 55;
+
+    const drawField = (label: string, value: string) => {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(107, 114, 128);
+      doc.text(label, 20, y);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(17, 24, 39);
+      doc.text(value || '-', 20, y + 6);
+      y += 18;
+    };
+
+    const drawRow = (label1: string, val1: string, label2: string, val2: string) => {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(107, 114, 128);
+      doc.text(label1, 20, y);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(17, 24, 39);
+      doc.text(val1 || '-', 20, y + 6);
+
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(107, 114, 128);
+      doc.text(label2, pageWidth / 2 + 5, y);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(17, 24, 39);
+      doc.text(val2 || '-', pageWidth / 2 + 5, y + 6);
+      y += 18;
+    };
+
+    drawField('REQUESTER NAME', this.bookingData.name);
+    drawRow('EMAIL', this.bookingData.email, 'PHONE', this.bookingData.phone);
+    drawField('DEPARTMENT', this.bookingData.department);
+    drawField('PURPOSE OF REQUEST', this.bookingData.purpose);
+
+    doc.setDrawColor(229, 231, 235);
+    doc.line(20, y, pageWidth - 20, y);
+    y += 10;
+
+    drawField('VEHICLE ASSIGNED', (this.bookingData.selectedCar?.name || '') + ' (' + (this.bookingData.selectedCar?.type || '') + ')');
+    drawRow(
+      'DRIVER LICENSE', this.bookingData.hasLicense ? 'Valid' : 'Not Valid',
+      'SHELL FUEL CARD', this.bookingData.hasShellCard ? 'Assigned' : 'Not Assigned'
+    );
+    drawRow('DEPARTURE', this.formatDateTime(this.bookingData.departureTime), 'EST. RETURN', this.formatDateTime(this.bookingData.arrivalTime));
+    drawField('ROUTE', this.bookingData.source + '  ->  ' + this.bookingData.destination);
+
+    doc.setDrawColor(229, 231, 235);
+    doc.line(20, y, pageWidth - 20, y);
+    y += 10;
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(107, 114, 128);
+    doc.text('BK-REF-' + this.bookingRefId, pageWidth / 2, y + 5, { align: 'center' });
+
+    doc.setFontSize(8);
+    doc.setTextColor(156, 163, 175);
+    doc.text('Generated on ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }), pageWidth / 2, y + 15, { align: 'center' });
+
+    doc.save('booking-request-' + this.bookingRefId + '.pdf');
   }
 
   resetBooking() {
     this.bookingSubmitted = false;
     this.currentStep = 1;
     this.bookingRefId = '';
+    this.selectedCategory = 'Car';
     this.bookingData = {
       name: '',
       email: '',
+      phone: '',
       department: '',
       purpose: '',
       hasLicense: true,
@@ -1112,7 +700,5 @@ export class RequestCarComponent {
       departureTime: '',
       arrivalTime: ''
     };
-    this.selectedCategory = 'Car';
-    this.filterCars();
   }
 }

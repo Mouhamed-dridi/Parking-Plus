@@ -6,6 +6,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-driver-profile',
@@ -16,7 +17,8 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
     NzButtonModule,
     NzTabsModule,
     NzTagModule,
-    NzAvatarModule
+    NzAvatarModule,
+    NzModalModule
   ],
   template: `
     <div class="profile-page">
@@ -41,11 +43,10 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
                 <span nz-icon nzType="edit" nzTheme="outline"></span>
                 <span>Edit</span>
               </button>
-              <button class="solid-btn delete-solid">
+              <button class="solid-btn delete-solid" (click)="showDeleteModal = true">
                 <span nz-icon nzType="delete" nzTheme="outline"></span>
                 <span>Delete</span>
               </button>
-              <button class="icon-btn whatsapp-btn"><i class="fa-brands fa-whatsapp"></i></button>
             </div>
           </div>
         </div>
@@ -57,230 +58,68 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
           <div class="tab" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">Overview</div>
           <div class="tab" [class.active]="activeTab === 'trips'" (click)="activeTab = 'trips'">Trips History <span class="tab-badge">15</span></div>
           <div class="tab" [class.active]="activeTab === 'cars'" (click)="activeTab = 'cars'">Car Sessions</div>
+          <div class="tab" [class.active]="activeTab === 'contact'" (click)="activeTab = 'contact'">Contact Driver</div>
         </div>
       </div>
 
       <!-- OVERVIEW CONTENT -->
-      <div class="content-grid" *ngIf="activeTab === 'overview'">
-        <!-- LEFT COLUMN -->
-        <div class="left-column">
-          <div class="bio-card">
-            <h3>Bio</h3>
-            <p>
-              I have about 18+ years of experience in commercial delivery vehicle operation and fleet logistics. 
-              12+ years of experience in international long-haul transport across the MENA region. 
-              Most of my past works are mainly in corporate transport and high-priority delivery...
-              <span class="show-more">Show more</span>
-            </p>
-            <div class="social-icons">
-              <div class="s-icon"><span nz-icon nzType="linkedin"></span></div>
-              <div class="s-icon"><span nz-icon nzType="twitter"></span></div>
-              <div class="s-icon"><span nz-icon nzType="global"></span></div>
-            </div>
-          </div>
+      <div class="overview-centered" *ngIf="activeTab === 'overview'">
+        <div class="overview-card">
+          <h3>Bio</h3>
+          <p>
+            I have about 18+ years of experience in commercial delivery vehicle operation and fleet logistics. 
+            12+ years of experience in international long-haul transport across the MENA region. 
+            Most of my past works are mainly in corporate transport and high-priority delivery...
+          </p>
+        </div>
 
-          <div class="insights-container">
-            <div class="section-header">
-              <h3>Profile insights</h3>
-              <a href="#">How do I get these?</a>
+        <div class="overview-card">
+          <h3>Driver Information</h3>
+          <div class="info-grid-2col">
+            <div class="info-row">
+              <span class="info-label">Full Name</span>
+              <span class="info-value">Ahmed Benali</span>
             </div>
-            <div class="insight-row">
-              <div class="insight-card">
-                <div class="insight-title success">
-                  <span nz-icon nzType="trophy"></span>
-                  Perfect Presence
-                </div>
-                <p>Driver is prompt and highly responsive.</p>
-              </div>
-              <div class="insight-card">
-                <div class="insight-title danger">
-                  <span nz-icon nzType="heart"></span>
-                  Top achiever: Director
-                </div>
-                <p>Driver is amongst the top 10% of contributors in their field!</p>
-              </div>
+            <div class="info-row">
+              <span class="info-label">Email Address</span>
+              <span class="info-value">ahmed.benali&#64;parkplus.com</span>
             </div>
-          </div>
-
-          <div class="details-container">
-            <h3>Driver Information</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <span class="d-label">Email Address</span>
-                <span class="d-value">ahmed.benali&#64;parkplus.com</span>
-              </div>
-              <div class="detail-item">
-                <span class="d-label">Phone Number</span>
-                <span class="d-value">+216 55 123 456</span>
-              </div>
-              <div class="detail-item">
-                <span class="d-label">License ID</span>
-                <span class="d-value">TN-98765432</span>
-              </div>
-              <div class="detail-item">
-                <span class="d-label">Car Ref ID</span>
-                <span class="d-value">CAR-TN-0012</span>
-              </div>
+            <div class="info-row">
+              <span class="info-label">Phone Number</span>
+              <span class="info-value">+216 55 123 456</span>
             </div>
-          </div>
-
-          <div class="experience-container">
-            <h3>Experience & History</h3>
-            <div class="exp-item">
-              <div class="exp-label">Expertise</div>
-              <div class="exp-tags">
-                <span class="tag orange">Logistics</span>
-                <span class="tag blue">Delivery Vehicles</span>
-              </div>
+            <div class="info-row">
+              <span class="info-label">License ID</span>
+              <span class="info-value">TN-98765432</span>
             </div>
-            <div class="exp-item">
-              <div class="exp-label">Industries</div>
-              <div class="exp-tags">
-                <span class="tag blue"><span nz-icon nzType="laptop"></span> Tech</span>
-                <span class="tag dark"><span nz-icon nzType="shopping"></span> Retail</span>
-              </div>
+            <div class="info-row">
+              <span class="info-label">Car Model</span>
+              <span class="info-value">VW Caddy Cargo</span>
             </div>
-            <div class="exp-item">
-              <div class="exp-label">Car History</div>
-              <div class="exp-history">
-                <div class="history-card">
-                  <div class="h-icon"><span nz-icon nzType="car"></span></div>
-                  <div class="h-info">
-                    <div class="h-title">VW Caddy (Delivery Van)</div>
-                    <div class="h-date">Jan 2023 - Present • 1 yr 4 mos</div>
-                  </div>
-                  <span class="status-badge active">Current</span>
-                </div>
-                <div class="history-card">
-                  <div class="h-icon"><span nz-icon nzType="car"></span></div>
-                  <div class="h-info">
-                    <div class="h-title">Renault Dokker Van (Delivery Van)</div>
-                    <div class="h-date">Mar 2020 - Dec 2022 • 2 yrs 10 mos</div>
-                  </div>
-                </div>
-              </div>
+            <div class="info-row">
+              <span class="info-label">Car Ref ID</span>
+              <span class="info-value">CAR-TN-0012</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Region</span>
+              <span class="info-value">Tunis</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">CIN</span>
+              <span class="info-value">12345678</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="right-column">
-          <div class="car-details-card">
-            <div class="quick-actions">
-              <div class="qa-item"><span nz-icon nzType="swap" nzTheme="outline"></span> Ajouter au comparateur</div>
-              <div class="qa-item" style="padding-left: 24px;">Financer avec Banque Zitouna</div>
-            </div>
-
-            <div class="car-specs-list">
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="node-index" nzTheme="outline"></span> Kilométrage</div>
-                <div class="c-val">33 000 KM</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="calendar" nzTheme="outline"></span> Mise en circulation</div>
-                <div class="c-val">04.2023</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="experiment" nzTheme="outline"></span> Énergie</div>
-                <div class="c-val">Essence</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="control" nzTheme="outline"></span> Boite vitesse</div>
-                <div class="c-val">Automatique</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="thunderbolt" nzTheme="outline"></span> Puissance fiscale</div>
-                <div class="c-val">16 CV</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="apartment" nzTheme="outline"></span> Transmission</div>
-                <div class="c-val">Intégrale</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="car" nzTheme="outline"></span> Carrosserie</div>
-                <div class="c-val">SUV</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="tool" nzTheme="outline"></span> État général</div>
-                <div class="c-val">Très bon</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="user" nzTheme="outline"></span> Anciens propriétaires</div>
-                <div class="c-val">1ère main</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="history" nzTheme="outline"></span> Date de l'annonce</div>
-                <div class="c-val">13.04.2026</div>
-              </div>
-              <div class="c-row">
-                <div class="c-label"><span nz-icon nzType="environment" nzTheme="outline"></span> Gouvernorat</div>
-                <div class="c-val">Tunis</div>
-              </div>
-            </div>
-
-            <div class="contact-btns">
-              <button class="c-btn call-btn"><span nz-icon nzType="phone" nzTheme="fill"></span> 56 585 651</button>
-              <button class="c-btn sms-btn"><span nz-icon nzType="message" nzTheme="fill"></span> SMS</button>
-              <button class="c-btn wa-btn"><i class="fa-brands fa-whatsapp"></i> Whatsapp</button>
-            </div>
-          </div>
-
-          <div class="stat-card statistics">
-            <div class="stat-header">
-              <h3>Community statistics</h3>
-              <a href="#">See more <span nz-icon nzType="down"></span></a>
-            </div>
-            <div class="stat-list">
-              <div class="stat-item">
-                <div class="stat-icon blue-box"><span nz-icon nzType="rocket"></span></div>
-                <div class="stat-info">
-                  <div class="stat-val">1,350 hrs</div>
-                  <div class="stat-lbl">Total driving time</div>
-                </div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-icon red-box"><span nz-icon nzType="star"></span></div>
-                <div class="stat-info">
-                  <div class="stat-val">34</div>
-                  <div class="stat-lbl">Trips completed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stat-card sessions">
-            <div class="stat-header">
-              <h3>Available shifts</h3>
-              <p class="tz-info">In your local timezone (Africa/Tunis) <a href="#">Update</a></p>
-            </div>
-            
-            <div class="date-scroll">
-              <div class="date-card active">
-                <div class="d-day">TUE</div>
-                <div class="d-date">02 May</div>
-                <div class="d-slots">2 shifts</div>
-              </div>
-              <div class="date-card">
-                <div class="d-day">WED</div>
-                <div class="d-date">03 May</div>
-                <div class="d-slots">2 shifts</div>
-              </div>
-              <div class="date-card">
-                <div class="d-day">TUE</div>
-                <div class="d-date">09 May</div>
-                <div class="d-slots">2 shifts</div>
-              </div>
-            </div>
-
-            <div class="time-slots">
-              <div class="time-label">Available time slots</div>
-              <div class="slots-row">
-                <div class="t-slot active">8:00 PM</div>
-                <div class="t-slot">9:00 PM</div>
-              </div>
-            </div>
-
-            <button class="book-session-btn">Book Shift for 02 May 2026</button>
+      <!-- CONTACT CONTENT -->
+      <div class="overview-centered" *ngIf="activeTab === 'contact'">
+        <div class="overview-card">
+          <h3>Contact Driver</h3>
+          <div class="contact-row">
+            <button class="contact-btn phone-btn"><span nz-icon nzType="phone" nzTheme="fill"></span> +216 55 123 456</button>
+            <button class="contact-btn email-btn"><span nz-icon nzType="mail" nzTheme="fill"></span> ahmed.benali&#64;parkplus.com</button>
+            <button class="contact-btn wa-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
           </div>
         </div>
       </div>
@@ -342,6 +181,22 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
       </div>
 
     </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <nz-modal
+      [(nzVisible)]="showDeleteModal"
+      nzTitle="Confirm Deletion"
+      (nzOnCancel)="showDeleteModal = false"
+      [nzFooter]="deleteModalFooter"
+      [nzWidth]="400">
+      <ng-container *nzModalContent>
+        <p>Are you sure you want to delete this driver? This action cannot be undone.</p>
+      </ng-container>
+      <ng-template #deleteModalFooter>
+        <button nz-button nzType="default" (click)="showDeleteModal = false">Cancel</button>
+        <button nz-button nzType="primary" nzDanger (click)="confirmDelete()">Delete</button>
+      </ng-template>
+    </nz-modal>
   `,
   styles: [`
     .profile-page {
@@ -457,9 +312,6 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
       transition: all 0.2s;
     }
     .icon-btn:hover { background: #f9fafb; border-color: #d1d5db; }
-    .whatsapp-btn { color: #25D366; font-size: 22px; }
-    .whatsapp-btn:hover { color: #1da851; border-color: #25D366; background: #e8fbf0; }
-
     /* TABS */
     .tabs-section {
       border-bottom: 1px solid #f3f4f6;
@@ -502,298 +354,74 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
       margin-left: 4px;
     }
 
-    /* CONTENT GRID */
-    .content-grid {
-      max-width: 1200px;
+    /* DRIVER DETAILS */
+    .overview-centered {
+      max-width: 720px;
       margin: 40px auto;
-      padding: 0 40px;
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
-
-    .bio-card h3 { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 16px; }
-    .bio-card p {
-      font-size: 16px;
+    .overview-card {
+      background: #f9fafb;
+      border: 1px solid #f3f4f6;
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+    .overview-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #111827;
+      margin: 0 0 16px;
+    }
+    .overview-card p {
+      font-size: 15px;
       line-height: 1.7;
       color: #374151;
-      margin-bottom: 24px;
-    }
-    .show-more { color: #0f766e; font-weight: 700; cursor: pointer; }
-    .social-icons { display: flex; gap: 15px; }
-    .s-icon {
-      width: 40px;
-      height: 40px;
-      background: #f3f4f6;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #4b5563;
-      font-size: 18px;
+      margin: 0;
     }
 
-    .insights-container { margin-top: 50px; }
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    .info-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
-    .section-header h3 { margin: 0; font-size: 20px; font-weight: 800; color: #111827; }
-    .section-header a { font-size: 14px; color: #0f766e; font-weight: 600; text-decoration: none; }
-
-    .insight-row { display: flex; gap: 20px; }
-    .insight-card {
-      flex: 1;
-      border: 1.5px solid #f3f4f6;
-      border-radius: 16px;
-      padding: 24px;
-    }
-    .insight-title {
+    .info-row {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .info-label {
+      font-size: 11px;
       font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-value {
       font-size: 15px;
-      margin-bottom: 10px;
+      font-weight: 600;
+      color: #111827;
     }
-    .insight-title.success { color: #10b981; }
-    .insight-title.danger { color: #ef4444; }
-    .insight-card p { margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5; }
 
-    .experience-container { margin-top: 50px; }
-    .experience-container h3 { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 24px; }
-    .exp-item {
-      display: flex;
-      align-items: flex-start;
-      padding: 20px 0;
-      border-bottom: 1.5px solid #f3f4f6;
-    }
-    .exp-label { width: 150px; font-size: 15px; color: #6b7280; font-weight: 600; margin-top: 6px; }
-    .exp-tags { display: flex; gap: 10px; flex-wrap: wrap; }
-    .tag {
-      padding: 6px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
+    .contact-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .contact-btn {
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-    .tag.orange { background: #fff7ed; color: #ea580c; }
-    .tag.blue { background: #eff6ff; color: #3b82f6; }
-    .tag.dark { background: #f3f4f6; color: #1f2937; }
-
-    /* CAR HISTORY */
-    .exp-history { display: flex; flex-direction: column; gap: 12px; flex: 1; }
-    .history-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px;
-      border: 1.5px solid #f3f4f6;
-      border-radius: 12px;
-      background: #fafafa;
-    }
-    .h-icon {
-      width: 44px;
-      height: 44px;
-      background: white;
+      padding: 12px 20px;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #6b7280;
-    }
-    .h-info { flex: 1; }
-    .h-title { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 4px; }
-    .h-date { font-size: 13px; color: #6b7280; font-weight: 500; }
-    .status-badge {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: #e5e7eb;
-      color: #4b5563;
-    }
-    .status-badge.active { background: #dcfce7; color: #166534; }
-
-    /* DRIVER DETAILS */
-    .details-container { margin-top: 50px; }
-    .details-container h3 { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 24px; }
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .detail-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: #f9fafb;
-      padding: 16px;
-      border-radius: 12px;
-      border: 1.5px solid #f3f4f6;
-    }
-    .d-label { font-size: 12px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .d-value { font-size: 15px; font-weight: 700; color: #111827; }
-
-    /* RIGHT COLUMN */
-    .car-details-card {
-      background: white;
-      border: 1px solid #f0f0f0;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-      margin-bottom: 30px;
-    }
-    .quick-actions {
-      border-bottom: 1px solid #f0f0f0;
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .qa-item {
-      font-size: 15px;
-      color: #374151;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .car-specs-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .c-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .c-label {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: #6b7280;
       font-size: 14px;
-      font-weight: 500;
-    }
-    .c-label span {
-      font-size: 18px;
-      color: #9ca3af;
-    }
-    .c-val {
-      font-weight: 800;
-      color: #111827;
-      font-size: 14px;
-    }
-    .contact-btns {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: 8px;
-      margin-top: 24px;
-    }
-    .c-btn {
-      height: 44px;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      background: white;
       transition: all 0.2s;
     }
-    .c-btn:hover { background: #f9fafb; border-color: #d1d5db; }
-    .call-btn { color: #dc2626; }
-    .sms-btn { color: #dc2626; }
+    .contact-btn:hover { background: #f9fafb; border-color: #d1d5db; }
+    .phone-btn { color: #dc2626; }
+    .email-btn { color: #2563eb; }
     .wa-btn { color: #10b981; }
-
-    .stat-card {
-      border: 1.5px solid #f3f4f6;
-      border-radius: 20px;
-      padding: 30px;
-      background: white;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    }
-    .stat-header { margin-bottom: 24px; }
-    .stat-header h3 { margin: 0; font-size: 20px; font-weight: 800; color: #111827; }
-    .stat-header a { font-size: 14px; color: #0f766e; font-weight: 600; text-decoration: none; }
-    .stat-header p { margin: 8px 0 0; font-size: 13px; color: #6b7280; }
-
-    .stat-list { display: flex; flex-direction: column; gap: 24px; }
-    .stat-item { display: flex; align-items: center; gap: 20px; }
-    .stat-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-    .blue-box { background: #eff6ff; color: #3b82f6; }
-    .red-box { background: #fef2f2; color: #ef4444; }
-    .stat-val { font-size: 20px; font-weight: 800; color: #111827; }
-    .stat-lbl { font-size: 13px; color: #6b7280; font-weight: 500; }
-
-    .date-scroll {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .date-card {
-      flex: 1;
-      border: 1.5px solid #f3f4f6;
-      border-radius: 14px;
-      padding: 15px 10px;
-      text-align: center;
-      cursor: pointer;
-    }
-    .date-card.active { border-color: #0f766e; background: #f0fdfa; }
-    .d-day { font-size: 11px; font-weight: 800; color: #6b7280; margin-bottom: 4px; }
-    .d-date { font-size: 15px; font-weight: 800; color: #111827; margin-bottom: 4px; }
-    .d-slots { font-size: 12px; font-weight: 700; color: #10b981; }
-
-    .time-slots { margin-top: 30px; }
-    .time-label { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 15px; }
-    .slots-row { display: flex; gap: 12px; }
-    .t-slot {
-      flex: 1;
-      height: 54px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      color: #111827;
-      cursor: pointer;
-    }
-    .t-slot.active { border-color: #111827; background: #f9fafb; }
-
-    .book-session-btn {
-      width: 100%;
-      height: 60px;
-      background: #0f766e;
-      color: white;
-      border: none;
-      border-radius: 14px;
-      margin-top: 30px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .book-session-btn:hover { background: #0d645d; }
 
     /* FICHE TECHNIQUE STYLE */
     .fiche-container {
@@ -893,7 +521,6 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
     }
 
     @media (max-width: 992px) {
-      .content-grid { grid-template-columns: 1fr; }
       .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -90px; }
       .header-main { flex-direction: column; gap: 20px; }
       .name-row { justify-content: center; }
@@ -902,12 +529,19 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 })
 export class DriverProfileComponent implements OnInit {
   activeTab: string = 'overview';
+  showDeleteModal = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router
   ) { }
   ngOnInit(): void { }
+
+  confirmDelete(): void {
+    this.showDeleteModal = false;
+    this.router.navigate(['/drivers']);
+  }
+
   onAvatarError(event: any) {
     event.target.src = 'https://i.pravatar.cc/150?u=a042581f4e29026704d';
   }

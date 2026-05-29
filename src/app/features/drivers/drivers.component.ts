@@ -13,7 +13,9 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
+import { CarService } from '../../core/services/car.service';
 
 interface Driver {
   id: number;
@@ -41,8 +43,7 @@ interface Driver {
   imports: [
     CommonModule, NzGridModule, NzButtonModule, NzIconModule, NzTableModule,
     NzAvatarModule, NzTagModule, NzDropDownModule, NzDrawerModule, NzDividerModule,
-    NzAvatarModule, NzTagModule, NzDropDownModule, NzDrawerModule, NzDividerModule,
-    NzBadgeModule, NzModalModule, NzInputModule, FormsModule
+    NzBadgeModule, NzModalModule, NzInputModule, NzSelectModule, FormsModule
   ],
   template: `
     <div class="page-container">
@@ -62,10 +63,6 @@ interface Driver {
               <span nz-icon nzType="appstore" nzTheme="outline"></span>
             </button>
           </div>
-          <button nz-button nzType="default" class="report-btn" (click)="goToRepairs()">
-            <span nz-icon nzType="warning" nzTheme="outline"></span>
-            Report a Problem
-          </button>
           <button nz-button nzType="primary" class="add-btn" (click)="showAddModal()">
             <span nz-icon nzType="plus" nzTheme="outline"></span>
             Add New Driver
@@ -121,7 +118,7 @@ interface Driver {
                   <button nz-button nzType="text" nzSize="default" class="act-btn-edit" (click)="navigateToProfile(d)">
                     <span nz-icon nzType="edit"></span>
                   </button>
-                  <button nz-button nzType="text" nzSize="default" nzDanger class="act-btn-del">
+                  <button nz-button nzType="text" nzSize="default" nzDanger class="act-btn-del" (click)="showDeleteConfirm(d.id)">
                     <span nz-icon nzType="delete"></span>
                   </button>
                 </div>
@@ -345,7 +342,9 @@ interface Driver {
             </div>
             <div class="form-item">
               <label>Car Model</label>
-              <input nz-input placeholder="e.g. Isuzu D-Max" [(ngModel)]="newDriver.vehicle" />
+              <nz-select [(ngModel)]="newDriver.vehicle" nzPlaceHolder="Select a car" style="width:100%;">
+                <nz-option *ngFor="let c of allCars" [nzLabel]="c.name" [nzValue]="c.name"></nz-option>
+              </nz-select>
             </div>
             <div class="form-item">
               <label>Car Ref ID</label>
@@ -353,11 +352,13 @@ interface Driver {
             </div>
             <div class="form-item">
               <label>Region</label>
-              <input nz-input placeholder="e.g. NewYork" [(ngModel)]="newDriver.region" />
+              <nz-select [(ngModel)]="newDriver.region" nzPlaceHolder="Select a region" style="width:100%;">
+                <nz-option *ngFor="let r of tunisianRegions" [nzLabel]="r" [nzValue]="r"></nz-option>
+              </nz-select>
             </div>
             <div class="form-item">
-              <label>Sub-Region</label>
-              <input nz-input placeholder="e.g. West Bay" [(ngModel)]="newDriver.subRegion" />
+              <label>CIN</label>
+              <input nz-input placeholder="e.g. 12345678" [(ngModel)]="newDriver.subRegion" />
             </div>
           </div>
         </div>
@@ -368,6 +369,22 @@ interface Driver {
         <button nz-button nzType="primary" (click)="handleOk()" [disabled]="!newDriver.name || !newDriver.email">
           Create Driver
         </button>
+      </ng-template>
+    </nz-modal>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <nz-modal
+      [(nzVisible)]="showDeleteModal"
+      nzTitle="Delete Driver"
+      (nzOnCancel)="showDeleteModal = false"
+      [nzFooter]="deleteModalFooter"
+      [nzWidth]="400">
+      <ng-container *nzModalContent>
+        <p>Are you sure you want to delete this driver? This action cannot be undone.</p>
+      </ng-container>
+      <ng-template #deleteModalFooter>
+        <button nz-button nzType="default" (click)="showDeleteModal = false">Cancel</button>
+        <button nz-button nzType="primary" nzDanger (click)="confirmDelete()">Delete</button>
       </ng-template>
     </nz-modal>
 
@@ -408,20 +425,6 @@ interface Driver {
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-    .report-btn {
-      border-radius: 8px;
-      height: 36px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #dc2626;
-      border-color: #fca5a5;
-    }
-    .report-btn:hover {
-      color: #b91c1c !important;
-      border-color: #f87171 !important;
     }
     .view-toggle {
       display: flex;
@@ -870,17 +873,45 @@ interface Driver {
       border-color: #2563eb;
       box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
     }
+    .form-item ::ng-deep .ant-select-selector {
+      height: 40px !important;
+      border-radius: 8px !important;
+      border-color: #e2e8f0 !important;
+    }
+    .form-item ::ng-deep .ant-select-selection-item {
+      line-height: 40px !important;
+    }
   `]
 })
 export class DriversComponent {
   private router = inject(Router);
+  private carService = inject(CarService);
 
-  viewMode: 'list' | 'grid' = 'list';
+  viewMode: 'list' | 'grid' = 'grid';
   drawerOpen = false;
   selectedDriver: Driver | null = null;
 
-  goToRepairs(): void {
-    this.router.navigate(['/repairs']);
+  allCars = this.carService.getCars();
+
+  tunisianRegions = [
+    'Tunis', 'Sfax', 'Sousse', 'Nabeul', 'Gabès',
+    'Bizerte', 'Kairouan', 'Monastir', 'Médenine', 'Kasserine'
+  ];
+
+  showDeleteModal = false;
+  deleteTargetId: number | null = null;
+
+  showDeleteConfirm(id: number): void {
+    this.deleteTargetId = id;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (this.deleteTargetId !== null) {
+      this.drivers = this.drivers.filter(d => d.id !== this.deleteTargetId);
+    }
+    this.showDeleteModal = false;
+    this.deleteTargetId = null;
   }
 
   navigateToProfile(driver: Driver | null) {

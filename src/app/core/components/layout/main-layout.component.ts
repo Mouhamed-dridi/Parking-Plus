@@ -39,33 +39,28 @@ import { HeaderComponent } from '../header/header.component';
     .app-layout {
       height: 100vh;
     }
-
     .menu-sidebar {
-      background: var(--bg-surface) !important;
-      box-shadow: 1px 0 0 var(--border-muted);
+      background: #fff !important;
+      border-right: 1px solid #e0e0e0;
       z-index: 10;
     }
-
     nz-header {
-      background: var(--bg-surface) !important;
-      padding: 0 24px;
-      height: 64px;
-      line-height: 64px;
-      border-bottom: 1px solid var(--border-muted);
+      background: #fff !important;
+      padding: 0 16px;
+      height: 56px;
+      line-height: 56px;
+      border-bottom: 1px solid #e0e0e0;
       z-index: 9;
     }
-
     nz-content {
-      background: var(--bg-base);
+      background: #f8f9fa;
       margin: 0;
-      padding: 24px;
+      padding: 0;
       overflow-y: auto;
     }
-
     .inner-content {
-      min-height: calc(100vh - 112px);
+      min-height: calc(100vh - 56px);
     }
-
     ::ng-deep .ant-layout-sider-zero-width-trigger {
       display: none;
     }

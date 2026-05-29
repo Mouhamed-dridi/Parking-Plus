@@ -17,7 +17,18 @@ export const routes: Routes = [
     children: [
       {
         path: 'listing',
-        loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent)
+        loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent),
+        data: { vehicleType: 'Car' }
+      },
+      {
+        path: 'delivery-cars',
+        loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent),
+        data: { vehicleType: 'Delivery' }
+      },
+      {
+        path: 'used-car',
+        loadComponent: () => import('./features/listing/listing.component').then(m => m.ListingComponent),
+        data: { vehicleType: 'Used' }
       },
       {
         path: 'listing/:id',

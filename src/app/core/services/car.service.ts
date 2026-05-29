@@ -26,7 +26,7 @@ export class CarService {
 
   private allCars: CarDetail[] = [
     {
-      id: 1, name: 'GWM Tank 300 HEV 2.0 L', type: 'Car', transmission: 'Auto', fuel: 'Hybrid', price: 548.98,
+      id: 1, name: 'GWM Tank 300 HEV 2.0 L', type: 'Car', transmission: 'Auto', fuel: 'Hybrid', price: 548.98, status: 'Free',
       image: '/images/cars/DGcars/gwm-tank-300.jpg',
       driver: { name: 'Mulika lelia', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
       specs: {
@@ -136,43 +136,43 @@ export class CarService {
       }
     },
     {
-      id: 2, name: 'Bentley', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 789.345,
+      id: 2, name: 'Bentley', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 789.345, status: 'Free',
       image: '/images/cars/DGcars/bdw.avif',
       driver: { name: 'Rabin', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
       specs: this.defaultSpecs('Bentley', 'Continental GT', '2024', 'Diesel', '8.0 L', 'Auto', 'Coupé')
     },
     {
-      id: 3, name: 'Porsche Tayce', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 1234.70,
+      id: 3, name: 'Porsche Tayce', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 1234.70, status: 'Maintenance',
       image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif',
       driver: { name: 'Israt tuli', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
       specs: this.defaultSpecs('Porsche', 'Taycan', '2024', 'Diesel', '4.0 L', 'Auto', 'Berline')
     },
     {
-      id: 4, name: 'Mercedes E Class', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 908.234,
+      id: 4, name: 'Mercedes E Class', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 908.234, status: 'In Road',
       image: '/images/cars/DGcars/jclass.png',
       driver: { name: 'Zahidul', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
       specs: this.defaultSpecs('Mercedes-Benz', 'E 220 d', '2024', 'Diesel', '2.0 L', 'Auto', 'Berline')
     },
     {
-      id: 8, name: 'VW Caddy', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 80.00,
+      id: 8, name: 'VW Caddy', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 80.00, status: 'In Road',
       image: '/images/cars/deliver/caddy.webp',
       driver: { name: '', avatar: '' },
       specs: this.defaultSpecs('Volkswagen', 'Caddy Maxi', '2023', 'Diesel', '2.0 L', 'Manuelle', 'Utilitaire')
     },
     {
-      id: 9, name: 'Renault Dokker', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 75.00,
+      id: 9, name: 'Renault Dokker', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 75.00, status: 'Free',
       image: '/images/cars/deliver/docker.webp',
       driver: { name: '', avatar: '' },
       specs: this.defaultSpecs('Renault', 'Dokker Van', '2023', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')
     },
     {
-      id: 10, name: 'Peugeot Partner', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 85.00,
+      id: 10, name: 'Peugeot Partner', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 85.00, status: 'Free',
       image: '/images/cars/deliver/partiner.webp',
       driver: { name: '', avatar: '' },
       specs: this.defaultSpecs('Peugeot', 'Partner', '2024', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')
     },
     {
-      id: 11, name: 'Peugeot Partner Pro', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 90.00,
+      id: 11, name: 'Peugeot Partner Pro', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 90.00, status: 'In Road',
       image: '/images/cars/deliver/partnier.avif',
       driver: { name: '', avatar: '' },
       specs: this.defaultSpecs('Peugeot', 'Partner Pro', '2024', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')

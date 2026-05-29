@@ -18,6 +18,7 @@ export interface CarData {
   transmission: string;
   fuel: string;
   price: number;
+  status?: 'Free' | 'In Road' | 'Maintenance';
 }
 
 @Component({
@@ -50,7 +51,12 @@ export interface CarData {
             <span class="tag"><span nz-icon nzType="dashboard" nzTheme="outline"></span> {{ car.fuel }}</span>
           </div>
 
-
+          <div class="status-row">
+            <span class="status-badge" [class.status-free]="car.status === 'Free'" [class.status-road]="car.status === 'In Road'" [class.status-maint]="car.status === 'Maintenance'">
+              <span class="status-dot"></span>
+              {{ car.status || 'Free' }}
+            </span>
+          </div>
 
         </div>
       </div>
@@ -155,6 +161,43 @@ export interface CarData {
     .tag span.anticon {
       color: var(--primary-color);
       font-size: 12px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .status-free {
+      background: #e6f4ea;
+      color: #1e8e3e;
+    }
+
+    .status-road {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .status-maint {
+      background: #fce8e6;
+      color: #d93025;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
   `]
