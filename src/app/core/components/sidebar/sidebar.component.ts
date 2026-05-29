@@ -107,6 +107,7 @@ export class SidebarComponent {
     ]},
     { label: 'Drivers', icon: 'idcard', route: '/drivers' },
     { label: 'Booking', icon: 'calendar', route: '/request-car' },
+    { label: 'Booking List', icon: 'unordered-list', route: '/booking-list' },
     { label: 'Maintenance', icon: 'tool', route: '/repairs' },
   ];
 

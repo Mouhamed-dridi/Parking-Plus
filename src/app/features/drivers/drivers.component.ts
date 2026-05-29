@@ -16,6 +16,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
 import { CarService } from '../../core/services/car.service';
+import { TrashService } from '../../core/services/trash.service';
 
 interface Driver {
   id: number;
@@ -886,6 +887,7 @@ interface Driver {
 export class DriversComponent {
   private router = inject(Router);
   private carService = inject(CarService);
+  private trashService = inject(TrashService);
 
   viewMode: 'list' | 'grid' = 'grid';
   drawerOpen = false;
@@ -908,6 +910,16 @@ export class DriversComponent {
 
   confirmDelete(): void {
     if (this.deleteTargetId !== null) {
+      const driver = this.drivers.find(d => d.id === this.deleteTargetId);
+      if (driver) {
+        this.trashService.addItem({
+          id: 'driver-' + driver.id,
+          type: 'driver',
+          name: driver.name,
+          data: { ...driver },
+          deletedAt: new Date()
+        });
+      }
       this.drivers = this.drivers.filter(d => d.id !== this.deleteTargetId);
     }
     this.showDeleteModal = false;

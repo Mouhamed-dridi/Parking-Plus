@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -8,7 +8,11 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ThemeService } from '../../core/services/theme.service';
+import { TrashService, TrashItem } from '../../core/services/trash.service';
 
 @Component({
   selector: 'app-settings',
@@ -23,6 +27,9 @@ import { ThemeService } from '../../core/services/theme.service';
     NzIconModule,
     NzTypographyModule,
     NzDividerModule,
+    NzTableModule,
+    NzTagModule,
+    NzModalModule,
   ],
   template: `
     <div class="settings-page">
@@ -78,13 +85,13 @@ import { ThemeService } from '../../core/services/theme.service';
 
       <!-- User Management Card -->
       <nz-card class="settings-card" nzTitle="User Management">
-        <div class="card-subtitle">{{usersCount}} users in your team</div>
+        <div class="card-subtitle">{{ users.length }} users in your team</div>
         <div class="actions">
-          <button nz-button nzType="primary" class="btn-primary">
+          <button nz-button nzType="primary" class="btn-primary" (click)="showCreateUserModal = true">
             <span nz-icon nzType="user-add" nzTheme="outline"></span>
-            Invite New User
+            Create User
           </button>
-          <button nz-button nzType="default" class="btn-secondary">
+          <button nz-button nzType="default" class="btn-secondary" (click)="showManageUsersModal = true">
             <span nz-icon nzType="team" nzTheme="outline"></span>
             Manage All Users
           </button>
@@ -136,6 +143,188 @@ import { ThemeService } from '../../core/services/theme.service';
           </div>
         </div>
       </nz-card>
+
+      <!-- Trash Card -->
+      <nz-card class="settings-card" nzTitle="Trash">
+        <div class="card-subtitle">{{ trashItems.length }} deleted items</div>
+
+        <nz-table #trashTable [nzData]="trashItems" [nzShowPagination]="true" [nzPageSize]="5" nzSize="small">
+          <thead>
+            <tr>
+              <th>TYPE</th>
+              <th>NAME</th>
+              <th>DELETED AT</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of trashTable.data">
+              <td>
+                <nz-tag [nzColor]="item.type === 'driver' ? 'blue' : 'green'">{{ item.type }}</nz-tag>
+              </td>
+              <td>{{ item.name }}</td>
+              <td>{{ formatDate(item.deletedAt) }}</td>
+              <td>
+                <button nz-button nzType="text" nzSize="small" class="restore-btn" (click)="restoreItem(item.id)">
+                  <span nz-icon nzType="undo" nzTheme="outline"></span> Restore
+                </button>
+                <button nz-button nzType="text" nzSize="small" nzDanger class="delete-btn" (click)="permanentDelete(item.id)">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+
+        <div class="empty-trash" *ngIf="trashItems.length === 0">
+          <span nz-icon nzType="inbox" nzTheme="outline" class="empty-icon"></span>
+          <p>Trash is empty</p>
+        </div>
+
+        <div class="trash-actions" *ngIf="trashItems.length > 0">
+          <button nz-button nzType="default" nzDanger (click)="clearAll()">
+            <span nz-icon nzType="delete" nzTheme="outline"></span> Empty Trash
+          </button>
+        </div>
+      </nz-card>
+
+      <!-- CREATE USER MODAL -->
+      <nz-modal
+        [(nzVisible)]="showCreateUserModal"
+        nzTitle="Create User"
+        (nzOnCancel)="showCreateUserModal = false"
+        [nzFooter]="createUserFooter"
+        [nzWidth]="420">
+        <ng-container *nzModalContent>
+          <div class="create-user-form">
+            <div class="form-item">
+              <label>Full Name</label>
+              <input nz-input placeholder="e.g. John Doe" [(ngModel)]="newUser.name" />
+            </div>
+            <div class="form-item">
+              <label>Email Address</label>
+              <input nz-input placeholder="e.g. john@parkplus.com" [(ngModel)]="newUser.email" />
+            </div>
+            <div class="form-item">
+              <label>Password</label>
+              <input nz-input type="password" placeholder="Enter password" [(ngModel)]="newUser.password" />
+            </div>
+            <div class="form-item">
+              <label>Role</label>
+              <nz-select [(ngModel)]="newUser.role" nzPlaceHolder="Select role" style="width: 100%;">
+                <nz-option nzLabel="User" nzValue="user"></nz-option>
+                <nz-option nzLabel="Admin" nzValue="admin"></nz-option>
+              </nz-select>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #createUserFooter>
+          <button nz-button nzType="default" (click)="showCreateUserModal = false">Cancel</button>
+          <button nz-button nzType="primary" (click)="createUser()" [disabled]="!newUser.name || !newUser.email || !newUser.password">Create User</button>
+        </ng-template>
+      </nz-modal>
+
+      <!-- MANAGE USERS MODAL -->
+      <nz-modal
+        [(nzVisible)]="showManageUsersModal"
+        nzTitle="Manage All Users"
+        (nzOnCancel)="showManageUsersModal = false"
+        [nzFooter]="manageUsersFooter"
+        [nzWidth]="700">
+        <ng-container *nzModalContent>
+          <nz-table #userTable [nzData]="users" nzSize="small">
+            <thead>
+              <tr>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>ROLE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of userTable.data">
+                <td>{{ u.name }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <nz-tag [nzColor]="u.role === 'admin' ? 'purple' : 'blue'">{{ u.role }}</nz-tag>
+                </td>
+                <td>
+                  <button nz-button nzType="text" nzSize="small" class="edit-btn" (click)="editUser(u)">
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button nz-button nzType="text" nzSize="small" class="restore-btn" (click)="changePassword(u)">
+                    <span nz-icon nzType="lock" nzTheme="outline"></span>
+                  </button>
+                  <button nz-button nzType="text" nzSize="small" nzDanger class="delete-btn" (click)="deleteUser(u.id)">
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </ng-container>
+        <ng-template #manageUsersFooter>
+          <button nz-button nzType="default" (click)="showManageUsersModal = false">Close</button>
+        </ng-template>
+      </nz-modal>
+
+      <!-- EDIT USER MODAL -->
+      <nz-modal
+        [(nzVisible)]="showEditUserModal"
+        nzTitle="Edit User"
+        (nzOnCancel)="showEditUserModal = false"
+        [nzFooter]="editUserFooter"
+        [nzWidth]="420">
+        <ng-container *nzModalContent>
+          <div class="create-user-form">
+            <div class="form-item">
+              <label>Full Name</label>
+              <input nz-input [(ngModel)]="editingUser.name" />
+            </div>
+            <div class="form-item">
+              <label>Email Address</label>
+              <input nz-input [(ngModel)]="editingUser.email" />
+            </div>
+            <div class="form-item">
+              <label>Role</label>
+              <nz-select [(ngModel)]="editingUser.role" style="width: 100%;">
+                <nz-option nzLabel="User" nzValue="user"></nz-option>
+                <nz-option nzLabel="Admin" nzValue="admin"></nz-option>
+              </nz-select>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #editUserFooter>
+          <button nz-button nzType="default" (click)="showEditUserModal = false">Cancel</button>
+          <button nz-button nzType="primary" (click)="saveEditUser()">Save Changes</button>
+        </ng-template>
+      </nz-modal>
+
+      <!-- CHANGE PASSWORD MODAL -->
+      <nz-modal
+        [(nzVisible)]="showChangePasswordModal"
+        nzTitle="Change Password"
+        (nzOnCancel)="showChangePasswordModal = false"
+        [nzFooter]="changePasswordFooter"
+        [nzWidth]="420">
+        <ng-container *nzModalContent>
+          <div class="create-user-form">
+            <p class="pwd-user-info">Changing password for <strong>{{ editingUser.name }}</strong></p>
+            <div class="form-item">
+              <label>New Password</label>
+              <input nz-input type="password" placeholder="Enter new password" [(ngModel)]="newPassword" />
+            </div>
+            <div class="form-item">
+              <label>Confirm Password</label>
+              <input nz-input type="password" placeholder="Confirm new password" [(ngModel)]="confirmPassword" />
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #changePasswordFooter>
+          <button nz-button nzType="default" (click)="showChangePasswordModal = false">Cancel</button>
+          <button nz-button nzType="primary" (click)="savePassword()" [disabled]="!newPassword || newPassword !== confirmPassword">Update Password</button>
+        </ng-template>
+      </nz-modal>
     </div>
   `,
   styles: [`
@@ -287,20 +476,168 @@ import { ThemeService } from '../../core/services/theme.service';
     nz-divider {
       margin: 16px 0;
     }
+
+    .restore-btn {
+      color: #16a34a !important;
+    }
+    .restore-btn:hover {
+      color: #15803d !important;
+    }
+
+    .delete-btn {
+      color: #dc2626 !important;
+    }
+    .delete-btn:hover {
+      color: #b91c1c !important;
+    }
+
+    .empty-trash {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .empty-icon {
+      font-size: 48px;
+      color: #d1d5db;
+      margin-bottom: 12px;
+    }
+    .empty-trash p {
+      color: #9ca3af;
+      margin: 0;
+    }
+
+    .trash-actions {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .create-user-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-item label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+    .pwd-user-info {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #374151;
+    }
+    .edit-btn { color: #6366f1 !important; }
   `]
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
+  private trashService = inject(TrashService);
+
   language = 'en';
   timeZone = 'UTC';
   dateFormat = 'MM/DD/YYYY';
 
   constructor(public themeService: ThemeService) {}
 
-  usersCount = 5;
-
   currentVersion = 'v1.0.0';
   lastUpdated = new Date().toLocaleDateString();
   autoUpdates = false;
 
   twoFactorEnabled = false;
+
+  trashItems: TrashItem[] = [];
+
+  // User Management
+  users = [
+    { id: 1, name: 'Ahmed Benali', email: 'ahmed@parkplus.com', role: 'admin' },
+    { id: 2, name: 'Sara Trabelsi', email: 'sara@parkplus.com', role: 'user' },
+    { id: 3, name: 'Mohamed Karim', email: 'mohamed@parkplus.com', role: 'user' },
+    { id: 4, name: 'Fatma Zahra', email: 'fatma@parkplus.com', role: 'user' },
+    { id: 5, name: 'Ali Mansour', email: 'ali@parkplus.com', role: 'admin' }
+  ];
+
+  showCreateUserModal = false;
+  showManageUsersModal = false;
+  showEditUserModal = false;
+  showChangePasswordModal = false;
+
+  newUser = { name: '', email: '', password: '', role: 'user' };
+  editingUser: any = {};
+  newPassword = '';
+  confirmPassword = '';
+
+  ngOnInit() {
+    this.trashItems = this.trashService.getItems();
+  }
+
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  restoreItem(id: string) {
+    this.trashService.restoreItem(id);
+    this.trashItems = this.trashService.getItems();
+  }
+
+  permanentDelete(id: string) {
+    this.trashService.permanentDelete(id);
+    this.trashItems = this.trashService.getItems();
+  }
+
+  clearAll() {
+    this.trashService.clearAll();
+    this.trashItems = this.trashService.getItems();
+  }
+
+  createUser() {
+    if (!this.newUser.name || !this.newUser.email || !this.newUser.password) return;
+    this.users.push({
+      id: Date.now(),
+      name: this.newUser.name,
+      email: this.newUser.email,
+      role: this.newUser.role
+    });
+    this.newUser = { name: '', email: '', password: '', role: 'user' };
+    this.showCreateUserModal = false;
+  }
+
+  editUser(user: any) {
+    this.editingUser = { ...user };
+    this.showManageUsersModal = false;
+    this.showEditUserModal = true;
+  }
+
+  saveEditUser() {
+    const index = this.users.findIndex(u => u.id === this.editingUser.id);
+    if (index !== -1) {
+      this.users[index] = { ...this.editingUser };
+    }
+    this.showEditUserModal = false;
+  }
+
+  changePassword(user: any) {
+    this.editingUser = { ...user };
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.showManageUsersModal = false;
+    this.showChangePasswordModal = true;
+  }
+
+  savePassword() {
+    this.showChangePasswordModal = false;
+  }
+
+  deleteUser(id: number) {
+    this.users = this.users.filter(u => u.id !== id);
+  }
 }

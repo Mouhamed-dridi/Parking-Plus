@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -8,6 +8,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import jsPDF from 'jspdf';
+import { BookingService } from '../../core/services/booking.service';
 
 interface Car {
   id: number;
@@ -451,6 +452,8 @@ interface Car {
   `]
 })
 export class RequestCarComponent {
+  private bookingService = inject(BookingService);
+
   currentStep = 1;
   bookingSubmitted = false;
   bookingRefId = '';
@@ -588,10 +591,26 @@ export class RequestCarComponent {
   submitBooking() {
     if (!this.isStepValid(1) || !this.isStepValid(2) || !this.isStepValid(3)) return;
     
-    // Generate simulated reference ID
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const regionSuffix = this.bookingData.destination.substring(0, 2).toUpperCase() || 'US';
-    this.bookingRefId = `BK-${randomNum}-${regionSuffix}`;
+    this.bookingRefId = this.bookingService.generateRefId();
+
+    this.bookingService.addBooking({
+      id: this.bookingRefId,
+      refId: this.bookingRefId,
+      name: this.bookingData.name,
+      email: this.bookingData.email,
+      phone: this.bookingData.phone,
+      department: this.bookingData.department,
+      purpose: this.bookingData.purpose,
+      vehicleName: this.bookingData.selectedCar?.name || '',
+      vehicleType: this.bookingData.selectedCar?.type || '',
+      hasLicense: this.bookingData.hasLicense,
+      hasShellCard: this.bookingData.hasShellCard,
+      source: this.bookingData.source,
+      destination: this.bookingData.destination,
+      departureTime: this.bookingData.departureTime,
+      arrivalTime: this.bookingData.arrivalTime,
+      createdAt: new Date()
+    });
     
     this.bookingSubmitted = true;
   }

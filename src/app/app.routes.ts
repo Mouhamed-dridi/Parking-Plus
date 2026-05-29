@@ -47,6 +47,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/request-car/request-car.component').then(m => m.RequestCarComponent)
       },
       {
+        path: 'booking-list',
+        loadComponent: () => import('./features/booking-list/booking-list.component').then(m => m.BookingListComponent)
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
       },
