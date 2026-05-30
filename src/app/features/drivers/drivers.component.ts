@@ -116,7 +116,7 @@ interface Driver {
               </td>
               <td (click)="$event.stopPropagation()">
                 <div class="action-btns">
-                  <button nz-button nzType="text" nzSize="default" class="act-btn-edit" (click)="navigateToProfile(d)">
+                  <button nz-button nzType="text" nzSize="default" class="act-btn-edit" (click)="showEditModal(d)">
                     <span nz-icon nzType="edit"></span>
                   </button>
                   <button nz-button nzType="text" nzSize="default" nzDanger class="act-btn-del" (click)="showDeleteConfirm(d.id)">
@@ -386,6 +386,72 @@ interface Driver {
       <ng-template #deleteModalFooter>
         <button nz-button nzType="default" (click)="showDeleteModal = false">Cancel</button>
         <button nz-button nzType="primary" nzDanger (click)="confirmDelete()">Delete</button>
+      </ng-template>
+    </nz-modal>
+
+    <!-- EDIT DRIVER MODAL -->
+    <nz-modal
+      [(nzVisible)]="isEditModalVisible"
+      nzTitle="Edit Driver"
+      (nzOnCancel)="isEditModalVisible = false"
+      [nzFooter]="editModalFooter"
+      [nzWidth]="620">
+      <ng-container *nzModalContent>
+        <div class="add-driver-form">
+          <div class="profile-upload-section">
+            <div class="upload-avatar-wrap">
+              <img [src]="editingDriver.avatar" class="upload-preview" />
+              <div class="upload-overlay" (click)="editFileInput.click()">
+                <span nz-icon nzType="camera" nzTheme="outline"></span>
+                <span>Change</span>
+              </div>
+            </div>
+            <input #editFileInput type="file" (change)="onEditFileSelected($event)" style="display: none" accept="image/*" />
+          </div>
+
+          <div class="form-grid">
+            <div class="form-item">
+              <label>Full Name</label>
+              <input nz-input [(ngModel)]="editingDriver.name" />
+            </div>
+            <div class="form-item">
+              <label>Email Address</label>
+              <input nz-input [(ngModel)]="editingDriver.email" />
+            </div>
+            <div class="form-item">
+              <label>Phone Number</label>
+              <input nz-input [(ngModel)]="editingDriver.phone" />
+            </div>
+            <div class="form-item">
+              <label>License ID</label>
+              <input nz-input [(ngModel)]="editingDriver.license" />
+            </div>
+            <div class="form-item">
+              <label>Car Model</label>
+              <nz-select [(ngModel)]="editingDriver.vehicle" nzPlaceHolder="Select a car" style="width:100%;">
+                <nz-option *ngFor="let c of allCars" [nzLabel]="c.name" [nzValue]="c.name"></nz-option>
+              </nz-select>
+            </div>
+            <div class="form-item">
+              <label>Car Ref ID</label>
+              <input nz-input [(ngModel)]="editingDriver.carRefId" />
+            </div>
+            <div class="form-item">
+              <label>Region</label>
+              <nz-select [(ngModel)]="editingDriver.region" nzPlaceHolder="Select a region" style="width:100%;">
+                <nz-option *ngFor="let r of tunisianRegions" [nzLabel]="r" [nzValue]="r"></nz-option>
+              </nz-select>
+            </div>
+            <div class="form-item">
+              <label>CIN</label>
+              <input nz-input [(ngModel)]="editingDriver.subRegion" />
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #editModalFooter>
+        <button nz-button nzType="default" (click)="isEditModalVisible = false">Cancel</button>
+        <button nz-button nzType="primary" (click)="saveEdit()">Save Changes</button>
       </ng-template>
     </nz-modal>
 
@@ -934,6 +1000,8 @@ export class DriversComponent {
 
   // Add Modal State
   isAddModalVisible = false;
+  isEditModalVisible = false;
+  editingDriver: Partial<Driver> = {};
   newDriver: Partial<Driver> = this.getDefaultNewDriver();
 
   getDefaultNewDriver(): Partial<Driver> {
@@ -973,6 +1041,30 @@ export class DriversComponent {
       };
       this.drivers = [driver, ...this.drivers];
       this.isAddModalVisible = false;
+    }
+  }
+
+  showEditModal(driver: Driver) {
+    this.editingDriver = { ...driver };
+    this.isEditModalVisible = true;
+  }
+
+  saveEdit() {
+    const index = this.drivers.findIndex(d => d.id === this.editingDriver.id);
+    if (index !== -1) {
+      this.drivers[index] = { ...this.drivers[index], ...this.editingDriver } as Driver;
+    }
+    this.isEditModalVisible = false;
+  }
+
+  onEditFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.editingDriver.avatar = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
   }
 

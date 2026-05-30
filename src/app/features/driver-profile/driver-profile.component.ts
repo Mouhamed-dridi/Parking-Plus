@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -7,18 +8,23 @@ import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-driver-profile',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     NzIconModule,
     NzButtonModule,
     NzTabsModule,
     NzTagModule,
     NzAvatarModule,
-    NzModalModule
+    NzModalModule,
+    NzInputModule,
+    NzSelectModule
   ],
   template: `
     <div class="profile-page">
@@ -34,12 +40,12 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
           <div class="header-main">
             <div class="name-area">
               <div class="name-row">
-                <h1>Ahmed Benali</h1>
+                <h1>{{ editData.name }}</h1>
               </div>
               <p class="role-desc">Senior Driver at <strong>Park+ Logistics</strong></p>
             </div>
             <div class="action-row">
-              <button class="solid-btn edit-solid">
+              <button class="solid-btn edit-solid" (click)="showEditModal = true">
                 <span nz-icon nzType="edit" nzTheme="outline"></span>
                 <span>Edit</span>
               </button>
@@ -78,19 +84,19 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
           <div class="info-grid-2col">
             <div class="info-row">
               <span class="info-label">Full Name</span>
-              <span class="info-value">Ahmed Benali</span>
+              <span class="info-value">{{ editData.name }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Email Address</span>
-              <span class="info-value">ahmed.benali&#64;parkplus.com</span>
+              <span class="info-value">{{ editData.email }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Phone Number</span>
-              <span class="info-value">+216 55 123 456</span>
+              <span class="info-value">{{ editData.phone }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">License ID</span>
-              <span class="info-value">TN-98765432</span>
+              <span class="info-value">{{ editData.license }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Car Model</span>
@@ -98,11 +104,11 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
             </div>
             <div class="info-row">
               <span class="info-label">Car Ref ID</span>
-              <span class="info-value">CAR-TN-0012</span>
+              <span class="info-value">{{ editData.carRefId }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Region</span>
-              <span class="info-value">Tunis</span>
+              <span class="info-value">{{ editData.region }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">CIN</span>
@@ -117,8 +123,8 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
         <div class="overview-card">
           <h3>Contact Driver</h3>
           <div class="contact-row">
-            <button class="contact-btn phone-btn"><span nz-icon nzType="phone" nzTheme="fill"></span> +216 55 123 456</button>
-            <button class="contact-btn email-btn"><span nz-icon nzType="mail" nzTheme="fill"></span> ahmed.benali&#64;parkplus.com</button>
+            <button class="contact-btn phone-btn"><span nz-icon nzType="phone" nzTheme="fill"></span> {{ editData.phone }}</button>
+            <button class="contact-btn email-btn"><span nz-icon nzType="mail" nzTheme="fill"></span> {{ editData.email }}</button>
             <button class="contact-btn wa-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
           </div>
         </div>
@@ -195,6 +201,49 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
       <ng-template #deleteModalFooter>
         <button nz-button nzType="default" (click)="showDeleteModal = false">Cancel</button>
         <button nz-button nzType="primary" nzDanger (click)="confirmDelete()">Delete</button>
+      </ng-template>
+    </nz-modal>
+
+    <!-- EDIT DRIVER MODAL -->
+    <nz-modal
+      [(nzVisible)]="showEditModal"
+      nzTitle="Edit Driver"
+      (nzOnCancel)="showEditModal = false"
+      [nzFooter]="editModalFooter"
+      [nzWidth]="620">
+      <ng-container *nzModalContent>
+        <div class="edit-form">
+          <div class="edit-grid">
+            <div class="edit-item">
+              <label>Full Name</label>
+              <input nz-input [(ngModel)]="editData.name" />
+            </div>
+            <div class="edit-item">
+              <label>Email Address</label>
+              <input nz-input [(ngModel)]="editData.email" />
+            </div>
+            <div class="edit-item">
+              <label>Phone Number</label>
+              <input nz-input [(ngModel)]="editData.phone" />
+            </div>
+            <div class="edit-item">
+              <label>License ID</label>
+              <input nz-input [(ngModel)]="editData.license" />
+            </div>
+            <div class="edit-item">
+              <label>Car Ref ID</label>
+              <input nz-input [(ngModel)]="editData.carRefId" />
+            </div>
+            <div class="edit-item">
+              <label>Region</label>
+              <input nz-input [(ngModel)]="editData.region" />
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #editModalFooter>
+        <button nz-button nzType="default" (click)="showEditModal = false">Cancel</button>
+        <button nz-button nzType="primary" (click)="saveEdit()">Save Changes</button>
       </ng-template>
     </nz-modal>
   `,
@@ -525,17 +574,48 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
       .header-main { flex-direction: column; gap: 20px; }
       .name-row { justify-content: center; }
     }
+
+    .edit-form { padding: 8px 0; }
+    .edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .edit-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .edit-item label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+    }
   `]
 })
 export class DriverProfileComponent implements OnInit {
   activeTab: string = 'overview';
   showDeleteModal = false;
+  showEditModal = false;
+
+  editData = {
+    name: 'Ahmed Benali',
+    email: 'ahmed.benali@parkplus.com',
+    phone: '+216 55 123 456',
+    license: 'TN-98765432',
+    carRefId: 'CAR-TN-0012',
+    region: 'Tunis'
+  };
 
   constructor(
     private route: ActivatedRoute,
     private router: Router
   ) { }
   ngOnInit(): void { }
+
+  saveEdit(): void {
+    this.showEditModal = false;
+  }
 
   confirmDelete(): void {
     this.showDeleteModal = false;

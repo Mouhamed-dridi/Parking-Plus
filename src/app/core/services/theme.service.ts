@@ -21,15 +21,15 @@ export class ThemeService {
   }
 
   private enableDark(): void {
-    document.body.classList.add('dark-theme');
-    document.body.classList.remove('light-theme');
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
     this.isDark = true;
     localStorage.setItem(this.storageKey, 'dark');
   }
 
   private enableLight(): void {
-    document.body.classList.add('light-theme');
-    document.body.classList.remove('dark-theme');
+    document.documentElement.classList.add('light');
+    document.documentElement.classList.remove('dark');
     this.isDark = false;
     localStorage.setItem(this.storageKey, 'light');
   }

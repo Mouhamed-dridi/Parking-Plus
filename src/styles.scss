@@ -286,3 +286,184 @@ a:hover { color: var(--accent-hover); }
 .status-dot.free { background: #1b5e20; }
 .status-dot.occupied { background: #b71c1c; }
 .status-dot.reserved { background: #e65100; }
+
+/* ═══════════════════════════════════════════════════
+   Dark Mode — Component Overrides
+   ═══════════════════════════════════════════════════ */
+
+.dark {
+  /* Page backgrounds */
+  .repairs-container,
+  .page-container,
+  .page-header,
+  .listing-content,
+  .settings-page,
+  .profile-page,
+  .overview-centered,
+  .overview-card,
+  .table-container,
+  .form-card,
+  .car-sessions-content,
+  .fiche-container {
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* KPI cards */
+  .kpi-card,
+  .stat-card,
+  .bio-card,
+  .car-details-card,
+  .driver-card {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .kpi-label, .stat-lbl, .d-label, .info-label {
+    color: var(--text-secondary) !important;
+  }
+  .kpi-value, .stat-val, .c-val, .info-value, .driver-name {
+    color: var(--text-primary) !important;
+  }
+
+  /* Tables */
+  .repairs-table,
+  .list-view,
+  .grid-view {
+    background: var(--bg-surface) !important;
+  }
+
+  /* Forms */
+  .form-item label,
+  .form-group label,
+  .edit-item label {
+    color: var(--text-secondary) !important;
+  }
+
+  input, textarea, .ant-input, .ant-select-selector {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-muted) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Modals */
+  .ant-modal-content,
+  .ant-modal-header,
+  .modal-card {
+    background: var(--bg-surface) !important;
+  }
+  .ant-modal-title, .modal-header h2 {
+    color: var(--text-primary) !important;
+  }
+
+  /* Cards */
+  .settings-card,
+  .trash-card,
+  nz-card {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+  }
+  .ant-card-head,
+  .ant-card-head-title {
+    color: var(--text-primary) !important;
+    border-color: var(--border-muted) !important;
+  }
+  .ant-card-body {
+    color: var(--text-primary) !important;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+  }
+
+  /* Headers */
+  h1, h2, h3, h4, h5, h6, .page-title,
+  .step-title, .stat-header h3, .overview-card h3 {
+    color: var(--text-primary) !important;
+  }
+
+  .subtitle, .page-sub, .step-desc, .card-subtitle {
+    color: var(--text-secondary) !important;
+  }
+
+  /* Tabs */
+  .tabs-container, .tab {
+    background: var(--bg-surface) !important;
+  }
+  .tab {
+    color: var(--text-secondary) !important;
+    border-color: var(--border-muted) !important;
+  }
+  .tab.active {
+    color: var(--accent) !important;
+  }
+
+  /* Filter bar */
+  .filters-bar, .section-header {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+  }
+
+  /* Text */
+  p, span, td, th, label, .r-val, .r-sub, .r-lbl, .c-row, .fiche-row span {
+    color: var(--text-primary) !important;
+  }
+
+  /* Badge badges in KPI */
+  .kpi-badge { color: var(--text-primary) !important; }
+
+  /* Button overrides */
+  .btn-primary, .add-btn {
+    background-color: var(--accent) !important;
+  }
+  .btn-primary:hover, .add-btn:hover {
+    background-color: var(--accent-hover) !important;
+  }
+
+  /* Receipt */
+  .receipt-card, .success-screen {
+    background: var(--bg-surface) !important;
+  }
+
+  /* Password cell */
+  .password-cell span {
+    color: var(--text-primary) !important;
+  }
+
+  /* Tags */
+  .ant-tag {
+    color: var(--text-primary) !important;
+  }
+
+  /* Table rows */
+  .ant-table-tbody > tr > td,
+  .ant-table-thead > tr > th {
+    color: var(--text-primary) !important;
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+  }
+
+  /* Select dropdown */
+  .ant-select-dropdown {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-muted) !important;
+  }
+  .ant-select-item {
+    color: var(--text-primary) !important;
+  }
+  .ant-select-item-option-active,
+  .ant-select-item-option-selected {
+    background: var(--bg-hover) !important;
+  }
+
+  /* Switch */
+  .ant-switch {
+    background: var(--border-muted) !important;
+  }
+  .ant-switch-checked {
+    background: var(--accent) !important;
+  }
+}

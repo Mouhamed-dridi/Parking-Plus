@@ -310,14 +310,15 @@ interface Repair {
       color: #6b7280;
     }
     .btn-primary {
-      height: 42px;
-      padding: 0 22px;
-      border-radius: 10px;
+      background-color: #6366f1;
+      border-color: #6366f1;
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 18px;
       border: none;
-      background: #6366f1;
       color: white;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -325,63 +326,73 @@ interface Repair {
       transition: all 0.2s;
       white-space: nowrap;
     }
-    .btn-primary:hover { background: #4f46e5; }
+    .btn-primary:hover { background-color: #4f46e5 !important; }
     .btn-primary.disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ── KPI CARDS ── */
     .kpi-row {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-bottom: 24px;
     }
     .kpi-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
+      background: #fff;
+      padding: 16px 20px;
       display: flex;
-      align-items: center;
-      gap: 16px;
-      border: 1px solid #f0f0f0;
+      align-items: flex-start;
+      gap: 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      position: relative;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     .kpi-icon-wrap {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
     .kpi-body {
-      display: flex;
-      flex-direction: column;
       flex: 1;
     }
     .kpi-label {
-      font-size: 12px;
+      font-size: 11px;
+      color: #5f6368;
       font-weight: 500;
-      color: #9ca3af;
+      margin: 0 0 2px;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
     .kpi-value {
       font-size: 24px;
-      font-weight: 700;
-      color: #1f2937;
-      margin-top: 2px;
+      font-weight: 600;
+      color: #202124;
+      margin: 0;
     }
     .kpi-badge {
-      font-size: 11px;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 10px;
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 20px;
       white-space: nowrap;
     }
     .badge-blue { background: #eef2ff; color: #6366f1; }
     .badge-amber { background: #fef3c7; color: #d97706; }
     .badge-green { background: #d1fae5; color: #059669; }
+
+    @media (max-width: 992px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .kpi-row { grid-template-columns: 1fr; }
+    }
 
     /* ── FILTERS BAR ── */
     .filters-bar {
