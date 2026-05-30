@@ -27,6 +27,7 @@ interface Repair {
   estimatedCost: number;
   actualCost?: number;
   priority: 'High' | 'Medium' | 'Low';
+  duration?: string;
 }
 
 @Component({
@@ -46,31 +47,27 @@ interface Repair {
           <h1 class="page-title">Car Repairs</h1>
           <p class="page-sub">Track and manage vehicle repairs across your fleet</p>
         </div>
-        <button class="btn-primary" (click)="showReportModal = true">
-          <span nz-icon nzType="plus" nzTheme="outline"></span>
-          Report New Car Fix
-        </button>
+        <div class="header-btns">
+          <button class="btn-primary" (click)="showReportModal = true">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            Report New Car Fix
+          </button>
+          <button class="btn-success" (click)="showCloseRepairModal = true">
+            <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+            Close Repair
+          </button>
+        </div>
       </div>
 
       <!-- ═══ KPI CARDS ═══ -->
       <div class="kpi-row">
         <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#eef2ff">
-            <span nz-icon nzType="tool" nzTheme="outline" style="color:#6366f1;font-size:20px;"></span>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">In Repair</span>
-            <span class="kpi-value">{{ inRepairCount }}</span>
-          </div>
-          <span class="kpi-badge badge-blue">Active</span>
-        </div>
-        <div class="kpi-card">
           <div class="kpi-icon-wrap" style="background:#fef3c7">
-            <span nz-icon nzType="clock-circle" nzTheme="outline" style="color:#f59e0b;font-size:20px;"></span>
+            <span nz-icon nzType="tool" nzTheme="outline" style="color:#f59e0b;font-size:20px;"></span>
           </div>
           <div class="kpi-body">
-            <span class="kpi-label">Waiting</span>
-            <span class="kpi-value">{{ waitingCount }}</span>
+            <span class="kpi-label">Still in Maintenance</span>
+            <span class="kpi-value">{{ inFixRepairs.length }}</span>
           </div>
           <span class="kpi-badge badge-amber">Pending</span>
         </div>
@@ -79,85 +76,34 @@ interface Repair {
             <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#10b981;font-size:20px;"></span>
           </div>
           <div class="kpi-body">
-            <span class="kpi-label">Repaired This Month</span>
-            <span class="kpi-value">{{ repairedThisMonth }}</span>
+            <span class="kpi-label">Closed</span>
+            <span class="kpi-value">{{ closedRepairs.length }}</span>
           </div>
-          <span class="kpi-badge badge-green">+{{ monthlyChange }}%</span>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#f0f5ff">
-            <span nz-icon nzType="dashboard" nzTheme="outline" style="color:#3b82f6;font-size:20px;"></span>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">Avg Repair Time</span>
-            <span class="kpi-value">{{ avgRepairTime }}</span>
-          </div>
-          <span class="kpi-badge badge-blue">{{ avgTrend }}</span>
+          <span class="kpi-badge badge-green">Done</span>
         </div>
       </div>
 
-      <!-- ═══ FILTERS BAR ═══ -->
-      <div class="filters-bar">
-        <div class="search-wrap">
-          <span nz-icon nzType="search" nzTheme="outline" class="search-icon"></span>
-          <input nz-input [(ngModel)]="searchQuery" placeholder="Search by plate, brand, issue..." class="search-input" />
-        </div>
-        <nz-select [(ngModel)]="filterStatus" nzPlaceHolder="Status" style="width:150px;" nzAllowClear>
-          <nz-option nzLabel="All Status" nzValue=""></nz-option>
-          <nz-option nzLabel="Waiting" nzValue="Waiting"></nz-option>
-          <nz-option nzLabel="In Progress" nzValue="In Progress"></nz-option>
-          <nz-option nzLabel="Completed" nzValue="Completed"></nz-option>
-          <nz-option nzLabel="Cancelled" nzValue="Cancelled"></nz-option>
-        </nz-select>
-        <nz-select [(ngModel)]="filterPriority" nzPlaceHolder="Priority" style="width:140px;" nzAllowClear>
-          <nz-option nzLabel="All Priority" nzValue=""></nz-option>
-          <nz-option nzLabel="High" nzValue="High"></nz-option>
-          <nz-option nzLabel="Medium" nzValue="Medium"></nz-option>
-          <nz-option nzLabel="Low" nzValue="Low"></nz-option>
-        </nz-select>
-        <nz-select [(ngModel)]="filterType" nzPlaceHolder="Repair Type" style="width:160px;" nzAllowClear>
-          <nz-option nzLabel="All Types" nzValue=""></nz-option>
-          <nz-option nzLabel="Mechanical" nzValue="Mechanical"></nz-option>
-          <nz-option nzLabel="Electrical" nzValue="Electrical"></nz-option>
-          <nz-option nzLabel="Body Damage" nzValue="Body Damage"></nz-option>
-          <nz-option nzLabel="Tire" nzValue="Tire"></nz-option>
-          <nz-option nzLabel="Other" nzValue="Other"></nz-option>
-        </nz-select>
-        <button class="btn-export" (click)="exportList()">
-          <span nz-icon nzType="export" nzTheme="outline"></span> Export
-        </button>
-      </div>
-
-      <!-- ═══ STATUS TABS ═══ -->
-      <div class="status-tabs">
-        <div class="stab" [class.active]="statusTab === ''" (click)="statusTab = ''">All Repairs <span class="stab-count">{{ filteredRepairs.length }}</span></div>
-        <div class="stab" [class.active]="statusTab === 'Waiting'" (click)="statusTab = 'Waiting'">Waiting <span class="stab-count">{{ countByStatus('Waiting') }}</span></div>
-        <div class="stab" [class.active]="statusTab === 'In Progress'" (click)="statusTab = 'In Progress'">In Progress <span class="stab-count">{{ countByStatus('In Progress') }}</span></div>
-        <div class="stab" [class.active]="statusTab === 'Completed'" (click)="statusTab = 'Completed'">Completed <span class="stab-count">{{ countByStatus('Completed') }}</span></div>
-        <div class="stab" [class.active]="statusTab === 'Cancelled'" (click)="statusTab = 'Cancelled'">Cancelled <span class="stab-count">{{ countByStatus('Cancelled') }}</span></div>
-      </div>
-
-      <!-- ═══ REPAIR TABLE ═══ -->
-      <div class="table-card">
-        <div class="table-wrap">
+      <!-- ═══ IN FIX TABLE ═══ -->
+      <div class="table-section">
+        <h2 class="section-title">
+          <span nz-icon nzType="tool" nzTheme="outline" style="color:#f59e0b;"></span>
+          In Fix
+        </h2>
+        <div class="table-card">
           <table class="data-table">
             <thead>
               <tr>
                 <th>Car</th>
-                <th>Issue</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Reported</th>
-                <th>Start Date</th>
-                <th>Expected</th>
-                <th>Garage / Tech</th>
-                <th>Cost</th>
+                <th>Driver</th>
+                <th>Issue Type</th>
                 <th>Priority</th>
-                <th>Actions</th>
+                <th>Reported</th>
+                <th>Provider</th>
+                <th>Duration</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let r of filteredRepairs">
+              <tr *ngFor="let r of inFixRepairs">
                 <td>
                   <div class="car-cell">
                     <div class="car-avatar">{{ r.brand[0] }}{{ r.model[0] }}</div>
@@ -167,35 +113,62 @@ interface Repair {
                     </div>
                   </div>
                 </td>
-                <td><span class="issue-text">{{ r.issue }}</span></td>
-                <td><span class="type-pill" [class.type-mech]="r.repairType === 'Mechanical'" [class.type-elec]="r.repairType === 'Electrical'" [class.type-body]="r.repairType === 'Body Damage'" [class.type-tire]="r.repairType === 'Tire'">{{ r.repairType }}</span></td>
-                <td><span class="status-pill" [class.pill-wait]="r.status === 'Waiting'" [class.pill-prog]="r.status === 'In Progress'" [class.pill-done]="r.status === 'Completed'" [class.pill-canc]="r.status === 'Cancelled'">{{ r.status }}</span></td>
-                <td class="cell-date">{{ r.reportedDate }}</td>
-                <td class="cell-date">{{ r.startDate || '-' }}</td>
-                <td class="cell-date">{{ r.expectedDate }}</td>
-                <td>
-                  <div class="garage-cell">
-                    <span class="garage-name">{{ r.garage }}</span>
-                    <span class="tech-name">{{ r.technician }}</span>
-                  </div>
-                </td>
-                <td class="cell-cost">
-                  <span class="cost-value">{{ formatCost(r.estimatedCost) }}</span>
-                  <span class="cost-label" *ngIf="r.actualCost">actual: {{ formatCost(r.actualCost) }}</span>
-                </td>
+                <td>{{ r.technician }}</td>
+                <td><span class="type-pill">{{ r.repairType }}</span></td>
                 <td>
                   <span class="priority-pill" [class.pill-high]="r.priority === 'High'" [class.pill-med]="r.priority === 'Medium'" [class.pill-low]="r.priority === 'Low'">{{ r.priority }}</span>
                 </td>
+                <td class="cell-date">{{ r.reportedDate }}</td>
+                <td>{{ r.garage }}</td>
+                <td>{{ r.duration || '-' }}</td>
+              </tr>
+              <tr *ngIf="inFixRepairs.length === 0">
+                <td colspan="7" class="empty-row">No cars currently in maintenance</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ CLOSED TABLE ═══ -->
+      <div class="table-section">
+        <h2 class="section-title">
+          <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#10b981;"></span>
+          Closed
+        </h2>
+        <div class="table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Car</th>
+                <th>Driver</th>
+                <th>Start Date</th>
+                <th>Finish Date</th>
+                <th>Price</th>
+                <th>Provider</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of closedRepairs">
                 <td>
-                  <div class="action-btns">
-                    <button class="action-btn" title="View Details" (click)="viewDetails(r)"><span nz-icon nzType="eye" nzTheme="outline"></span></button>
-                    <button class="action-btn" title="Update Status" (click)="updateStatus(r)"><span nz-icon nzType="edit" nzTheme="outline"></span></button>
-                    <button class="action-btn action-done" *ngIf="r.status !== 'Completed' && r.status !== 'Cancelled'" title="Mark Completed" (click)="markCompleted(r)"><span nz-icon nzType="check" nzTheme="outline"></span></button>
+                  <div class="car-cell">
+                    <div class="car-avatar" style="background:#d1fae5; color:#059669;">{{ r.brand[0] }}{{ r.model[0] }}</div>
+                    <div class="car-info">
+                      <span class="car-name">{{ r.brand }} {{ r.model }}</span>
+                      <span class="car-plate">{{ r.plate }}</span>
+                    </div>
                   </div>
                 </td>
+                <td>{{ r.technician }}</td>
+                <td class="cell-date">{{ r.reportedDate }}</td>
+                <td class="cell-date">{{ r.expectedDate }}</td>
+                <td class="cell-cost"><span class="cost-value">{{ formatCost(r.estimatedCost) }}</span></td>
+                <td>{{ r.garage }}</td>
+                <td><span class="issue-text">{{ r.issue }}</span></td>
               </tr>
-              <tr *ngIf="filteredRepairs.length === 0">
-                <td colspan="11" class="empty-row">No repairs found matching your filters</td>
+              <tr *ngIf="closedRepairs.length === 0">
+                <td colspan="7" class="empty-row">No closed repairs yet</td>
               </tr>
             </tbody>
           </table>
@@ -250,6 +223,20 @@ interface Repair {
               <input nz-input [(ngModel)]="newFix.provider" placeholder="Type provider or support name" />
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Duration Value</label>
+              <input nz-input type="number" [(ngModel)]="newFix.durationValue" placeholder="e.g. 5" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Duration Unit</label>
+              <nz-select [(ngModel)]="newFix.durationUnit" nzPlaceHolder="Select unit" style="width:100%;">
+                <nz-option nzLabel="Days" nzValue="Days"></nz-option>
+                <nz-option nzLabel="Weeks" nzValue="Weeks"></nz-option>
+                <nz-option nzLabel="Months" nzValue="Months"></nz-option>
+              </nz-select>
+            </div>
+          </div>
           <div class="form-group">
             <label>Issue Description <span class="req">*</span></label>
             <textarea nz-input rows="3" [(ngModel)]="newFix.issue" placeholder="Describe the problem in detail..." class="issue-textarea"></textarea>
@@ -275,6 +262,76 @@ interface Repair {
           <button class="btn-cancel" (click)="showReportModal = false">Cancel</button>
           <button class="btn-primary" (click)="submitNewFix()" [class.disabled]="!isFormValid()">
             <span nz-icon nzType="plus" nzTheme="outline"></span> Submit Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CLOSE REPAIR MODAL ═══ -->
+    <div class="modal-overlay" *ngIf="showCloseRepairModal" (click)="showCloseRepairModal = false">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Close Repair</h2>
+          <button class="modal-close" (click)="showCloseRepairModal = false"><span nz-icon nzType="close" nzTheme="outline"></span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Select Car <span class="req">*</span></label>
+              <nz-select [(ngModel)]="closeRepair.carId" nzPlaceHolder="Choose a vehicle" style="width:100%;">
+                <nz-option *ngFor="let c of carOptions" [nzLabel]="c.label" [nzValue]="c.id"></nz-option>
+              </nz-select>
+            </div>
+            <div class="form-group">
+              <label>Driver</label>
+              <nz-select [(ngModel)]="closeRepair.driverId" nzPlaceHolder="Select driver" style="width:100%;">
+                <nz-option *ngFor="let d of driverOptions" [nzLabel]="d.label" [nzValue]="d.id"></nz-option>
+              </nz-select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date <span class="req">*</span></label>
+              <input nz-input type="date" [(ngModel)]="closeRepair.startDate" />
+            </div>
+            <div class="form-group">
+              <label>Finish Date <span class="req">*</span></label>
+              <input nz-input type="date" [(ngModel)]="closeRepair.finishDate" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Repair Price <span class="req">*</span></label>
+              <input nz-input type="number" [(ngModel)]="closeRepair.price" placeholder="e.g. 350" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Provider / Garage</label>
+              <input nz-input [(ngModel)]="closeRepair.provider" placeholder="Type provider name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description <span class="req">*</span></label>
+            <textarea nz-input rows="3" [(ngModel)]="closeRepair.description" placeholder="Describe the repair work done..." class="issue-textarea"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Attached Files</label>
+            <div class="upload-area" (click)="closeFileInput.click()">
+              <input #closeFileInput type="file" multiple accept="image/*,.pdf" style="display:none" (change)="onCloseFilesSelected($event)" />
+              <span nz-icon nzType="paper-clip" nzTheme="outline" class="upload-icon"></span>
+              <span class="upload-text">Click to upload files</span>
+              <div class="file-list" *ngIf="closeRepairFiles.length > 0">
+                <div class="file-chip" *ngFor="let f of closeRepairFiles">
+                  <span nz-icon nzType="file" nzTheme="outline"></span>
+                  <span class="file-name">{{ f.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="showCloseRepairModal = false">Cancel</button>
+          <button class="btn-success" (click)="submitCloseRepair()" [class.disabled]="!isCloseRepairValid()">
+            <span nz-icon nzType="check" nzTheme="outline"></span> Close Repair
           </button>
         </div>
       </div>
@@ -328,6 +385,44 @@ interface Repair {
     }
     .btn-primary:hover { background-color: #4f46e5 !important; }
     .btn-primary.disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-success {
+      background-color: #10b981;
+      border-color: #10b981;
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 18px;
+      border: none;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-success:hover { background-color: #059669 !important; }
+    .btn-success.disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .header-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .table-section {
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     /* ── KPI CARDS ── */
     .kpi-row {
@@ -785,6 +880,7 @@ export class RepairsComponent {
   statusTab = '';
 
   showReportModal = false;
+  showCloseRepairModal = false;
 
   newFix = {
     carId: '',
@@ -792,8 +888,22 @@ export class RepairsComponent {
     priority: '',
     reactionType: '',
     provider: '',
+    durationValue: null as number | null,
+    durationUnit: '',
     issue: ''
   };
+
+  closeRepair = {
+    carId: '',
+    driverId: '',
+    startDate: '',
+    finishDate: '',
+    price: null as number | null,
+    provider: '',
+    description: ''
+  };
+
+  closeRepairFiles: File[] = [];
 
   selectedFiles: File[] = [];
 
@@ -819,68 +929,23 @@ export class RepairsComponent {
   ];
 
   repairs: Repair[] = [
-    { id: 'R001', plate: '1234 ABC', brand: 'Toyota', model: 'Camry LE', year: 2024, image: '', issue: 'Engine overheating after 30 min of driving. Coolant leak detected.', repairType: 'Mechanical', status: 'In Progress', reportedDate: '2026-05-20', startDate: '2026-05-22', expectedDate: '2026-05-28', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 1200, priority: 'High' },
-    { id: 'R002', plate: '5678 DEF', brand: 'Honda', model: 'Accord EX', year: 2024, image: '', issue: 'Check engine light on. Error code P0420.', repairType: 'Electrical', status: 'Waiting', reportedDate: '2026-05-22', startDate: '', expectedDate: '2026-05-30', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 450, priority: 'Medium' },
-    { id: 'R003', plate: '9012 GHI', brand: 'Ford', model: 'Transit XLT', year: 2023, image: '', issue: 'Front bumper cracked. Minor body damage from parking incident.', repairType: 'Body Damage', status: 'Completed', reportedDate: '2026-05-10', startDate: '2026-05-12', expectedDate: '2026-05-19', garage: 'Elite Garage', technician: 'Sami Bouzid', estimatedCost: 800, actualCost: 750, priority: 'Low' },
-    { id: 'R004', plate: '3456 JKL', brand: 'Nissan', model: 'Altima SV', year: 2023, image: '', issue: 'Tire pressure warning. Left rear tire has slow puncture.', repairType: 'Tire', status: 'Completed', reportedDate: '2026-05-18', startDate: '2026-05-19', expectedDate: '2026-05-20', garage: 'City Motors', technician: 'Yassin Fikri', estimatedCost: 120, actualCost: 95, priority: 'Low' },
-    { id: 'R005', plate: '7890 MNO', brand: 'Mercedes', model: 'Sprinter', year: 2024, image: '', issue: 'Transmission slipping in 3rd gear. Needs full diagnostic.', repairType: 'Mechanical', status: 'Waiting', reportedDate: '2026-05-23', startDate: '', expectedDate: '2026-06-02', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 2500, priority: 'High' },
-    { id: 'R006', plate: '1112 PQR', brand: 'Chevrolet', model: 'Express', year: 2023, image: '', issue: 'AC not cooling. Compressor not engaging.', repairType: 'Electrical', status: 'In Progress', reportedDate: '2026-05-19', startDate: '2026-05-21', expectedDate: '2026-05-27', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 680, priority: 'Medium' },
-    { id: 'R007', plate: '1314 STU', brand: 'BMW', model: '5 Series', year: 2024, image: '', issue: 'Oil leak from valve cover gasket. Needs immediate repair.', repairType: 'Mechanical', status: 'Waiting', reportedDate: '2026-05-24', startDate: '', expectedDate: '2026-06-01', garage: 'Elite Garage', technician: 'Sami Bouzid', estimatedCost: 950, priority: 'High' },
-    { id: 'R008', plate: '1516 VWX', brand: 'Volkswagen', model: 'Passat', year: 2022, image: '', issue: 'Brake pads worn. Squeaking noise when braking.', repairType: 'Mechanical', status: 'Completed', reportedDate: '2026-04-28', startDate: '2026-04-29', expectedDate: '2026-05-01', garage: 'City Motors', technician: 'Yassin Fikri', estimatedCost: 350, actualCost: 320, priority: 'Medium' },
-    { id: 'R009', plate: '1718 YZA', brand: 'Hyundai', model: 'Sonata', year: 2023, image: '', issue: 'Battery dead. Needs replacement battery.', repairType: 'Electrical', status: 'Cancelled', reportedDate: '2026-05-15', startDate: '', expectedDate: '2026-05-18', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 200, priority: 'Low' },
-    { id: 'R010', plate: '1920 BCD', brand: 'Kia', model: 'Sportage', year: 2024, image: '', issue: 'Check suspension. Clunking noise from front left.', repairType: 'Mechanical', status: 'In Progress', reportedDate: '2026-05-17', startDate: '2026-05-19', expectedDate: '2026-05-26', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 1100, priority: 'High' },
+    { id: 'R001', plate: '1234 ABC', brand: 'Toyota', model: 'Camry LE', year: 2024, image: '', issue: 'Engine overheating after 30 min of driving. Coolant leak detected.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-20', startDate: '2026-05-22', expectedDate: '2026-05-28', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 1200, priority: 'High', duration: '5 Days' },
+    { id: 'R002', plate: '5678 DEF', brand: 'Honda', model: 'Accord EX', year: 2024, image: '', issue: 'Check engine light on. Error code P0420.', repairType: 'Problem in System', status: 'Waiting', reportedDate: '2026-05-22', startDate: '', expectedDate: '2026-05-30', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 450, priority: 'Medium', duration: '3 Days' },
+    { id: 'R003', plate: '9012 GHI', brand: 'Ford', model: 'Transit XLT', year: 2023, image: '', issue: 'Front bumper cracked. Minor body damage from parking incident.', repairType: 'Problem with Equipment', status: 'Completed', reportedDate: '2026-05-10', startDate: '2026-05-12', expectedDate: '2026-05-19', garage: 'Elite Garage', technician: 'Sami Bouzid', estimatedCost: 800, actualCost: 750, priority: 'Low' },
+    { id: 'R004', plate: '7890 MNO', brand: 'Mercedes', model: 'Sprinter', year: 2024, image: '', issue: 'Transmission slipping in 3rd gear. Needs full diagnostic.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-23', startDate: '2026-05-24', expectedDate: '2026-06-02', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 2500, priority: 'High', duration: '2 Weeks' },
+    { id: 'R005', plate: '1112 PQR', brand: 'Chevrolet', model: 'Express', year: 2023, image: '', issue: 'AC not cooling. Compressor not engaging.', repairType: 'Problem in System', status: 'Completed', reportedDate: '2026-05-19', startDate: '2026-05-21', expectedDate: '2026-05-27', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 680, priority: 'Medium' },
   ];
 
-  get inRepairCount(): number {
-    return this.repairs.filter(r => r.status === 'In Progress').length;
+  get inFixRepairs(): Repair[] {
+    return this.repairs.filter(r => r.status === 'Waiting' || r.status === 'In Progress');
   }
-  get waitingCount(): number {
-    return this.repairs.filter(r => r.status === 'Waiting').length;
-  }
-  get repairedThisMonth(): number {
-    const m = '2026-05';
-    return this.repairs.filter(r => r.status === 'Completed' && r.reportedDate.startsWith(m)).length;
-  }
-  get monthlyChange(): number {
-    return 12;
-  }
-  get avgRepairTime(): string {
-    return '4.2 days';
-  }
-  get avgTrend(): string {
-    return '-0.8d';
+
+  get closedRepairs(): Repair[] {
+    return this.repairs.filter(r => r.status === 'Completed');
   }
 
   countByStatus(s: string): number {
     return this.repairs.filter(r => r.status === s).length;
-  }
-
-  get filteredRepairs(): Repair[] {
-    let list = [...this.repairs];
-
-    if (this.statusTab) {
-      list = list.filter(r => r.status === this.statusTab);
-    }
-    if (this.filterStatus) {
-      list = list.filter(r => r.status === this.filterStatus);
-    }
-    if (this.filterPriority) {
-      list = list.filter(r => r.priority === this.filterPriority);
-    }
-    if (this.filterType) {
-      list = list.filter(r => r.repairType === this.filterType);
-    }
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
-      list = list.filter(r =>
-        r.plate.toLowerCase().includes(q) ||
-        r.brand.toLowerCase().includes(q) ||
-        r.model.toLowerCase().includes(q) ||
-        r.issue.toLowerCase().includes(q) ||
-        r.garage.toLowerCase().includes(q)
-      );
-    }
-    return list;
   }
 
   viewDetails(r: Repair): void {
@@ -936,6 +1001,13 @@ export class RepairsComponent {
     const carOpt = this.carOptions.find(c => c.id === this.newFix.carId);
     const [brand, model, plate] = carOpt ? carOpt.label.split(' - ') : ['Unknown', '-', ''];
 
+    const driverOpt = this.driverOptions.find(d => d.id === this.newFix.driverId);
+    const driverName = driverOpt ? driverOpt.label : 'Unassigned';
+
+    const duration = this.newFix.durationValue && this.newFix.durationUnit
+      ? `${this.newFix.durationValue} ${this.newFix.durationUnit}`
+      : '';
+
     const newRepair: Repair = {
       id: `R${String(this.repairs.length + 1).padStart(3, '0')}`,
       plate: plate || 'TBD',
@@ -950,14 +1022,57 @@ export class RepairsComponent {
       startDate: '',
       expectedDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
       garage: this.newFix.provider || 'TBD',
-      technician: 'Unassigned',
+      technician: driverName,
       estimatedCost: 0,
       priority: this.newFix.priority as 'High' | 'Medium' | 'Low',
+      duration: duration,
     };
 
     this.repairs.unshift(newRepair);
     this.showReportModal = false;
-    this.newFix = { carId: '', driverId: '', priority: '', reactionType: '', provider: '', issue: '' };
+    this.newFix = { carId: '', driverId: '', priority: '', reactionType: '', provider: '', durationValue: null, durationUnit: '', issue: '' };
     this.selectedFiles = [];
+  }
+
+  isCloseRepairValid(): boolean {
+    return !!(this.closeRepair.carId && this.closeRepair.startDate && this.closeRepair.finishDate && this.closeRepair.price && this.closeRepair.description);
+  }
+
+  onCloseFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.closeRepairFiles = Array.from(input.files);
+    }
+  }
+
+  submitCloseRepair(): void {
+    if (!this.isCloseRepairValid()) return;
+
+    const carOpt = this.carOptions.find(c => c.id === this.closeRepair.carId);
+    const [brand, model, plate] = carOpt ? carOpt.label.split(' - ') : ['Unknown', '-', ''];
+
+    const closedRepair: Repair = {
+      id: `R${String(this.repairs.length + 1).padStart(3, '0')}`,
+      plate: plate || 'TBD',
+      brand: brand || 'Unknown',
+      model: model || '-',
+      year: 2024,
+      image: '',
+      issue: this.closeRepair.description,
+      repairType: 'Completed Repair',
+      status: 'Completed',
+      reportedDate: this.closeRepair.startDate,
+      startDate: this.closeRepair.startDate,
+      expectedDate: this.closeRepair.finishDate,
+      garage: this.closeRepair.provider || 'TBD',
+      technician: 'Unassigned',
+      estimatedCost: this.closeRepair.price || 0,
+      priority: 'Medium',
+    };
+
+    this.repairs.unshift(closedRepair);
+    this.showCloseRepairModal = false;
+    this.closeRepair = { carId: '', driverId: '', startDate: '', finishDate: '', price: null, provider: '', description: '' };
+    this.closeRepairFiles = [];
   }
 }
