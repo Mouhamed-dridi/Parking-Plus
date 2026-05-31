@@ -28,6 +28,9 @@ interface Repair {
   actualCost?: number;
   priority: 'High' | 'Medium' | 'Low';
   duration?: string;
+  fixStatus?: 'Still in Fix' | 'Fixed' | 'Not Going to Fix Yet';
+  documentFile?: File;
+  documentName?: string;
 }
 
 @Component({
@@ -48,13 +51,13 @@ interface Repair {
           <p class="page-sub">Track and manage vehicle repairs across your fleet</p>
         </div>
         <div class="header-btns">
-          <button class="btn-primary" (click)="showReportModal = true">
+          <button class="btn-blue" (click)="showReportModal = true">
             <span nz-icon nzType="plus" nzTheme="outline"></span>
-            Report New Car Fix
+            Request to Fix Car
           </button>
-          <button class="btn-success" (click)="showCloseRepairModal = true">
+          <button class="btn-outline-white" (click)="showCloseRepairModal = true">
             <span nz-icon nzType="check-circle" nzTheme="outline"></span>
-            Close Repair
+            Closed Ticket
           </button>
         </div>
       </div>
@@ -62,8 +65,8 @@ interface Repair {
       <!-- ═══ KPI CARDS ═══ -->
       <div class="kpi-row">
         <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#fef3c7">
-            <span nz-icon nzType="tool" nzTheme="outline" style="color:#f59e0b;font-size:20px;"></span>
+          <div class="kpi-icon-wrap" style="background:#fef7e0">
+            <span nz-icon nzType="tool" nzTheme="outline" style="color:#f9ab00;font-size:20px;"></span>
           </div>
           <div class="kpi-body">
             <span class="kpi-label">Still in Maintenance</span>
@@ -72,8 +75,8 @@ interface Repair {
           <span class="kpi-badge badge-amber">Pending</span>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon-wrap" style="background:#ecfdf5">
-            <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#10b981;font-size:20px;"></span>
+          <div class="kpi-icon-wrap" style="background:#e6f4ea">
+            <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#1e8e3e;font-size:20px;"></span>
           </div>
           <div class="kpi-body">
             <span class="kpi-label">Closed</span>
@@ -86,7 +89,7 @@ interface Repair {
       <!-- ═══ IN FIX TABLE ═══ -->
       <div class="table-section">
         <h2 class="section-title">
-          <span nz-icon nzType="tool" nzTheme="outline" style="color:#f59e0b;"></span>
+          <span nz-icon nzType="tool" nzTheme="outline" style="color:#f9ab00;"></span>
           In Fix
         </h2>
         <div class="table-card">
@@ -100,17 +103,15 @@ interface Repair {
                 <th>Reported</th>
                 <th>Provider</th>
                 <th>Duration</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let r of inFixRepairs">
                 <td>
-                  <div class="car-cell">
-                    <div class="car-avatar">{{ r.brand[0] }}{{ r.model[0] }}</div>
-                    <div class="car-info">
-                      <span class="car-name">{{ r.brand }} {{ r.model }}</span>
-                      <span class="car-plate">{{ r.plate }}</span>
-                    </div>
+                  <div class="car-info">
+                    <span class="car-name">{{ r.brand }} {{ r.model }}</span>
+                    <span class="car-plate">{{ r.plate }}</span>
                   </div>
                 </td>
                 <td>{{ r.technician }}</td>
@@ -121,9 +122,16 @@ interface Repair {
                 <td class="cell-date">{{ r.reportedDate }}</td>
                 <td>{{ r.garage }}</td>
                 <td>{{ r.duration || '-' }}</td>
+                <td>
+                  <nz-select [(ngModel)]="r.fixStatus" nzPlaceHolder="Select" style="width:180px;" nzSize="small">
+                    <nz-option nzLabel="Still in Fix" nzValue="Still in Fix"></nz-option>
+                    <nz-option nzLabel="Fixed" nzValue="Fixed"></nz-option>
+                    <nz-option nzLabel="Not Going to Fix Yet" nzValue="Not Going to Fix Yet"></nz-option>
+                  </nz-select>
+                </td>
               </tr>
               <tr *ngIf="inFixRepairs.length === 0">
-                <td colspan="7" class="empty-row">No cars currently in maintenance</td>
+                <td colspan="8" class="empty-row">No cars currently in maintenance</td>
               </tr>
             </tbody>
           </table>
@@ -133,7 +141,7 @@ interface Repair {
       <!-- ═══ CLOSED TABLE ═══ -->
       <div class="table-section">
         <h2 class="section-title">
-          <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#10b981;"></span>
+          <span nz-icon nzType="check-circle" nzTheme="outline" style="color:#1e8e3e;"></span>
           Closed
         </h2>
         <div class="table-card">
@@ -147,17 +155,15 @@ interface Repair {
                 <th>Price</th>
                 <th>Provider</th>
                 <th>Description</th>
+                <th>Document</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let r of closedRepairs">
                 <td>
-                  <div class="car-cell">
-                    <div class="car-avatar" style="background:#d1fae5; color:#059669;">{{ r.brand[0] }}{{ r.model[0] }}</div>
-                    <div class="car-info">
-                      <span class="car-name">{{ r.brand }} {{ r.model }}</span>
-                      <span class="car-plate">{{ r.plate }}</span>
-                    </div>
+                  <div class="car-info">
+                    <span class="car-name">{{ r.brand }} {{ r.model }}</span>
+                    <span class="car-plate">{{ r.plate }}</span>
                   </div>
                 </td>
                 <td>{{ r.technician }}</td>
@@ -166,9 +172,28 @@ interface Repair {
                 <td class="cell-cost"><span class="cost-value">{{ formatCost(r.estimatedCost) }}</span></td>
                 <td>{{ r.garage }}</td>
                 <td><span class="issue-text">{{ r.issue }}</span></td>
+                <td>
+                  <div class="doc-upload-cell">
+                    <input type="file" accept=".jpg,.jpeg,.pdf"
+                           (change)="onDocumentSelected($event, r)"
+                           [id]="'doc-' + r.id" hidden />
+                    <button class="doc-upload-btn" *ngIf="!r.documentName"
+                            (click)="triggerDocUpload(r.id)">
+                      <span nz-icon nzType="upload" nzTheme="outline"></span> Upload
+                    </button>
+                    <div class="doc-file-info" *ngIf="r.documentName">
+                      <span nz-icon [nzType]="r.documentName!.endsWith('.pdf') ? 'file-pdf' : 'file-image'"
+                            nzTheme="outline"></span>
+                      <span class="doc-name">{{ r.documentName }}</span>
+                      <button class="doc-remove" (click)="removeDocument(r)">
+                        <span nz-icon nzType="close" nzTheme="outline"></span>
+                      </button>
+                    </div>
+                  </div>
+                </td>
               </tr>
               <tr *ngIf="closedRepairs.length === 0">
-                <td colspan="7" class="empty-row">No closed repairs yet</td>
+                <td colspan="8" class="empty-row">No closed repairs yet</td>
               </tr>
             </tbody>
           </table>
@@ -181,7 +206,7 @@ interface Repair {
     <div class="modal-overlay" *ngIf="showReportModal" (click)="showReportModal = false">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Report New Car Fix</h2>
+          <h2>Request to Fix Car</h2>
           <button class="modal-close" (click)="showReportModal = false"><span nz-icon nzType="close" nzTheme="outline"></span></button>
         </div>
         <div class="modal-body">
@@ -260,7 +285,7 @@ interface Repair {
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" (click)="showReportModal = false">Cancel</button>
-          <button class="btn-primary" (click)="submitNewFix()" [class.disabled]="!isFormValid()">
+          <button class="btn-blue" (click)="submitNewFix()" [class.disabled]="!isFormValid()">
             <span nz-icon nzType="plus" nzTheme="outline"></span> Submit Report
           </button>
         </div>
@@ -271,7 +296,7 @@ interface Repair {
     <div class="modal-overlay" *ngIf="showCloseRepairModal" (click)="showCloseRepairModal = false">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Close Repair</h2>
+          <h2>Closed Ticket</h2>
           <button class="modal-close" (click)="showCloseRepairModal = false"><span nz-icon nzType="close" nzTheme="outline"></span></button>
         </div>
         <div class="modal-body">
@@ -330,8 +355,8 @@ interface Repair {
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" (click)="showCloseRepairModal = false">Cancel</button>
-          <button class="btn-success" (click)="submitCloseRepair()" [class.disabled]="!isCloseRepairValid()">
-            <span nz-icon nzType="check" nzTheme="outline"></span> Close Repair
+          <button class="btn-outline-white" (click)="submitCloseRepair()" [class.disabled]="!isCloseRepairValid()">
+            <span nz-icon nzType="check" nzTheme="outline"></span> Closed Ticket
           </button>
         </div>
       </div>
@@ -340,10 +365,9 @@ interface Repair {
   styles: [`
     :host { display: block; }
     .repairs-container {
-      background: #f8fafc;
       min-height: 100vh;
-      padding: 28px 32px;
-      font-family: 'Inter', sans-serif;
+      padding: 24px 28px;
+      font-family: 'Inter', 'Google Sans', Arial, sans-serif;
     }
 
     /* ── HEADER ── */
@@ -351,73 +375,72 @@ interface Repair {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 16px;
     }
     .page-title {
       margin: 0;
-      font-size: 26px;
-      font-weight: 700;
-      color: #1f2937;
+      font-size: 22px;
+      font-weight: 600;
+      color: #202124;
     }
     .page-sub {
       margin: 4px 0 0;
-      font-size: 14px;
-      color: #6b7280;
+      font-size: 13px;
+      color: #5f6368;
     }
-    .btn-primary {
-      background-color: #6366f1;
-      border-color: #6366f1;
-      border-radius: 8px;
-      height: 40px;
-      padding: 0 18px;
-      border: none;
-      color: white;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .btn-primary:hover { background-color: #4f46e5 !important; }
-    .btn-primary.disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .btn-success {
-      background-color: #10b981;
-      border-color: #10b981;
-      border-radius: 8px;
-      height: 40px;
-      padding: 0 18px;
-      border: none;
+    /* ── BLUE BUTTON (primary action) ── */
+    .btn-blue {
+      background: #1a73e8;
+      border: 1px solid #1a73e8;
+      height: 34px;
+      padding: 0 14px;
       color: white;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
+      gap: 6px;
+      transition: all 0.15s;
       white-space: nowrap;
     }
-    .btn-success:hover { background-color: #059669 !important; }
-    .btn-success.disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-blue:hover { background: #1557b0; border-color: #1557b0; }
+    .btn-blue.disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── WHITE OUTLINE BUTTON ── */
+    .btn-outline-white {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      height: 34px;
+      padding: 0 14px;
+      color: #5f6368;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-outline-white:hover { background: #f1f3f4; border-color: #ccc; }
+    .btn-outline-white.disabled { opacity: 0.4; cursor: not-allowed; }
 
     .header-btns {
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
 
     .table-section {
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
     .section-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
-      color: #111827;
+      color: #202124;
       margin: 0 0 12px;
       display: flex;
       align-items: center;
@@ -429,7 +452,7 @@ interface Repair {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .kpi-card {
       background: #fff;
@@ -438,14 +461,11 @@ interface Repair {
       align-items: flex-start;
       gap: 14px;
       border: 1px solid #e0e0e0;
-      border-radius: 12px;
       position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     .kpi-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -473,14 +493,12 @@ interface Repair {
       top: 12px;
       right: 12px;
       font-size: 10px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
+      font-weight: 500;
+      padding: 2px 8px;
       white-space: nowrap;
     }
-    .badge-blue { background: #eef2ff; color: #6366f1; }
-    .badge-amber { background: #fef3c7; color: #d97706; }
-    .badge-green { background: #d1fae5; color: #059669; }
+    .badge-amber { background: #fef7e0; color: #f9ab00; }
+    .badge-green { background: #e6f4ea; color: #1e8e3e; }
 
     @media (max-width: 992px) {
       .kpi-row { grid-template-columns: repeat(2, 1fr); }
@@ -496,10 +514,9 @@ interface Repair {
       gap: 12px;
       margin-bottom: 20px;
       flex-wrap: wrap;
-      background: white;
+      background: #fff;
       padding: 16px;
-      border-radius: 12px;
-      border: 1px solid #f0f0f0;
+      border: 1px solid #e0e0e0;
     }
     .search-wrap {
       display: flex;
@@ -508,76 +525,38 @@ interface Repair {
       flex: 1;
       min-width: 200px;
     }
-    .search-icon { color: #9ca3af; font-size: 16px; }
+    .search-icon { color: #9aa0a6; font-size: 16px; }
     .search-input {
       flex: 1;
       border: none;
       outline: none;
       font-size: 14px;
-      color: #374151;
+      color: #202124;
       background: transparent;
     }
-    .search-input::placeholder { color: #9ca3af; }
+    .search-input::placeholder { color: #9aa0a6; }
 
     .btn-export {
-      height: 36px;
-      padding: 0 16px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background: white;
-      color: #374151;
+      height: 34px;
+      padding: 0 14px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #5f6368;
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s;
+      transition: all 0.15s;
       white-space: nowrap;
     }
-    .btn-export:hover { border-color: #6366f1; color: #6366f1; }
-
-    /* ── STATUS TABS ── */
-    .status-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 20px;
-      background: white;
-      padding: 4px;
-      border-radius: 12px;
-      border: 1px solid #f0f0f0;
-      overflow-x: auto;
-    }
-    .stab {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #6b7280;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .stab:hover { color: #6366f1; background: #f5f3ff; }
-    .stab.active { color: white; background: #6366f1; }
-    .stab.active .stab-count { background: rgba(255,255,255,0.2); color: white; }
-    .stab-count {
-      padding: 1px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      background: #f1f5f9;
-      color: #6b7280;
-    }
+    .btn-export:hover { border-color: #1a73e8; color: #1a73e8; }
 
     /* ── TABLE ── */
     .table-card {
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #f0f0f0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      background: #fff;
+      border: 1px solid #e0e0e0;
       overflow: hidden;
     }
     .table-wrap {
@@ -590,51 +569,33 @@ interface Repair {
     }
     .data-table thead th {
       text-align: left;
-      padding: 14px 16px;
-      font-weight: 600;
-      color: #6b7280;
+      padding: 12px 16px;
+      font-weight: 500;
+      color: #5f6368;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      border-bottom: 2px solid #f1f5f9;
+      border-bottom: 1px solid #e0e0e0;
       white-space: nowrap;
-      background: #fafafa;
+      background: #f8f9fa;
     }
     .data-table tbody td {
-      padding: 14px 16px;
-      color: #374151;
-      border-bottom: 1px solid #f9fafb;
+      padding: 12px 16px;
+      color: #202124;
+      border-bottom: 1px solid #f1f3f4;
       vertical-align: middle;
     }
-    .data-table tbody tr:hover td { background: #f8fafc; }
+    .data-table tbody tr:hover td { background: #f1f3f4; }
     .data-table tbody tr:last-child td { border-bottom: none; }
 
     .empty-row {
       text-align: center;
       padding: 48px 16px !important;
-      color: #9ca3af !important;
+      color: #9aa0a6 !important;
       font-size: 14px;
     }
 
-    /* ── CAR CELL ── */
-    .car-cell {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .car-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #6366f1, #818cf8);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
+    /* ── CAR CELL (no avatar, plain text only) ── */
     .car-info {
       display: flex;
       flex-direction: column;
@@ -642,11 +603,11 @@ interface Repair {
     .car-name {
       font-size: 13px;
       font-weight: 600;
-      color: #1f2937;
+      color: #202124;
     }
     .car-plate {
       font-size: 11px;
-      color: #9ca3af;
+      color: #9aa0a6;
       font-weight: 500;
     }
 
@@ -656,61 +617,103 @@ interface Repair {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #6b7280;
+      color: #5f6368;
     }
 
     /* ── PILLS ── */
     .status-pill {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 500;
     }
-    .pill-wait { background: #fef3c7; color: #d97706; }
-    .pill-prog { background: #dbeafe; color: #2563eb; }
-    .pill-done { background: #d1fae5; color: #059669; }
-    .pill-canc { background: #fee2e2; color: #dc2626; }
+    .pill-wait { background: #fef7e0; color: #f9ab00; }
+    .pill-prog { background: #e8f0fe; color: #1a73e8; }
+    .pill-done { background: #e6f4ea; color: #1e8e3e; }
+    .pill-canc { background: #fce8e6; color: #d93025; }
 
     .type-pill {
       display: inline-block;
-      padding: 3px 10px;
-      border-radius: 6px;
+      padding: 2px 8px;
       font-size: 11px;
       font-weight: 500;
-      background: #f1f5f9;
-      color: #6b7280;
+      background: #f1f3f4;
+      color: #5f6368;
     }
-    .type-mech { background: #fef3c7; color: #d97706; }
-    .type-elec { background: #dbeafe; color: #2563eb; }
-    .type-body { background: #fce7f3; color: #db2777; }
-    .type-tire { background: #e0e7ff; color: #4338ca; }
 
     .priority-pill {
       display: inline-block;
-      padding: 3px 10px;
-      border-radius: 6px;
+      padding: 2px 8px;
       font-size: 11px;
       font-weight: 600;
     }
-    .pill-high { background: #fee2e2; color: #dc2626; }
-    .pill-med { background: #fef3c7; color: #d97706; }
-    .pill-low { background: #d1fae5; color: #059669; }
+    .pill-high { background: #fce8e6; color: #d93025; }
+    .pill-med { background: #fef7e0; color: #f9ab00; }
+    .pill-low { background: #e6f4ea; color: #1e8e3e; }
 
     /* ── CELLS ── */
-    .cell-date { font-size: 12px; color: #6b7280; white-space: nowrap; }
+    .cell-date { font-size: 12px; color: #5f6368; white-space: nowrap; }
     .garage-cell {
       display: flex;
       flex-direction: column;
     }
-    .garage-name { font-size: 13px; font-weight: 500; color: #374151; }
-    .tech-name { font-size: 11px; color: #9ca3af; }
+    .garage-name { font-size: 13px; font-weight: 500; color: #202124; }
+    .tech-name { font-size: 11px; color: #9aa0a6; }
     .cell-cost {
       display: flex;
       flex-direction: column;
     }
-    .cost-value { font-size: 13px; font-weight: 600; color: #1f2937; }
-    .cost-label { font-size: 10px; color: #9ca3af; }
+    .cost-value { font-size: 13px; font-weight: 600; color: #202124; }
+    .cost-label { font-size: 10px; color: #9aa0a6; }
+
+    /* ── DOCUMENT UPLOAD CELL ── */
+    .doc-upload-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .doc-upload-btn {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #5f6368;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .doc-upload-btn:hover { border-color: #1a73e8; color: #1a73e8; }
+    .doc-file-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #202124;
+    }
+    .doc-name {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .doc-remove {
+      width: 20px;
+      height: 20px;
+      border: none;
+      background: none;
+      color: #9aa0a6;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .doc-remove:hover { color: #d93025; }
 
     /* ── ACTION BUTTONS ── */
     .action-btns {
@@ -718,20 +721,19 @@ interface Repair {
       gap: 4px;
     }
     .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid #e5e7eb;
+      width: 28px;
+      height: 28px;
+      border: 1px solid #e0e0e0;
       background: white;
-      color: #6b7280;
+      color: #5f6368;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
-    .action-btn:hover { border-color: #6366f1; color: #6366f1; }
-    .action-done:hover { border-color: #10b981; color: #10b981; }
+    .action-btn:hover { border-color: #1a73e8; color: #1a73e8; }
+    .action-done:hover { border-color: #1e8e3e; color: #1e8e3e; }
 
     /* ── MODAL ── */
     .modal-overlay {
@@ -770,22 +772,22 @@ interface Repair {
       margin: 0;
       font-size: 20px;
       font-weight: 700;
-      color: #1f2937;
+      color: #202124;
     }
     .modal-close {
       width: 32px;
       height: 32px;
       border: none;
-      background: #f1f5f9;
+      background: #f1f3f4;
       border-radius: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #6b7280;
+      color: #5f6368;
       transition: all 0.2s;
     }
-    .modal-close:hover { background: #fee2e2; color: #dc2626; }
+    .modal-close:hover { background: #fce8e6; color: #d93025; }
     .modal-body {
       padding: 24px 28px;
       display: flex;
@@ -809,19 +811,19 @@ interface Repair {
       font-weight: 600;
       color: #374151;
     }
-    .req { color: #dc2626; }
+    .req { color: #d93025; }
     .issue-textarea {
       resize: vertical;
       min-height: 80px;
       border-radius: 8px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #e0e0e0;
       padding: 10px 14px;
       font-size: 14px;
       font-family: inherit;
     }
-    .issue-textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+    .issue-textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.1); }
     .upload-area {
-      border: 2px dashed #e5e7eb;
+      border: 2px dashed #e0e0e0;
       border-radius: 10px;
       padding: 28px;
       text-align: center;
@@ -832,17 +834,17 @@ interface Repair {
       gap: 6px;
       transition: all 0.2s;
     }
-    .upload-area:hover { border-color: #6366f1; background: #f5f3ff; }
-    .upload-icon { font-size: 28px; color: #9ca3af; }
-    .upload-text { font-size: 14px; color: #6b7280; font-weight: 500; }
-    .upload-hint { font-size: 12px; color: #9ca3af; }
+    .upload-area:hover { border-color: #1a73e8; background: #e8f0fe; }
+    .upload-icon { font-size: 28px; color: #9aa0a6; }
+    .upload-text { font-size: 14px; color: #5f6368; font-weight: 500; }
+    .upload-hint { font-size: 12px; color: #9aa0a6; }
     .file-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; width: 100%; }
     .file-chip {
       display: flex; align-items: center; gap: 6px; padding: 6px 12px;
-      background: #f1f5f9; border-radius: 8px; font-size: 12px; color: #374151;
+      background: #f1f3f4; font-size: 12px; color: #202124;
     }
     .file-name { font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .file-size { color: #9ca3af; font-size: 11px; }
+    .file-size { color: #9aa0a6; font-size: 11px; }
 
     .modal-footer {
       display: flex;
@@ -851,18 +853,17 @@ interface Repair {
       padding: 16px 28px 24px;
     }
     .btn-cancel {
-      height: 40px;
-      padding: 0 20px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
+      height: 34px;
+      padding: 0 16px;
+      border: 1px solid #e0e0e0;
       background: white;
-      color: #374151;
-      font-size: 14px;
+      color: #5f6368;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
-    .btn-cancel:hover { background: #f9fafb; }
+    .btn-cancel:hover { background: #f1f3f4; }
 
     @media (max-width: 1024px) {
       .repairs-container { padding: 20px 16px; }
@@ -929,10 +930,10 @@ export class RepairsComponent {
   ];
 
   repairs: Repair[] = [
-    { id: 'R001', plate: '1234 ABC', brand: 'Toyota', model: 'Camry LE', year: 2024, image: '', issue: 'Engine overheating after 30 min of driving. Coolant leak detected.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-20', startDate: '2026-05-22', expectedDate: '2026-05-28', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 1200, priority: 'High', duration: '5 Days' },
-    { id: 'R002', plate: '5678 DEF', brand: 'Honda', model: 'Accord EX', year: 2024, image: '', issue: 'Check engine light on. Error code P0420.', repairType: 'Problem in System', status: 'Waiting', reportedDate: '2026-05-22', startDate: '', expectedDate: '2026-05-30', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 450, priority: 'Medium', duration: '3 Days' },
+    { id: 'R001', plate: '1234 ABC', brand: 'Toyota', model: 'Camry LE', year: 2024, image: '', issue: 'Engine overheating after 30 min of driving. Coolant leak detected.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-20', startDate: '2026-05-22', expectedDate: '2026-05-28', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 1200, priority: 'High', duration: '5 Days', fixStatus: 'Still in Fix' },
+    { id: 'R002', plate: '5678 DEF', brand: 'Honda', model: 'Accord EX', year: 2024, image: '', issue: 'Check engine light on. Error code P0420.', repairType: 'Problem in System', status: 'Waiting', reportedDate: '2026-05-22', startDate: '', expectedDate: '2026-05-30', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 450, priority: 'Medium', duration: '3 Days', fixStatus: 'Still in Fix' },
     { id: 'R003', plate: '9012 GHI', brand: 'Ford', model: 'Transit XLT', year: 2023, image: '', issue: 'Front bumper cracked. Minor body damage from parking incident.', repairType: 'Problem with Equipment', status: 'Completed', reportedDate: '2026-05-10', startDate: '2026-05-12', expectedDate: '2026-05-19', garage: 'Elite Garage', technician: 'Sami Bouzid', estimatedCost: 800, actualCost: 750, priority: 'Low' },
-    { id: 'R004', plate: '7890 MNO', brand: 'Mercedes', model: 'Sprinter', year: 2024, image: '', issue: 'Transmission slipping in 3rd gear. Needs full diagnostic.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-23', startDate: '2026-05-24', expectedDate: '2026-06-02', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 2500, priority: 'High', duration: '2 Weeks' },
+    { id: 'R004', plate: '7890 MNO', brand: 'Mercedes', model: 'Sprinter', year: 2024, image: '', issue: 'Transmission slipping in 3rd gear. Needs full diagnostic.', repairType: 'Problem Engine', status: 'In Progress', reportedDate: '2026-05-23', startDate: '2026-05-24', expectedDate: '2026-06-02', garage: 'AutoPro Main', technician: 'Ahmed Sayeb', estimatedCost: 2500, priority: 'High', duration: '2 Weeks', fixStatus: 'Still in Fix' },
     { id: 'R005', plate: '1112 PQR', brand: 'Chevrolet', model: 'Express', year: 2023, image: '', issue: 'AC not cooling. Compressor not engaging.', repairType: 'Problem in System', status: 'Completed', reportedDate: '2026-05-19', startDate: '2026-05-21', expectedDate: '2026-05-27', garage: 'SpeedFix Center', technician: 'Karim Lazrak', estimatedCost: 680, priority: 'Medium' },
   ];
 
@@ -1026,6 +1027,7 @@ export class RepairsComponent {
       estimatedCost: 0,
       priority: this.newFix.priority as 'High' | 'Medium' | 'Low',
       duration: duration,
+      fixStatus: 'Still in Fix',
     };
 
     this.repairs.unshift(newRepair);
@@ -1074,5 +1076,24 @@ export class RepairsComponent {
     this.showCloseRepairModal = false;
     this.closeRepair = { carId: '', driverId: '', startDate: '', finishDate: '', price: null, provider: '', description: '' };
     this.closeRepairFiles = [];
+  }
+
+  // ── Document upload methods for Closed table ──
+  triggerDocUpload(repairId: string): void {
+    document.getElementById('doc-' + repairId)?.click();
+  }
+
+  onDocumentSelected(event: Event, repair: Repair): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      repair.documentFile = file;
+      repair.documentName = file.name;
+    }
+  }
+
+  removeDocument(repair: Repair): void {
+    repair.documentFile = undefined;
+    repair.documentName = undefined;
   }
 }
