@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -6,6 +6,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { TrashService } from '../../core/services/trash.service';
 
 interface Provider {
   id: string;
@@ -84,7 +85,8 @@ interface Provider {
               <span>{{ p.phone }}</span>
             </div>
             <div class="footer-spacer"></div>
-            <button class="footer-action-btn"><span nz-icon nzType="edit" nzTheme="outline"></span></button>
+            <button class="footer-action-btn" (click)="openEditModal(p)"><span nz-icon nzType="edit" nzTheme="outline"></span></button>
+            <button class="footer-action-btn delete-btn" (click)="confirmDeleteProvider(p)"><span nz-icon nzType="delete" nzTheme="outline"></span></button>
           </div>
         </div>
 
@@ -161,6 +163,97 @@ interface Provider {
           <button class="btn-cancel" (click)="showAddModal = false">Cancel</button>
           <button class="btn-blue" (click)="submitNewProvider()" [class.disabled]="!isFormValid()">
             <span nz-icon nzType="plus" nzTheme="outline"></span> Add Provider
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ EDIT PROVIDER MODAL ═══ -->
+    <div class="modal-overlay" *ngIf="showEditModal" (click)="cancelEdit()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Edit Provider</h2>
+          <button class="modal-close" (click)="cancelEdit()"><span nz-icon nzType="close" nzTheme="outline"></span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Provider Name <span class="req">*</span></label>
+              <input nz-input [(ngModel)]="editingProvider!.name" placeholder="e.g. AutoPro Main" />
+            </div>
+            <div class="form-group">
+              <label>Service Type <span class="req">*</span></label>
+              <nz-select [(ngModel)]="editingProvider!.serviceType" nzPlaceHolder="Select type" style="width:100%;">
+                <nz-option nzLabel="Repair" nzValue="Repair"></nz-option>
+                <nz-option nzLabel="Spare Parts" nzValue="Spare Parts"></nz-option>
+                <nz-option nzLabel="Accessories" nzValue="Accessories"></nz-option>
+                <nz-option nzLabel="Tires" nzValue="Tires"></nz-option>
+                <nz-option nzLabel="General Maintenance" nzValue="General Maintenance"></nz-option>
+              </nz-select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Location / Address</label>
+              <input nz-input [(ngModel)]="editingProvider!.location" placeholder="e.g. 123 Main St, Tunis" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input nz-input [(ngModel)]="editingProvider!.phone" placeholder="e.g. +216 20 123 456" />
+            </div>
+            <div class="form-group">
+              <label>Website</label>
+              <input nz-input [(ngModel)]="editingProvider!.website" placeholder="e.g. https://www.autopro.tn" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Provider Logo / Image</label>
+            <div class="upload-area" (click)="editFileInput.click()">
+              <input #editFileInput type="file" accept="image/*" style="display:none" (change)="onEditImageSelected($event)" />
+              
+              <ng-container *ngIf="!editImagePreview && !editingProvider!.image">
+                <span nz-icon nzType="picture" nzTheme="outline" class="upload-icon"></span>
+                <span class="upload-text">Click to upload logo</span>
+                <span class="upload-hint">Images (PNG, JPG) up to 2MB</span>
+              </ng-container>
+
+              <div class="upload-preview" *ngIf="editImagePreview || editingProvider!.image">
+                <img [src]="editImagePreview || editingProvider!.image" alt="Preview" />
+                <button type="button" class="upload-remove" (click)="removeEditImage(); $event.stopPropagation()">
+                  <span nz-icon nzType="close" nzTheme="outline"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+          <button class="btn-blue" (click)="saveEdit()" [class.disabled]="!isEditFormValid()">
+            <span nz-icon nzType="save" nzTheme="outline"></span> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DELETE CONFIRMATION ═══ -->
+    <div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+      <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Delete Provider</h2>
+          <button class="modal-close" (click)="cancelDelete()"><span nz-icon nzType="close" nzTheme="outline"></span></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:14px;color:#5f6368;margin:0;line-height:1.6;">
+            Are you sure you want to delete <strong>{{ deletingProvider?.name }}</strong>?<br/>
+            This item will be moved to Trash.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+          <button class="btn-danger" (click)="executeDelete()">
+            <span nz-icon nzType="delete" nzTheme="outline"></span> Delete
           </button>
         </div>
       </div>
@@ -349,6 +442,7 @@ interface Provider {
       transition: all 0.15s;
     }
     .footer-action-btn:hover { color: #1a73e8; }
+    .footer-action-btn.delete-btn:hover { color: #d93025; }
 
     .empty-state {
       grid-column: 1 / -1;
@@ -424,6 +518,13 @@ interface Provider {
       color: #5f6368; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
     }
     .btn-cancel:hover { background: #f1f3f4; }
+    .btn-danger {
+      height: 34px; padding: 0 16px; border: 1px solid #d93025; background: #d93025;
+      color: white; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-danger:hover { background: #b31412; border-color: #b31412; }
+    .modal-card-sm { max-width: 420px; }
   `]
 })
 export class GarageCrmComponent {
@@ -440,6 +541,15 @@ export class GarageCrmComponent {
     phone: '',
     website: ''
   };
+
+  private trashService = inject(TrashService);
+
+  showEditModal = false;
+  editingProvider: Provider | null = null;
+  editImagePreview: string | null = null;
+
+  showDeleteConfirm = false;
+  deletingProvider: Provider | null = null;
 
   providers: Provider[] = [
     { id: 'P001', name: 'Misfat', image: '/assets/images/crm/misfat.jpg', website: 'https://misfat.com.tn', location: 'Oued Smar, Tunis', phone: '+216 71 433 333', serviceType: 'Spare Parts' },
@@ -496,5 +606,79 @@ export class GarageCrmComponent {
     this.showAddModal = false;
     this.newProvider = { name: '', serviceType: '', location: '', phone: '', website: '' };
     this.imagePreview = null;
+  }
+
+  openEditModal(p: Provider): void {
+    this.editingProvider = { ...p };
+    this.editImagePreview = null;
+    this.showEditModal = true;
+  }
+
+  cancelEdit(): void {
+    this.showEditModal = false;
+    this.editingProvider = null;
+    this.editImagePreview = null;
+  }
+
+  onEditImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editImagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeEditImage(): void {
+    this.editImagePreview = null;
+    if (this.editingProvider) {
+      this.editingProvider.image = '';
+    }
+  }
+
+  isEditFormValid(): boolean {
+    return !!(this.editingProvider?.name && this.editingProvider?.serviceType);
+  }
+
+  saveEdit(): void {
+    if (!this.isEditFormValid() || !this.editingProvider) return;
+
+    const idx = this.providers.findIndex(p => p.id === this.editingProvider!.id);
+    if (idx !== -1) {
+      if (this.editImagePreview) {
+        this.editingProvider.image = this.editImagePreview;
+      }
+      this.providers[idx] = { ...this.editingProvider };
+    }
+
+    this.cancelEdit();
+  }
+
+  confirmDeleteProvider(p: Provider): void {
+    this.deletingProvider = p;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.deletingProvider = null;
+  }
+
+  executeDelete(): void {
+    if (!this.deletingProvider) return;
+
+    this.trashService.addItem({
+      id: 'provider-' + this.deletingProvider.id,
+      type: 'provider',
+      name: this.deletingProvider.name,
+      data: { ...this.deletingProvider },
+      deletedAt: new Date()
+    });
+
+    this.providers = this.providers.filter(p => p.id !== this.deletingProvider!.id);
+    this.cancelDelete();
   }
 }
