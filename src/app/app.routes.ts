@@ -67,6 +67,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/repairs/repairs.component').then(m => m.RepairsComponent)
       },
       {
+        path: 'garage-crm',
+        loadComponent: () => import('./features/garage-crm/garage-crm.component').then(m => m.GarageCrmComponent)
+      },
+      {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       }
