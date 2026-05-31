@@ -79,7 +79,7 @@ export class HeaderComponent {
   constructor(private router: Router) {}
 
   goToSettings(): void {
-    this.router.navigate(['/settings']);
+    this.router.navigate(['/user-management']);
   }
 
   logout(): void {

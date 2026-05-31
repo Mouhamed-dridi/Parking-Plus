@@ -115,6 +115,7 @@ export class SidebarComponent {
   ];
 
   systemItems: MenuItem[] = [
+    { label: 'User Management', icon: 'team', route: '/user-management' },
     { label: 'Reports', icon: 'file-text', route: '/reports' },
     { label: 'Trash', icon: 'delete', route: '/trash' },
     { label: 'Settings', icon: 'setting', route: '/settings' },
