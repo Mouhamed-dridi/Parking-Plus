@@ -34,9 +34,15 @@ export class LoginComponent {
       return;
     }
 
+    // Check alphabetic only
+    if (!/^[a-zA-Z]+$/.test(this.email.trim())) {
+      this.errorMessage = 'Login must contain only letters.';
+      return;
+    }
+
     // Check credentials
     if (this.email !== 'admin' || this.password !== 'admin') {
-      this.errorMessage = 'Invalid email or password.';
+      this.errorMessage = 'Invalid login or password.';
       return;
     }
 

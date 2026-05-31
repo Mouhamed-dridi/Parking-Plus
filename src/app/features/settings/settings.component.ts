@@ -71,7 +71,7 @@ import { ThemeService } from '../../core/services/theme.service';
               <label>{{ themeService.isDark ? 'Dark Mode' : 'Light Mode' }}</label>
             </div>
             <nz-switch
-              [(ngModel)]="themeService.isDark"
+              [ngModel]="themeService.isDark"
               (ngModelChange)="themeService.toggleTheme()"
               [nzCheckedChildren]="checkedTemplate"
               [nzUnCheckedChildren]="uncheckedTemplate"

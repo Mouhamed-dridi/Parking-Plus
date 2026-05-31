@@ -16,8 +16,26 @@ export interface CarSpecs {
   fonctionnels: { label: string; value: string }[];
 }
 
+export interface MaintenanceRecord {
+  date: string;
+  description: string;
+  garage: string;
+  cost: number;
+}
+
+export interface TripRecord {
+  date: string;
+  driver: string;
+  from: string;
+  to: string;
+  distance: string;
+  duration: string;
+}
+
 export interface CarDetail extends CarData {
   specs: CarSpecs;
+  maintenanceHistory?: MaintenanceRecord[];
+  trips?: TripRecord[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +47,16 @@ export class CarService {
       id: 1, name: 'GWM Tank 300 HEV 2.0 L', type: 'Car', transmission: 'Auto', fuel: 'Hybrid', price: 548.98, status: 'Free',
       image: '/images/cars/DGcars/gwm-tank-300.jpg',
       driver: { name: 'Mulika lelia', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+      maintenanceHistory: [
+        { date: '2026-04-15', description: 'Oil change & filter replacement', garage: 'AutoPro Main', cost: 180 },
+        { date: '2026-03-01', description: 'Brake pad replacement (front)', garage: 'SpeedFix Center', cost: 320 },
+        { date: '2026-01-20', description: 'Tire rotation & balancing', garage: 'Elite Garage', cost: 95 },
+      ],
+      trips: [
+        { date: '2026-05-28', driver: 'Mulika Lelia', from: 'Downtown Depot', to: 'Airport Terminal 2', distance: '45 km', duration: '35 min' },
+        { date: '2026-05-27', driver: 'Mulika Lelia', from: 'Central Station', to: 'Business District', distance: '12 km', duration: '20 min' },
+        { date: '2026-05-26', driver: 'Mulika Lelia', from: 'Harbor Zone', to: 'North Industrial Park', distance: '78 km', duration: '1h 10min' },
+      ],
       specs: {
         caracteristiques: [
           { label: 'Marque', value: 'GWM (Great Wall Motors)' },
