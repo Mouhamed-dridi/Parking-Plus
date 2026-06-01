@@ -175,10 +175,7 @@ interface Car {
                     </div>
                     <div class="card-details">
                       <h3 class="car-name">{{ car.name }}</h3>
-                      <div class="car-meta">
-                        <span><span nz-icon nzType="interaction"></span> {{ car.transmission }}</span>
-                        <span><span nz-icon nzType="dashboard"></span> {{ car.fuel }}</span>
-                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -403,8 +400,7 @@ interface Car {
     .selected-badge { position: absolute; top: -4px; left: -4px; background: #34a853; color: #fff; font-size: 9px; padding: 2px; display: flex; align-items: center; }
     .card-details { display: flex; flex-direction: column; justify-content: center; min-width: 0; flex-grow: 1; }
     .car-name { font-size: 12px; font-weight: 600; color: #202124; margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .car-meta { display: flex; gap: 6px; font-size: 10px; color: #9aa0a6; }
-    .car-meta span { display: flex; align-items: center; gap: 2px; }
+
 
     .success-screen { background: #f8f9fa; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
     .success-card { max-width: 580px; width: 100%; text-align: center; }

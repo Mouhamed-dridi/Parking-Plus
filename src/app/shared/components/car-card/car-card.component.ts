@@ -45,12 +45,6 @@ export interface CarData {
 
           <h3 class="car-name">{{ car.name }}</h3>
 
-          <div class="tags-row">
-            <span class="tag"><span nz-icon nzType="car" nzTheme="outline"></span> {{ car.type }}</span>
-            <span class="tag"><span nz-icon nzType="interaction" nzTheme="outline"></span> {{ car.transmission }}</span>
-            <span class="tag"><span nz-icon nzType="dashboard" nzTheme="outline"></span> {{ car.fuel }}</span>
-          </div>
-
           <div class="status-row">
             <span class="status-badge" [class.status-free]="car.status === 'Free'" [class.status-road]="car.status === 'In Road'" [class.status-maint]="car.status === 'Maintenance'">
               <span class="status-dot"></span>
@@ -141,26 +135,6 @@ export interface CarData {
       color: var(--text-dark);
       margin: 0 0 10px 0;
       letter-spacing: -0.3px;
-    }
-
-    .tags-row {
-      display: flex;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .tag {
-      font-size: 11px;
-      color: #64748b;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .tag span.anticon {
-      color: var(--primary-color);
-      font-size: 12px;
     }
 
     .status-row {
