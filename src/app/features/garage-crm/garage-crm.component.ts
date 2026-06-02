@@ -15,6 +15,7 @@ interface Provider {
   website: string;
   location: string;
   phone: string;
+  email: string;
   serviceType: string;
 }
 
@@ -73,17 +74,28 @@ interface Provider {
             <div class="card-category">{{ p.serviceType }}</div>
             <h3 class="card-title">{{ p.name }}</h3>
             
-            <div class="card-desc">
-              <p>Located at {{ p.location }}. For more details, visit <a [href]="p.website" target="_blank">{{ p.website.replace('https://', '') }}</a>.</p>
+            <div class="info-rows">
+              <div class="info-row">
+                <span nz-icon nzType="environment" nzTheme="outline" class="info-icon"></span>
+                <span class="info-text">{{ p.location }}</span>
+              </div>
+              <div class="info-row">
+                <span nz-icon nzType="phone" nzTheme="outline" class="info-icon"></span>
+                <span class="info-text">{{ p.phone }}</span>
+              </div>
+              <div class="info-row" *ngIf="p.email">
+                <span nz-icon nzType="mail" nzTheme="outline" class="info-icon"></span>
+                <span class="info-text">{{ p.email }}</span>
+              </div>
+              <div class="info-row" *ngIf="p.website">
+                <span nz-icon nzType="global" nzTheme="outline" class="info-icon"></span>
+                <a [href]="p.website" target="_blank" class="info-link">{{ p.website.replace('https://', '') }}</a>
+              </div>
             </div>
           </div>
 
           <!-- Footer -->
           <div class="card-footer">
-            <div class="footer-item">
-              <span nz-icon nzType="phone" nzTheme="outline"></span>
-              <span>{{ p.phone }}</span>
-            </div>
             <div class="footer-spacer"></div>
             <button class="footer-action-btn" (click)="openEditModal(p)"><span nz-icon nzType="edit" nzTheme="outline"></span></button>
             <button class="footer-action-btn delete-btn" (click)="confirmDeleteProvider(p)"><span nz-icon nzType="delete" nzTheme="outline"></span></button>
@@ -133,6 +145,10 @@ interface Provider {
             <div class="form-group">
               <label>Phone Number</label>
               <input nz-input [(ngModel)]="newProvider.phone" placeholder="e.g. +216 20 123 456" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input nz-input [(ngModel)]="newProvider.email" placeholder="e.g. contact@provider.tn" />
             </div>
             <div class="form-group">
               <label>Website</label>
@@ -202,6 +218,10 @@ interface Provider {
             <div class="form-group">
               <label>Phone Number</label>
               <input nz-input [(ngModel)]="editingProvider!.phone" placeholder="e.g. +216 20 123 456" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input nz-input [(ngModel)]="editingProvider!.email" placeholder="e.g. contact@provider.tn" />
             </div>
             <div class="form-group">
               <label>Website</label>
@@ -397,20 +417,33 @@ interface Provider {
       margin: 0 0 12px;
       line-height: 1.3;
     }
-    .card-desc {
-      font-size: 14px;
+    .info-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
       color: #5f6368;
-      line-height: 1.5;
-      margin: 0;
     }
-    .card-desc p {
-      margin: 0;
+    .info-icon {
+      flex-shrink: 0;
+      font-size: 14px;
+      color: #9aa0a6;
     }
-    .card-desc a {
+    .info-text {
+      line-height: 1.4;
+    }
+    .info-link {
       color: #1a73e8;
       text-decoration: none;
+      line-height: 1.4;
     }
-    .card-desc a:hover { text-decoration: underline; }
+    .info-link:hover { text-decoration: underline; }
 
     /* Footer */
     .card-footer {
@@ -418,18 +451,9 @@ interface Provider {
       border-top: 1px solid #e0e0e0;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
       background: #fafafa;
-    }
-    .footer-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #5f6368;
-      font-weight: 500;
-    }
-    .footer-spacer {
-      flex: 1;
     }
     .footer-action-btn {
       border: none;
@@ -539,6 +563,7 @@ export class GarageCrmComponent {
     serviceType: '',
     location: '',
     phone: '',
+    email: '',
     website: ''
   };
 
@@ -552,11 +577,11 @@ export class GarageCrmComponent {
   deletingProvider: Provider | null = null;
 
   providers: Provider[] = [
-    { id: 'P001', name: 'Misfat', image: '/assets/images/crm/misfat.jpg', website: 'https://misfat.com.tn', location: 'Oued Smar, Tunis', phone: '+216 71 433 333', serviceType: 'Spare Parts' },
-    { id: 'P002', name: 'Pneu Amine', image: '/assets/images/crm/Pneu%20Amine.jpg', website: 'https://www.pneu-amine.com.tn', location: 'Zone Industrielle, Ben Arous', phone: '+216 71 382 000', serviceType: 'Tires' },
-    { id: 'P003', name: 'Assad Batteries', image: '/assets/images/crm/Assad%20Batteries.webp', website: 'https://assadpower.com.tn', location: 'Bouargoub, Nabeul', phone: '+216 72 258 000', serviceType: 'Spare Parts' },
-    { id: 'P004', name: 'Gamma Auto', image: '/assets/images/crm/gamma-auto-tunisie.jpg', website: 'https://gamma-auto.com', location: 'La Charguia, Tunis', phone: '+216 71 809 111', serviceType: 'Spare Parts' },
-    { id: 'P005', name: 'AM Tuning', image: '/assets/images/crm/AM%20Tuning.jpg', website: 'https://www.amtuning.com.tn', location: 'Route de la Marsa, Tunis', phone: '+216 22 123 456', serviceType: 'Accessories' },
+    { id: 'P001', name: 'Misfat', image: '/assets/images/crm/misfat.jpg', website: 'https://misfat.com.tn', location: 'Oued Smar, Tunis', phone: '+216 71 433 333', email: 'contact@misfat.com.tn', serviceType: 'Spare Parts' },
+    { id: 'P002', name: 'Pneu Amine', image: '/assets/images/crm/Pneu%20Amine.jpg', website: 'https://www.pneu-amine.com.tn', location: 'Zone Industrielle, Ben Arous', phone: '+216 71 382 000', email: 'contact@pneu-amine.com.tn', serviceType: 'Tires' },
+    { id: 'P003', name: 'Assad Batteries', image: '/assets/images/crm/Assad%20Batteries.webp', website: 'https://assadpower.com.tn', location: 'Bouargoub, Nabeul', phone: '+216 72 258 000', email: 'info@assadpower.com.tn', serviceType: 'Spare Parts' },
+    { id: 'P004', name: 'Gamma Auto', image: '/assets/images/crm/gamma-auto-tunisie.jpg', website: 'https://gamma-auto.com', location: 'La Charguia, Tunis', phone: '+216 71 809 111', email: 'contact@gamma-auto.com', serviceType: 'Spare Parts' },
+    { id: 'P005', name: 'AM Tuning', image: '/assets/images/crm/AM%20Tuning.jpg', website: 'https://www.amtuning.com.tn', location: 'Route de la Marsa, Tunis', phone: '+216 22 123 456', email: 'contact@amtuning.com.tn', serviceType: 'Accessories' },
   ];
 
   get filteredProviders(): Provider[] {
@@ -599,12 +624,13 @@ export class GarageCrmComponent {
       website: this.newProvider.website,
       location: this.newProvider.location,
       phone: this.newProvider.phone,
+      email: this.newProvider.email,
       serviceType: this.newProvider.serviceType
     };
 
     this.providers.unshift(p);
     this.showAddModal = false;
-    this.newProvider = { name: '', serviceType: '', location: '', phone: '', website: '' };
+    this.newProvider = { name: '', serviceType: '', location: '', phone: '', email: '', website: '' };
     this.imagePreview = null;
   }
 

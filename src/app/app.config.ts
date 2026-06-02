@@ -14,14 +14,16 @@ import {
   AppstoreOutline, CarOutline, CarryOutOutline, ShoppingCartOutline, 
   DeploymentUnitOutline, ThunderboltOutline, IdcardOutline, EnvironmentOutline, 
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
-  EyeOutline, EyeInvisibleOutline, LoadingOutline
+  EyeOutline, EyeInvisibleOutline, LoadingOutline,
+  TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline, GlobalOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
   AppstoreOutline, CarOutline, CarryOutOutline, ShoppingCartOutline, 
   DeploymentUnitOutline, ThunderboltOutline, IdcardOutline, EnvironmentOutline, 
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
-  EyeOutline, EyeInvisibleOutline, LoadingOutline
+  EyeOutline, EyeInvisibleOutline, LoadingOutline,
+  TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline, GlobalOutline
 ];
 
 registerLocaleData(en);

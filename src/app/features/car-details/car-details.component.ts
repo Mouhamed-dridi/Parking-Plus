@@ -18,11 +18,7 @@ import { CarService, CarDetail } from '../../core/services/car.service';
         </button>
         <div class="header-info">
           <h1 class="car-title">{{ car.name }}</h1>
-          <div class="car-badges">
-            <span class="badge badge-fuel">{{ car.fuel }}</span>
-            <span class="badge badge-trans">{{ car.transmission }}</span>
-            <span class="badge badge-type">{{ car.type }}</span>
-          </div>
+
         </div>
       </div>
 
@@ -317,17 +313,6 @@ import { CarService, CarDetail } from '../../core/services/car.service';
       font-weight: 700;
       color: #1f2937;
     }
-
-    .car-badges { display: flex; gap: 8px; flex-wrap: wrap; }
-    .badge {
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .badge-fuel { background: #fef3c7; color: #d97706; }
-    .badge-trans { background: #dbeafe; color: #2563eb; }
-    .badge-type { background: #e0e7ff; color: #4338ca; }
 
     /* Tabs - driver profile style */
     .tabs-section {

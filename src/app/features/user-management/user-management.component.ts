@@ -105,6 +105,23 @@ import { NzInputModule } from 'ng-zorro-antd/input';
         </ng-template>
       </nz-modal>
 
+      <!-- DELETE USER CONFIRMATION MODAL -->
+      <nz-modal
+        [(nzVisible)]="showDeleteModal"
+        nzTitle="Delete User"
+        nzOkText="Delete"
+        nzOkType="primary"
+        nzOkDanger
+        (nzOnOk)="executeDelete()"
+        (nzOnCancel)="showDeleteModal = false"
+        [nzWidth]="400">
+        <ng-container *nzModalContent>
+          <p style="font-size:14px;color:#5f6368;margin:0;line-height:1.6;">
+            Are you sure you want to delete <strong>{{ deletingUserName }}</strong>?
+          </p>
+        </ng-container>
+      </nz-modal>
+
       <!-- EDIT USER MODAL -->
       <nz-modal
         [(nzVisible)]="showEditUserModal"
@@ -244,9 +261,12 @@ export class UserManagementComponent {
 
   showCreateUserModal = false;
   showEditUserModal = false;
+  showDeleteModal = false;
 
   newUser = { name: '', login: '', password: '', role: 'user' };
   editingUser: any = {};
+  deletingUserId: number | null = null;
+  deletingUserName = '';
 
   createUser() {
     if (!this.newUser.name || !this.newUser.login || !this.newUser.password) return;
@@ -285,6 +305,20 @@ export class UserManagementComponent {
   }
 
   deleteUser(id: number) {
-    this.users = this.users.filter(u => u.id !== id);
+    const user = this.users.find(u => u.id === id);
+    if (user) {
+      this.deletingUserId = id;
+      this.deletingUserName = user.name;
+      this.showDeleteModal = true;
+    }
+  }
+
+  executeDelete() {
+    if (this.deletingUserId !== null) {
+      this.users = this.users.filter(u => u.id !== this.deletingUserId);
+    }
+    this.showDeleteModal = false;
+    this.deletingUserId = null;
+    this.deletingUserName = '';
   }
 }
