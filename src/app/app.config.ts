@@ -14,16 +14,26 @@ import {
   AppstoreOutline, CarOutline, CarryOutOutline, ShoppingCartOutline, 
   DeploymentUnitOutline, ThunderboltOutline, IdcardOutline, EnvironmentOutline, 
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
+<<<<<<< HEAD
   EyeOutline, EyeInvisibleOutline, LoadingOutline,
   TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline, GlobalOutline
+=======
+  EyeOutline, EyeInvisibleOutline, LoadingOutline, TeamOutline,
+  UnorderedListOutline, ShopOutline, DeleteOutline
+>>>>>>> e08901ee7171bd0b0105f26c57321968958bf1a2
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
   AppstoreOutline, CarOutline, CarryOutOutline, ShoppingCartOutline, 
   DeploymentUnitOutline, ThunderboltOutline, IdcardOutline, EnvironmentOutline, 
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
+<<<<<<< HEAD
   EyeOutline, EyeInvisibleOutline, LoadingOutline,
   TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline, GlobalOutline
+=======
+  EyeOutline, EyeInvisibleOutline, LoadingOutline, TeamOutline,
+  UnorderedListOutline, ShopOutline, DeleteOutline
+>>>>>>> e08901ee7171bd0b0105f26c57321968958bf1a2
 ];
 
 registerLocaleData(en);

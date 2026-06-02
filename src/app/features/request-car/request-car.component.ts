@@ -175,6 +175,10 @@ interface Car {
                     </div>
                     <div class="card-details">
                       <h3 class="car-name">{{ car.name }}</h3>
+<<<<<<< HEAD
+=======
+
+>>>>>>> e08901ee7171bd0b0105f26c57321968958bf1a2
                     </div>
                   </div>
                 </div>
@@ -399,6 +403,11 @@ interface Car {
     .selected-badge { position: absolute; top: -4px; left: -4px; background: #34a853; color: #fff; font-size: 9px; padding: 2px; display: flex; align-items: center; }
     .card-details { display: flex; flex-direction: column; justify-content: center; min-width: 0; flex-grow: 1; }
     .car-name { font-size: 12px; font-weight: 600; color: #202124; margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> e08901ee7171bd0b0105f26c57321968958bf1a2
     .success-screen { background: #f8f9fa; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
     .success-card { max-width: 580px; width: 100%; text-align: center; }
     .success-header { margin-bottom: 28px; }
