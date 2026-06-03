@@ -8,6 +8,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CarService, CarDetail } from '../../core/services/car.service';
 import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } from '../../core/services/car-finance.service';
+import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/services/car-document.service';
 
 @Component({
   selector: 'app-car-details',
@@ -33,6 +34,7 @@ import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } fr
           <div class="tab" [class.active]="activeTab === 'maintenance'" (click)="setTab('maintenance')">Maintenance</div>
           <div class="tab" [class.active]="activeTab === 'trips'" (click)="setTab('trips')">Trips History</div>
           <div class="tab" [class.active]="activeTab === 'finance'" (click)="setTab('finance')">Finance</div>
+          <div class="tab" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">Documents</div>
           <div class="tab" [class.active]="activeTab === 'driver'" (click)="setTab('driver')">Driver</div>
         </div>
       </div>
@@ -399,6 +401,93 @@ import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } fr
         </div>
       </div>
 
+      <!-- Documents Tab -->
+      <div *ngIf="activeTab === 'documents'" class="tab-content">
+        <div class="documents-header">
+          <h2 class="tab-section-title">Documents</h2>
+          <button class="btn-edit" (click)="openDocModal()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span> Add Document
+          </button>
+        </div>
+        <div class="table-card" *ngIf="documents.length > 0; else noDocs">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Type</th>
+                <th>Upload Date</th>
+                <th>Notes</th>
+                <th class="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of documents">
+                <td class="cell-filename">{{ d.fileName }}</td>
+                <td><span class="doc-badge">{{ d.documentType }}</span></td>
+                <td class="cell-date">{{ d.uploadDate }}</td>
+                <td class="cell-notes">{{ d.notes }}</td>
+                <td class="cell-actions">
+                  <button class="btn-action" (click)="openDocModal(d)" title="Update">
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                  </button>
+                  <button class="btn-action btn-action-del" (click)="deleteDocument(d)" title="Delete">
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noDocs>
+          <div class="empty-docs">
+            <span nz-icon nzType="file" nzTheme="outline" class="empty-icon-lg"></span>
+            <p>No documents for this vehicle</p>
+          </div>
+        </ng-template>
+
+        <!-- Add/Edit Document Modal -->
+        <div class="modal-overlay" *ngIf="showDocModal" (click.self)="closeDocModal()">
+          <div class="modal-card medium-modal">
+            <div class="modal-header">
+              <h3>{{ editDoc.id ? 'Update' : 'Add' }} Document</h3>
+              <button class="modal-close" (click)="closeDocModal()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Upload File</label>
+                <div class="file-upload-area">
+                  <input type="file" #fileInput (change)="onFileSelected($event)" class="file-input-hidden" />
+                  <button type="button" class="btn-upload" (click)="fileInput.click()">
+                    <span nz-icon nzType="upload" nzTheme="outline"></span> Choose File
+                  </button>
+                  <span class="file-name-display">{{ editDoc.fileName || 'No file chosen' }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Document Type</label>
+                <nz-select [(ngModel)]="editDoc.documentType">
+                  <nz-option *ngFor="let t of docTypeList" [nzValue]="t" [nzLabel]="t"></nz-option>
+                </nz-select>
+              </div>
+              <div class="form-group">
+                <label>Upload Date</label>
+                <input nz-input [(ngModel)]="editDoc.uploadDate" type="date" />
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea nz-input [(ngModel)]="editDoc.notes" rows="3" placeholder="Optional notes"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-cancel" (click)="closeDocModal()">Cancel</button>
+              <button class="btn-primary" (click)="saveDocument()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Driver Tab -->
       <div *ngIf="activeTab === 'driver'" class="tab-content">
         <h2 class="tab-section-title">Assigned Driver</h2>
@@ -738,6 +827,53 @@ import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } fr
     }
     .empty-finance p { margin: 0; color: #9ca3af; font-size: 14px; }
 
+    .documents-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .doc-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .th-actions { width: 100px; text-align: center; }
+    .cell-filename { font-weight: 600; color: #1f2937; }
+    .cell-notes { color: #6b7280; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+    .btn-action {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #6b7280;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-action:hover { border-color: #6366f1; color: #6366f1; }
+    .btn-action-del:hover { border-color: #ef4444; color: #ef4444; }
+    .empty-docs {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+    }
+    .empty-docs p { margin: 0; color: #9ca3af; font-size: 14px; }
+
     .not-found {
       text-align: center;
       padding: 80px 20px;
@@ -815,6 +951,34 @@ import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } fr
       font-size: 14px;
       cursor: pointer;
     }
+    .file-upload-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .file-input-hidden { display: none; }
+    .btn-upload {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-upload:hover { border-color: #6366f1; color: #6366f1; }
+    .file-name-display {
+      font-size: 13px;
+      color: #6b7280;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .btn-cancel:hover { border-color: #9ca3af; }
     .btn-primary {
       padding: 8px 20px;
@@ -840,14 +1004,23 @@ export class CarDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private carService = inject(CarService);
   private financeService = inject(CarFinanceService);
+  private docService = inject(CarDocumentService);
 
   car: CarDetail | null = null;
   activeTab: string = 'fiche';
+
+  // Finance
   financeRecord: CarFinanceRecord | null = null;
   showFinanceModal = false;
   assuranceList = ASSURANCE_LIST;
   providerList = PROVIDER_LIST;
   editRecord: CarFinanceRecord = { carId: 0, carName: '', price: 0, achatDate: '', deliveryDate: '', insurance: '', insuranceMargin: '', vignetteTax: '', provider: '', immoId: '', carteGriseId: '', notes: '' };
+
+  // Documents
+  documents: CarDocument[] = [];
+  showDocModal = false;
+  docTypeList = DOCUMENT_TYPE_LIST;
+  editDoc: CarDocument = { id: 0, carId: 0, fileName: '', documentType: '', notes: '', uploadDate: '' };
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -855,6 +1028,7 @@ export class CarDetailsComponent implements OnInit {
       this.car = this.carService.getCarById(+idParam) || null;
       if (this.car) {
         this.financeRecord = this.financeService.getByCarId(this.car.id) || null;
+        this.documents = this.docService.getByCarId(this.car.id);
       }
     }
   }
@@ -867,6 +1041,7 @@ export class CarDetailsComponent implements OnInit {
     window.history.back();
   }
 
+  // Finance methods
   openFinanceModal(): void {
     const carId = this.car!.id;
     this.editRecord = this.financeService.getByCarId(carId)
@@ -883,5 +1058,39 @@ export class CarDetailsComponent implements OnInit {
     this.financeService.save({ ...this.editRecord });
     this.financeRecord = this.financeService.getByCarId(this.car!.id) || null;
     this.showFinanceModal = false;
+  }
+
+  // Document methods
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      this.editDoc.fileName = file.name;
+    }
+  }
+
+  openDocModal(doc?: CarDocument): void {
+    const carId = this.car!.id;
+    if (doc) {
+      this.editDoc = { ...doc };
+    } else {
+      this.editDoc = { id: 0, carId, fileName: '', documentType: '', notes: '', uploadDate: '' };
+    }
+    this.showDocModal = true;
+  }
+
+  closeDocModal(): void {
+    this.showDocModal = false;
+  }
+
+  saveDocument(): void {
+    this.docService.save({ ...this.editDoc });
+    this.documents = this.docService.getByCarId(this.car!.id);
+    this.showDocModal = false;
+  }
+
+  deleteDocument(doc: CarDocument): void {
+    this.docService.delete(doc.id);
+    this.documents = this.docService.getByCarId(this.car!.id);
   }
 }
