@@ -43,7 +43,7 @@ interface Provider {
         </div>
       </div>
 
-      <!-- ═══ FILTERS (Optional for layout consistency) ═══ -->
+      <!-- ═══ FILTERS ═══ -->
       <div class="filters-bar">
         <div class="search-wrap">
           <span nz-icon nzType="search" nzTheme="outline" class="search-icon"></span>
@@ -108,7 +108,7 @@ interface Provider {
           <p>No providers found matching your criteria</p>
         </div>
       </div>
-      
+
     </div>
 
     <!-- ═══ ADD PROVIDER MODAL ═══ -->
@@ -278,6 +278,7 @@ interface Provider {
         </div>
       </div>
     </div>
+
   `,
   styles: [`
     :host { display: block; }

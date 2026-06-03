@@ -1,14 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CarService, CarDetail } from '../../core/services/car.service';
+import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } from '../../core/services/car-finance.service';
 
 @Component({
   selector: 'app-car-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, NzIconModule, NzButtonModule],
+  imports: [CommonModule, FormsModule, RouterModule, NzIconModule, NzButtonModule, NzInputModule, NzSelectModule],
   template: `
     <div class="details-container" *ngIf="car; else notFound">
       <!-- Header -->
@@ -28,6 +32,7 @@ import { CarService, CarDetail } from '../../core/services/car.service';
           <div class="tab" [class.active]="activeTab === 'fiche'" (click)="setTab('fiche')">Fiche Technique</div>
           <div class="tab" [class.active]="activeTab === 'maintenance'" (click)="setTab('maintenance')">Maintenance</div>
           <div class="tab" [class.active]="activeTab === 'trips'" (click)="setTab('trips')">Trips History</div>
+          <div class="tab" [class.active]="activeTab === 'finance'" (click)="setTab('finance')">Finance</div>
           <div class="tab" [class.active]="activeTab === 'driver'" (click)="setTab('driver')">Driver</div>
         </div>
       </div>
@@ -242,6 +247,155 @@ import { CarService, CarDetail } from '../../core/services/car.service';
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Finance Tab -->
+      <div *ngIf="activeTab === 'finance'" class="tab-content">
+        <div class="finance-header">
+          <h2 class="tab-section-title">Financial Information</h2>
+          <button class="btn-edit" (click)="openFinanceModal()">
+            <span nz-icon nzType="edit" nzTheme="outline"></span> Edit
+          </button>
+        </div>
+        <div class="finance-grid" *ngIf="financeRecord; else noFinance">
+          <div class="finance-card">
+            <span nz-icon nzType="dollar" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Prix de vente</span>
+              <span class="fi-value">{{ financeRecord.price }} TND</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="calendar" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Date d'achat</span>
+              <span class="fi-value">{{ financeRecord.achatDate }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="field-time" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Date de livraison</span>
+              <span class="fi-value">{{ financeRecord.deliveryDate }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="safety" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Assurance</span>
+              <span class="fi-value">{{ financeRecord.insurance }} ({{ financeRecord.insuranceMargin }})</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="car" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Provider</span>
+              <span class="fi-value">{{ financeRecord.provider }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="audit" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Vignette Tax / année</span>
+              <span class="fi-value">{{ financeRecord.vignetteTax }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="idcard" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Immo ID</span>
+              <span class="fi-value">{{ financeRecord.immoId }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="file-protect" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">ID Carte Grise</span>
+              <span class="fi-value">{{ financeRecord.carteGriseId }}</span>
+            </div>
+          </div>
+          <div class="finance-card">
+            <span nz-icon nzType="file-text" nzTheme="outline" class="fi-icon"></span>
+            <div class="fi-body">
+              <span class="fi-label">Notes</span>
+              <span class="fi-value">{{ financeRecord.notes }}</span>
+            </div>
+          </div>
+        </div>
+        <ng-template #noFinance>
+          <div class="empty-finance">
+            <span nz-icon nzType="dollar" nzTheme="outline" class="empty-icon-lg"></span>
+            <p>No financial records for this vehicle</p>
+          </div>
+        </ng-template>
+
+        <!-- Edit Finance Modal -->
+        <div class="modal-overlay" *ngIf="showFinanceModal" (click.self)="closeFinanceModal()">
+          <div class="modal-card medium-modal">
+            <div class="modal-header">
+              <h3>Edit Financial Info</h3>
+              <button class="modal-close" (click)="closeFinanceModal()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Prix de vente (TND)</label>
+                <input nz-input [(ngModel)]="editRecord.price" type="number" step="0.001" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date d'achat</label>
+                  <input nz-input [(ngModel)]="editRecord.achatDate" type="date" />
+                </div>
+                <div class="form-group">
+                  <label>Date de livraison</label>
+                  <input nz-input [(ngModel)]="editRecord.deliveryDate" type="date" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Assurance</label>
+                  <nz-select [(ngModel)]="editRecord.insurance">
+                    <nz-option *ngFor="let a of assuranceList" [nzValue]="a" [nzLabel]="a"></nz-option>
+                  </nz-select>
+                </div>
+                <div class="form-group">
+                  <label>Marge d'assurance</label>
+                  <input nz-input [(ngModel)]="editRecord.insuranceMargin" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Provider</label>
+                <nz-select [(ngModel)]="editRecord.provider">
+                  <nz-option *ngFor="let p of providerList" [nzValue]="p" [nzLabel]="p"></nz-option>
+                </nz-select>
+              </div>
+              <div class="form-group">
+                <label>Vignette Tax / année</label>
+                <input nz-input [(ngModel)]="editRecord.vignetteTax" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Immo ID</label>
+                  <input nz-input [(ngModel)]="editRecord.immoId" />
+                </div>
+                <div class="form-group">
+                  <label>ID Carte Grise</label>
+                  <input nz-input [(ngModel)]="editRecord.carteGriseId" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea nz-input [(ngModel)]="editRecord.notes" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-cancel" (click)="closeFinanceModal()">Cancel</button>
+              <button class="btn-primary" (click)="saveFinance()">Save</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -517,6 +671,73 @@ import { CarService, CarDetail } from '../../core/services/car.service';
     .empty-icon-lg { font-size: 48px; color: #d1d5db; margin-bottom: 12px; }
     .empty-driver p { margin: 0; color: #9ca3af; font-size: 14px; }
 
+    .finance-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .btn-edit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-edit:hover { border-color: #6366f1; color: #6366f1; }
+
+    .finance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .finance-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .fi-icon {
+      font-size: 28px;
+      color: #6366f1;
+      flex-shrink: 0;
+    }
+    .fi-body {
+      display: flex;
+      flex-direction: column;
+    }
+    .fi-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .fi-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-top: 4px;
+    }
+
+    .empty-finance {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+    }
+    .empty-finance p { margin: 0; color: #9ca3af; font-size: 14px; }
+
     .not-found {
       text-align: center;
       padding: 80px 20px;
@@ -526,23 +747,115 @@ import { CarService, CarDetail } from '../../core/services/car.service';
     .not-found h2 { margin: 0 0 8px; color: #1f2937; }
     .not-found p { margin: 0 0 24px; }
 
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #1f2937; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .modal-close:hover { color: #1f2937; }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+    .form-row .form-group { flex: 1; }
+    .btn-cancel {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-cancel:hover { border-color: #9ca3af; }
+    .btn-primary {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #4f46e5; }
+    textarea { resize: vertical; }
+
     @media (max-width: 1024px) {
       .details-container { padding: 20px 16px; }
       .specs-grid { grid-template-columns: 1fr; }
+      .finance-grid { grid-template-columns: 1fr; }
     }
   `]
 })
 export class CarDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private carService = inject(CarService);
+  private financeService = inject(CarFinanceService);
 
   car: CarDetail | null = null;
   activeTab: string = 'fiche';
+  financeRecord: CarFinanceRecord | null = null;
+  showFinanceModal = false;
+  assuranceList = ASSURANCE_LIST;
+  providerList = PROVIDER_LIST;
+  editRecord: CarFinanceRecord = { carId: 0, carName: '', price: 0, achatDate: '', deliveryDate: '', insurance: '', insuranceMargin: '', vignetteTax: '', provider: '', immoId: '', carteGriseId: '', notes: '' };
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.car = this.carService.getCarById(+idParam) || null;
+      if (this.car) {
+        this.financeRecord = this.financeService.getByCarId(this.car.id) || null;
+      }
     }
   }
 
@@ -552,5 +865,23 @@ export class CarDetailsComponent implements OnInit {
 
   goBack(): void {
     window.history.back();
+  }
+
+  openFinanceModal(): void {
+    const carId = this.car!.id;
+    this.editRecord = this.financeService.getByCarId(carId)
+      ? { ...this.financeService.getByCarId(carId)! }
+      : { carId, carName: this.car!.name, price: 0, achatDate: '', deliveryDate: '', insurance: '', insuranceMargin: '', vignetteTax: '', provider: '', immoId: '', carteGriseId: '', notes: '' };
+    this.showFinanceModal = true;
+  }
+
+  closeFinanceModal(): void {
+    this.showFinanceModal = false;
+  }
+
+  saveFinance(): void {
+    this.financeService.save({ ...this.editRecord });
+    this.financeRecord = this.financeService.getByCarId(this.car!.id) || null;
+    this.showFinanceModal = false;
   }
 }
