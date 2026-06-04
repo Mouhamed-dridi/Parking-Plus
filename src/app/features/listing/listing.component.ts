@@ -395,65 +395,12 @@ export class ListingComponent implements OnInit {
     const vehicleType = this.route.snapshot.data['vehicleType'] as string | undefined;
     if (vehicleType === 'Used') {
       this.isUsedCarPage = true;
-      this.usedCars = this.getUsedCars();
+      this.usedCars = this.carService.getCarsByType('Used');
     } else if (vehicleType) {
       this.cars = this.allCars.filter(c => c.type?.toLowerCase() === vehicleType.toLowerCase());
     } else {
       this.cars = this.allCars;
     }
-  }
-
-  getUsedCars(): CarDetail[] {
-    return [
-      {
-        id: 101,
-        name: 'Hyundai Elantra 2022',
-        type: 'Used',
-        transmission: 'Auto',
-        fuel: 'Petrol',
-        price: 18500,
-        status: 'Free',
-        image: '/images/cars/usedfor_cars/hyd.jpg',
-        driver: { name: '', avatar: '' },
-        specs: this.carService.defaultSpecs('Hyundai Elantra', '45000 KM', '2022', 'Petrol', 'Tunis', 'Auto', 'Used')
-      },
-      {
-        id: 102,
-        name: 'Kia Sportage 2023',
-        type: 'Used',
-        transmission: 'Auto',
-        fuel: 'Diesel',
-        price: 24000,
-        status: 'Free',
-        image: '/images/cars/usedfor_cars/kia.png',
-        driver: { name: '', avatar: '' },
-        specs: this.carService.defaultSpecs('Kia Sportage', '30000 KM', '2023', 'Diesel', 'Sfax', 'Auto', 'Used')
-      },
-      {
-        id: 103,
-        name: 'VW Passat 2021',
-        type: 'Used',
-        transmission: 'Auto',
-        fuel: 'Diesel',
-        price: 21000,
-        status: 'Free',
-        image: '/images/cars/usedfor_cars/passat.avif',
-        driver: { name: '', avatar: '' },
-        specs: this.carService.defaultSpecs('VW Passat', '55000 KM', '2021', 'Diesel', 'Sousse', 'Auto', 'Used')
-      },
-      {
-        id: 104,
-        name: 'Skoda Octavia 2022',
-        type: 'Used',
-        transmission: 'Manual',
-        fuel: 'Petrol',
-        price: 16500,
-        status: 'Free',
-        image: '/images/cars/usedfor_cars/skoda.webp',
-        driver: { name: '', avatar: '' },
-        specs: this.carService.defaultSpecs('Skoda Octavia', '40000 KM', '2022', 'Petrol', 'Nabeul', 'Manual', 'Used')
-      }
-    ];
   }
 
   goToRepairs(): void {

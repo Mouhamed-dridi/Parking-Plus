@@ -20,7 +20,7 @@ export const DOCUMENT_TYPE_LIST = [
   'Autre',
 ];
 
-let nextDocId = 100;
+let nextDocId = 120;
 
 @Injectable({ providedIn: 'root' })
 export class CarDocumentService {
@@ -35,6 +35,11 @@ export class CarDocumentService {
     { id: 8, carId: 8, fileName: 'bl_livraison.pdf', documentType: 'BL', notes: 'BL livraison VW Caddy', uploadDate: '2024-04-15' },
     { id: 9, carId: 9, fileName: 'facture_renault.pdf', documentType: 'Facture', notes: 'Facture Renault Dokker', uploadDate: '2024-06-25' },
     { id: 10, carId: 10, fileName: 'carte_grise_partner.jpg', documentType: 'Carte Grise', notes: 'Carte grise Partner', uploadDate: '2024-09-01' },
+    { id: 11, carId: 101, fileName: 'carte_grise_elantra.pdf', documentType: 'Carte Grise', notes: 'Carte grise Hyundai Elantra', uploadDate: '2024-06-20' },
+    { id: 12, carId: 101, fileName: 'contra_vidange.pdf', documentType: 'Maintenance', notes: 'Dernière vidange effectuée', uploadDate: '2025-03-10' },
+    { id: 13, carId: 102, fileName: 'assurance_kia.pdf', documentType: 'Assurance', notes: 'Assurance Kia Sportage', uploadDate: '2024-07-30' },
+    { id: 14, carId: 103, fileName: 'facture_passat.pdf', documentType: 'Facture', notes: 'Facture d\'achat VW Passat', uploadDate: '2024-06-10' },
+    { id: 15, carId: 104, fileName: 'ct_octavia.pdf', documentType: 'Autre', notes: 'Contrôle technique Octavia', uploadDate: '2024-08-20' },
   ];
 
   getByCarId(carId: number): CarDocument[] {

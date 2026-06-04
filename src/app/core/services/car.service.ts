@@ -40,7 +40,7 @@ export interface CarDetail extends CarData {
 
 @Injectable({ providedIn: 'root' })
 export class CarService {
-  private nextId = 12;
+  private nextId = 105;
 
   private allCars: CarDetail[] = [
     {
@@ -184,26 +184,50 @@ export class CarService {
     {
       id: 8, name: 'VW Caddy', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 80.00, status: 'In Road',
       image: '/images/cars/deliver/caddy.webp',
-      driver: { name: '', avatar: '' },
+      driver: { name: 'Mehdi Ben Romdhane', avatar: '/images/drivers/Mehdi.jpg' }, driverId: 5,
       specs: this.defaultSpecs('Volkswagen', 'Caddy Maxi', '2023', 'Diesel', '2.0 L', 'Manuelle', 'Utilitaire')
     },
     {
       id: 9, name: 'Renault Dokker', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 75.00, status: 'Free',
       image: '/images/cars/deliver/docker.webp',
-      driver: { name: '', avatar: '' },
+      driver: { name: 'Nizar Chebbi', avatar: '/images/drivers/Nizar.jpg' }, driverId: 6,
       specs: this.defaultSpecs('Renault', 'Dokker Van', '2023', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')
     },
     {
       id: 10, name: 'Peugeot Partner', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 85.00, status: 'Free',
       image: '/images/cars/deliver/partiner.webp',
-      driver: { name: '', avatar: '' },
+      driver: { name: 'Omar Jaziri', avatar: '/images/drivers/Omar.jpg' }, driverId: 7,
       specs: this.defaultSpecs('Peugeot', 'Partner', '2024', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')
     },
     {
       id: 11, name: 'Peugeot Partner Pro', type: 'Delivery', transmission: 'Manual', fuel: 'Diesel', price: 90.00, status: 'In Road',
       image: '/images/cars/deliver/partnier.avif',
-      driver: { name: '', avatar: '' },
+      driver: { name: 'Fares Ben Amor', avatar: '/images/drivers/Fares.jpg' }, driverId: 8,
       specs: this.defaultSpecs('Peugeot', 'Partner Pro', '2024', 'Diesel', '1.5 L', 'Manuelle', 'Utilitaire')
+    },
+    {
+      id: 101, name: 'Hyundai Elantra 2022', type: 'Used', transmission: 'Auto', fuel: 'Petrol', price: 18500, status: 'Free',
+      image: '/images/cars/usedfor_cars/hyd.jpg',
+      driver: { name: '', avatar: '' },
+      specs: this.defaultSpecs('Hyundai', 'Elantra', '2022', 'Petrol', '2.0 L', 'Auto', 'Sedan')
+    },
+    {
+      id: 102, name: 'Kia Sportage 2023', type: 'Used', transmission: 'Auto', fuel: 'Diesel', price: 24000, status: 'Free',
+      image: '/images/cars/usedfor_cars/kia.png',
+      driver: { name: '', avatar: '' },
+      specs: this.defaultSpecs('Kia', 'Sportage', '2023', 'Diesel', '2.0 L', 'Auto', 'SUV')
+    },
+    {
+      id: 103, name: 'VW Passat 2021', type: 'Used', transmission: 'Auto', fuel: 'Diesel', price: 21000, status: 'Free',
+      image: '/images/cars/usedfor_cars/passat.avif',
+      driver: { name: '', avatar: '' },
+      specs: this.defaultSpecs('Volkswagen', 'Passat', '2021', 'Diesel', '2.0 L', 'Auto', 'Berline')
+    },
+    {
+      id: 104, name: 'Skoda Octavia 2022', type: 'Used', transmission: 'Manual', fuel: 'Petrol', price: 16500, status: 'Free',
+      image: '/images/cars/usedfor_cars/skoda.webp',
+      driver: { name: '', avatar: '' },
+      specs: this.defaultSpecs('Skoda', 'Octavia', '2022', 'Petrol', '1.5 L', 'Manuelle', 'Berline')
     }
   ];
 
