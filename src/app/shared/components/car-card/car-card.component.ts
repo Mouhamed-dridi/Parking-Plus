@@ -13,6 +13,7 @@ export interface CarData {
     name: string;
     avatar: string;
   };
+  driverId?: number;
   type: string;
   transmission: string;
   fuel: string;

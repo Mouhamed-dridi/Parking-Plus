@@ -9,6 +9,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CarService, CarDetail } from '../../core/services/car.service';
 import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } from '../../core/services/car-finance.service';
 import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/services/car-document.service';
+import { TrashService } from '../../core/services/trash.service';
+import { DriverService, Driver } from '../../core/services/driver.service';
 
 @Component({
   selector: 'app-car-details',
@@ -427,10 +429,13 @@ import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/
                 <td class="cell-date">{{ d.uploadDate }}</td>
                 <td class="cell-notes">{{ d.notes }}</td>
                 <td class="cell-actions">
+                  <button class="btn-action" (click)="viewDocument(d)" title="View">
+                    <span nz-icon nzType="eye" nzTheme="outline"></span>
+                  </button>
                   <button class="btn-action" (click)="openDocModal(d)" title="Update">
                     <span nz-icon nzType="edit" nzTheme="outline"></span>
                   </button>
-                  <button class="btn-action btn-action-del" (click)="deleteDocument(d)" title="Delete">
+                  <button class="btn-action btn-action-del" (click)="openDocDeleteConfirm(d)" title="Delete">
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
                   </button>
                 </td>
@@ -488,19 +493,87 @@ import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/
         </div>
       </div>
 
+        <!-- View Document Modal -->
+        <div class="modal-overlay" *ngIf="showViewDocModal" (click.self)="closeViewDocModal()">
+          <div class="modal-card medium-modal">
+            <div class="modal-header">
+              <h3>Document Details</h3>
+              <button class="modal-close" (click)="closeViewDocModal()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="view-doc-grid">
+                <div class="view-doc-row">
+                  <span class="view-doc-label">File Name</span>
+                  <span class="view-doc-value">{{ viewDoc.fileName }}</span>
+                </div>
+                <div class="view-doc-row">
+                  <span class="view-doc-label">Document Type</span>
+                  <span class="view-doc-value"><span class="doc-badge">{{ viewDoc.documentType }}</span></span>
+                </div>
+                <div class="view-doc-row">
+                  <span class="view-doc-label">Upload Date</span>
+                  <span class="view-doc-value">{{ viewDoc.uploadDate }}</span>
+                </div>
+                <div class="view-doc-row">
+                  <span class="view-doc-label">Notes</span>
+                  <span class="view-doc-value">{{ viewDoc.notes || '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-primary" (click)="closeViewDocModal()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Document Confirmation -->
+        <div class="modal-overlay" *ngIf="showDocDeleteConfirm" (click.self)="closeDocDeleteConfirm()">
+          <div class="modal-card" style="max-width: 400px;">
+            <div class="modal-header">
+              <h3>Confirm Deletion</h3>
+              <button class="modal-close" (click)="closeDocDeleteConfirm()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
+              </button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+              <span nz-icon nzType="warning" nzTheme="outline" style="font-size: 48px; color: #f59e0b; margin-bottom: 12px;"></span>
+              <p style="margin: 0; color: #374151; font-size: 15px;">Are you sure you want to delete<br/><strong>{{ docToDelete?.fileName }}</strong>?</p>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-cancel" (click)="closeDocDeleteConfirm()">Cancel</button>
+              <button class="btn-primary" style="background: #ef4444;" (click)="confirmDeleteDocument()">Delete</button>
+            </div>
+          </div>
+        </div>
+
       <!-- Driver Tab -->
       <div *ngIf="activeTab === 'driver'" class="tab-content">
-        <h2 class="tab-section-title">Assigned Driver</h2>
-        <div class="driver-info-card" *ngIf="car.driver.name; else noDriver">
+        <div class="documents-header">
+          <h2 class="tab-section-title">Assigned Driver</h2>
+          <button class="btn-edit" (click)="openAssignDriverModal()">
+            <span nz-icon nzType="user" nzTheme="outline"></span> Assign Driver
+          </button>
+        </div>
+        <div class="driver-info-card" *ngIf="assignedDriver; else noDriver">
           <div class="driver-avatar-wrap">
-            <img [src]="car.driver.avatar" class="driver-avatar-img" />
+            <img [src]="assignedDriver.avatar" class="driver-avatar-img" />
           </div>
           <div class="driver-details">
-            <h3>{{ car.driver.name }}</h3>
-            <p class="driver-status">
-              <span class="status-dot" [class.dot-road]="car.status === 'In Road'" [class.dot-free]="car.status === 'Free'" [class.dot-maint]="car.status === 'Maintenance'"></span>
-              {{ car.status === 'In Road' ? 'Currently driving' : car.status === 'Free' ? 'Available' : 'In Maintenance' }}
-            </p>
+            <h3>{{ assignedDriver.name }}</h3>
+            <p class="driver-meta"><span nz-icon nzType="idcard" nzTheme="outline"></span> {{ assignedDriver.role }}</p>
+            <p class="driver-meta"><span nz-icon nzType="mail" nzTheme="outline"></span> {{ assignedDriver.email }}</p>
+            <p class="driver-meta"><span nz-icon nzType="phone" nzTheme="outline"></span> {{ assignedDriver.phone }}</p>
+            <p class="driver-meta"><span nz-icon nzType="file-text" nzTheme="outline"></span> {{ assignedDriver.license }}</p>
+            <div class="driver-status-row">
+              <span class="driver-status">
+                <span class="status-dot" [class.dot-road]="assignedDriver.carState === 'in road'" [class.dot-free]="assignedDriver.carState === 'free'" [class.dot-maint]="assignedDriver.carState === 'apsnet'"></span>
+                {{ assignedDriver.carState === 'in road' ? 'In Road' : assignedDriver.carState === 'free' ? 'Free' : assignedDriver.carState === 'apsnet' ? 'Apsnet' : 'Blocked' }}
+              </span>
+              <span class="driver-stat"><strong>{{ assignedDriver.trips }}</strong> trips</span>
+              <span class="driver-stat"><strong>{{ assignedDriver.rating }}</strong> rating</span>
+            </div>
           </div>
         </div>
         <ng-template #noDriver>
@@ -509,6 +582,39 @@ import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/
             <p>No driver currently assigned to this vehicle</p>
           </div>
         </ng-template>
+
+        <!-- Assign Driver Modal -->
+        <div class="modal-overlay" *ngIf="showAssignDriverModal" (click.self)="closeAssignDriverModal()">
+          <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+              <h3>Assign Driver</h3>
+              <button class="modal-close" (click)="closeAssignDriverModal()">
+                <span nz-icon nzType="close" nzTheme="outline"></span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Select Driver</label>
+                <nz-select [(ngModel)]="selectedDriverId" nzPlaceHolder="Choose a driver" style="width: 100%;">
+                  <nz-option *ngFor="let d of allDrivers" [nzValue]="d.id" [nzLabel]="d.name"></nz-option>
+                </nz-select>
+              </div>
+              <div class="form-group" *ngIf="selectedDriverId">
+                <div class="assign-preview">
+                  <img [src]="getSelectedDriver()?.avatar" class="assign-preview-img" />
+                  <div>
+                    <strong>{{ getSelectedDriver()?.name }}</strong>
+                    <p style="margin: 2px 0 0; color: #6b7280; font-size: 13px;">{{ getSelectedDriver()?.role }} — {{ getSelectedDriver()?.email }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-cancel" (click)="closeAssignDriverModal()">Cancel</button>
+              <button class="btn-primary" (click)="saveAssignDriver()" [disabled]="!selectedDriverId">Save</button>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -874,6 +980,62 @@ import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/
     }
     .empty-docs p { margin: 0; color: #9ca3af; font-size: 14px; }
 
+    .view-doc-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .view-doc-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .view-doc-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .view-doc-value {
+      font-size: 15px;
+      color: #1f2937;
+      font-weight: 500;
+    }
+    .driver-meta {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .driver-status-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f3f4f6;
+    }
+    .driver-stat {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .assign-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    .assign-preview-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
     .not-found {
       text-align: center;
       padding: 80px 20px;
@@ -1005,6 +1167,8 @@ export class CarDetailsComponent implements OnInit {
   private carService = inject(CarService);
   private financeService = inject(CarFinanceService);
   private docService = inject(CarDocumentService);
+  private trashService = inject(TrashService);
+  private driverService = inject(DriverService);
 
   car: CarDetail | null = null;
   activeTab: string = 'fiche';
@@ -1021,6 +1185,16 @@ export class CarDetailsComponent implements OnInit {
   showDocModal = false;
   docTypeList = DOCUMENT_TYPE_LIST;
   editDoc: CarDocument = { id: 0, carId: 0, fileName: '', documentType: '', notes: '', uploadDate: '' };
+  showViewDocModal = false;
+  viewDoc: CarDocument = { id: 0, carId: 0, fileName: '', documentType: '', notes: '', uploadDate: '' };
+  showDocDeleteConfirm = false;
+  docToDelete: CarDocument | null = null;
+
+  // Driver
+  allDrivers: Driver[] = [];
+  assignedDriver: Driver | null = null;
+  showAssignDriverModal = false;
+  selectedDriverId: number | null = null;
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -1029,7 +1203,17 @@ export class CarDetailsComponent implements OnInit {
       if (this.car) {
         this.financeRecord = this.financeService.getByCarId(this.car.id) || null;
         this.documents = this.docService.getByCarId(this.car.id);
+        this.loadDriver();
       }
+    }
+    this.allDrivers = this.driverService.getAll();
+  }
+
+  private loadDriver(): void {
+    if (this.car?.driverId) {
+      this.assignedDriver = this.driverService.getById(this.car.driverId) || null;
+    } else {
+      this.assignedDriver = null;
     }
   }
 
@@ -1089,8 +1273,67 @@ export class CarDetailsComponent implements OnInit {
     this.showDocModal = false;
   }
 
-  deleteDocument(doc: CarDocument): void {
-    this.docService.delete(doc.id);
-    this.documents = this.docService.getByCarId(this.car!.id);
+  viewDocument(doc: CarDocument): void {
+    this.viewDoc = { ...doc };
+    this.showViewDocModal = true;
+  }
+
+  closeViewDocModal(): void {
+    this.showViewDocModal = false;
+  }
+
+  openDocDeleteConfirm(doc: CarDocument): void {
+    this.docToDelete = doc;
+    this.showDocDeleteConfirm = true;
+  }
+
+  closeDocDeleteConfirm(): void {
+    this.showDocDeleteConfirm = false;
+    this.docToDelete = null;
+  }
+
+  confirmDeleteDocument(): void {
+    const doc = this.docToDelete;
+    if (doc) {
+      this.trashService.addItem({
+        id: 'document-' + doc.id,
+        type: 'document',
+        name: doc.fileName,
+        data: { ...doc },
+        deletedAt: new Date()
+      });
+      this.docService.delete(doc.id);
+      this.documents = this.docService.getByCarId(this.car!.id);
+    }
+    this.closeDocDeleteConfirm();
+  }
+
+  // Driver methods
+  openAssignDriverModal(): void {
+    this.selectedDriverId = this.car?.driverId || null;
+    this.showAssignDriverModal = true;
+  }
+
+  closeAssignDriverModal(): void {
+    this.showAssignDriverModal = false;
+    this.selectedDriverId = null;
+  }
+
+  getSelectedDriver(): Driver | undefined {
+    return this.allDrivers.find(d => d.id === this.selectedDriverId);
+  }
+
+  saveAssignDriver(): void {
+    if (this.car && this.selectedDriverId) {
+      const driver = this.driverService.getById(this.selectedDriverId);
+      if (driver) {
+        this.carService.updateCarDriver(this.car.id, driver.id, driver.name, driver.avatar);
+      }
+    } else if (this.car && this.selectedDriverId === null) {
+      this.carService.updateCarDriver(this.car.id, null, '', '');
+    }
+    this.car = this.carService.getCarById(this.car!.id) || null;
+    this.loadDriver();
+    this.closeAssignDriverModal();
   }
 }

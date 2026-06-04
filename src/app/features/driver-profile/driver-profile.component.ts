@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { DriverService, Driver } from '../../core/services/driver.service';
 
 @Component({
   selector: 'app-driver-profile',
@@ -34,7 +35,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         <div class="profile-header-content">
           <div class="avatar-outer">
             <div class="avatar-inner">
-              <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Driver" (error)="onAvatarError($event)" />
+              <img [src]="driver?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Driver" (error)="onAvatarError($event)" />
             </div>
           </div>
           <div class="header-main">
@@ -594,30 +595,52 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
   `]
 })
 export class DriverProfileComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private driverService = inject(DriverService);
+
   activeTab: string = 'overview';
   showDeleteModal = false;
   showEditModal = false;
+  driver: Driver | null = null;
 
   editData = {
-    name: 'Ahmed Benali',
-    email: 'ahmed.benali@parkplus.com',
-    phone: '+216 55 123 456',
-    license: 'TN-98765432',
-    carRefId: 'CAR-TN-0012',
-    region: 'Tunis'
+    name: '',
+    email: '',
+    phone: '',
+    license: '',
+    carRefId: '',
+    region: ''
   };
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) { }
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.driver = this.driverService.getById(+id) || null;
+      if (this.driver) {
+        this.editData = {
+          name: this.driver.name,
+          email: this.driver.email,
+          phone: this.driver.phone,
+          license: this.driver.license,
+          carRefId: this.driver.carRefId,
+          region: this.driver.region
+        };
+      }
+    }
+  }
 
   saveEdit(): void {
+    if (this.driver) {
+      this.driverService.save({ ...this.driver, ...this.editData } as Driver);
+    }
     this.showEditModal = false;
   }
 
   confirmDelete(): void {
+    if (this.driver) {
+      this.driverService.delete(this.driver.id);
+    }
     this.showDeleteModal = false;
     this.router.navigate(['/drivers']);
   }

@@ -16,7 +16,9 @@ import {
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
   EyeOutline, EyeInvisibleOutline, LoadingOutline,
   TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline,
-  GlobalOutline, PhoneOutline, MailOutline, DollarOutline
+  GlobalOutline, PhoneOutline, MailOutline, DollarOutline,
+  FieldTimeOutline, SafetyOutline, AuditOutline, FileProtectOutline,
+  UploadOutline, WarningOutline, PlusOutline, UserOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -25,7 +27,9 @@ const icons = [
   InboxOutline, CalendarOutline, ToolOutline, FileTextOutline, SettingOutline,
   EyeOutline, EyeInvisibleOutline, LoadingOutline,
   TeamOutline, ShopOutline, UnorderedListOutline, DeleteOutline,
-  GlobalOutline, PhoneOutline, MailOutline, DollarOutline
+  GlobalOutline, PhoneOutline, MailOutline, DollarOutline,
+  FieldTimeOutline, SafetyOutline, AuditOutline, FileProtectOutline,
+  UploadOutline, WarningOutline, PlusOutline, UserOutline
 ];
 
 registerLocaleData(en);

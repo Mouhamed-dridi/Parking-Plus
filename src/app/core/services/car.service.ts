@@ -46,7 +46,7 @@ export class CarService {
     {
       id: 1, name: 'GWM Tank 300 HEV 2.0 L', type: 'Car', transmission: 'Auto', fuel: 'Hybrid', price: 548.98, status: 'Free',
       image: '/images/cars/DGcars/gwm-tank-300.jpg',
-      driver: { name: 'Mulika lelia', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+      driver: { name: 'Ahmed Benali', avatar: '/images/drivers/Ahmed.jpg' }, driverId: 1,
       maintenanceHistory: [
         { date: '2026-04-15', description: 'Oil change & filter replacement', garage: 'AutoPro Main', cost: 180 },
         { date: '2026-03-01', description: 'Brake pad replacement (front)', garage: 'SpeedFix Center', cost: 320 },
@@ -166,19 +166,19 @@ export class CarService {
     {
       id: 2, name: 'Bentley', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 789.345, status: 'Free',
       image: '/images/cars/DGcars/bdw.avif',
-      driver: { name: 'Rabin', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+      driver: { name: 'Sami Khaled', avatar: '/images/drivers/Sami.jpg' }, driverId: 2,
       specs: this.defaultSpecs('Bentley', 'Continental GT', '2024', 'Diesel', '8.0 L', 'Auto', 'Coupé')
     },
     {
       id: 3, name: 'Porsche Tayce', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 1234.70, status: 'Maintenance',
       image: '/images/cars/DGcars/2019-Audi-A4-MLP-Hero.avif',
-      driver: { name: 'Israt tuli', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
+      driver: { name: 'Yassine Morati', avatar: '/images/drivers/Yassine.jpg' }, driverId: 3,
       specs: this.defaultSpecs('Porsche', 'Taycan', '2024', 'Diesel', '4.0 L', 'Auto', 'Berline')
     },
     {
       id: 4, name: 'Mercedes E Class', type: 'Car', transmission: 'Auto', fuel: 'Diesel', price: 908.234, status: 'In Road',
       image: '/images/cars/DGcars/jclass.png',
-      driver: { name: 'Zahidul', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
+      driver: { name: 'Youssef Amrani', avatar: '/images/drivers/Youssef.jpg' }, driverId: 4,
       specs: this.defaultSpecs('Mercedes-Benz', 'E 220 d', '2024', 'Diesel', '2.0 L', 'Auto', 'Berline')
     },
     {
@@ -309,5 +309,13 @@ export class CarService {
   addCar(car: CarDetail): void {
     car.id = this.nextId++;
     this.allCars.unshift(car);
+  }
+
+  updateCarDriver(carId: number, driverId: number | null, driverName: string, driverAvatar: string): void {
+    const car = this.allCars.find(c => c.id === carId);
+    if (car) {
+      car.driverId = driverId ?? undefined;
+      car.driver = { name: driverName, avatar: driverAvatar };
+    }
   }
 }
