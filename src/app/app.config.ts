@@ -19,7 +19,8 @@ import {
   GlobalOutline, PhoneOutline, MailOutline, DollarOutline,
   FieldTimeOutline, SafetyOutline, AuditOutline, FileProtectOutline,
   UploadOutline, WarningOutline, PlusOutline, UserOutline,
-  HighlightOutline, CheckCircleOutline, CloseCircleOutline
+  HighlightOutline, CheckCircleOutline, CloseCircleOutline,
+  ArrowUpOutline, ArrowDownOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -31,7 +32,8 @@ const icons = [
   GlobalOutline, PhoneOutline, MailOutline, DollarOutline,
   FieldTimeOutline, SafetyOutline, AuditOutline, FileProtectOutline,
   UploadOutline, WarningOutline, PlusOutline, UserOutline,
-  HighlightOutline, CheckCircleOutline, CloseCircleOutline
+  HighlightOutline, CheckCircleOutline, CloseCircleOutline,
+  ArrowUpOutline, ArrowDownOutline
 ];
 
 registerLocaleData(en);

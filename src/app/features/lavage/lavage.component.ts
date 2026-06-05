@@ -237,34 +237,20 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
 
       <!-- ============================== LIST VIEW ============================== -->
       <div *ngIf="!showWizard">
-        <!-- KPI cards -->
+        <!-- KPI cards (matches main dashboard stat card style) -->
         <div class="kpi-row">
-          <div class="kpi-card kpi-today">
-            <div class="kpi-icon"><span nz-icon nzType="calendar" nzTheme="outline"></span></div>
-            <div class="kpi-body">
-              <span class="kpi-label">Today's Washes</span>
-              <span class="kpi-value">{{ kpiToday }}</span>
+          <div class="kpi-card" *ngFor="let kpi of statCards">
+            <div class="kpi-icon-wrap" [style.background]="kpi.bg">
+              <span nz-icon [nzType]="kpi.icon" nzTheme="outline" [style.color]="kpi.color"></span>
             </div>
-          </div>
-          <div class="kpi-card kpi-week">
-            <div class="kpi-icon"><span nz-icon nzType="field-time" nzTheme="outline"></span></div>
             <div class="kpi-body">
-              <span class="kpi-label">This Week</span>
-              <span class="kpi-value">{{ kpiWeek }}</span>
+              <p class="kpi-label">{{ kpi.label }}</p>
+              <h2 class="kpi-value">{{ kpi.value }}</h2>
+              <a class="kpi-link">{{ kpi.link }}</a>
             </div>
-          </div>
-          <div class="kpi-card kpi-pending">
-            <div class="kpi-icon"><span nz-icon nzType="clock-circle" nzTheme="outline"></span></div>
-            <div class="kpi-body">
-              <span class="kpi-label">Pending</span>
-              <span class="kpi-value">{{ kpiPending }}</span>
-            </div>
-          </div>
-          <div class="kpi-card kpi-done">
-            <div class="kpi-icon"><span nz-icon nzType="check-circle" nzTheme="outline"></span></div>
-            <div class="kpi-body">
-              <span class="kpi-label">Completed</span>
-              <span class="kpi-value">{{ kpiCompleted }}</span>
+            <div class="kpi-badge" [class.badge-up]="kpi.trend === 'up'" [class.badge-down]="kpi.trend === 'down'">
+              <span nz-icon [nzType]="kpi.trend === 'up' ? 'arrow-up' : 'arrow-down'"></span>
+              {{ kpi.change }}
             </div>
           </div>
         </div>
@@ -445,27 +431,27 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
     .header-actions { display: flex; gap: 10px; }
 
     .btn-primary {
-      height: 40px; padding: 0 20px; border-radius: 8px; border: none;
-      background: #6366f1; color: white; font-size: 14px; font-weight: 600;
-      cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 16px; border-radius: 2px; border: 1px solid #1a73e8;
+      background: #1a73e8; color: #fff; font-size: 14px; font-weight: 500;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
       transition: all 0.2s;
     }
-    .btn-primary:hover { background: #4f46e5; }
+    .btn-primary:hover { background: #1557b0; border-color: #1557b0; }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-secondary {
-      height: 40px; padding: 0 20px; border-radius: 8px;
-      border: 1px solid #d1d5db; background: white;
-      color: #374151; font-size: 14px; font-weight: 500; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 16px; border-radius: 2px;
+      border: 1px solid #e0e0e0; background: #fff;
+      color: #5f6368; font-size: 14px; font-weight: 500; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
     }
-    .btn-secondary:hover { border-color: #6366f1; color: #6366f1; }
+    .btn-secondary:hover { background: #f1f3f4; }
     .btn-cancel {
-      height: 40px; padding: 0 20px; border-radius: 8px;
-      border: 1px solid #d1d5db; background: white;
-      color: #374151; font-size: 14px; font-weight: 500; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 16px; border-radius: 2px;
+      border: 1px solid #e0e0e0; background: #fff;
+      color: #5f6368; font-size: 14px; font-weight: 500; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
     }
-    .btn-cancel:hover { background: #f9fafb; }
+    .btn-cancel:hover { background: #f1f3f4; }
     .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ====== WIZARD ====== */
@@ -606,53 +592,47 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
     }
     .success-actions { display: flex; gap: 12px; justify-content: center; }
 
-    /* ====== KPI ====== */
-    .kpi-row {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
-    }
+    /* ====== KPI (matches main dashboard stat card) ====== */
+    .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
     .kpi-card {
-      background: white; border-radius: 12px; padding: 20px 22px;
-      display: flex; align-items: center; gap: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      border-left: 4px solid #6366f1;
+      background: #fff; padding: 16px 20px; display: flex; align-items: flex-start; gap: 14px;
+      border: 1px solid #e0e0e0; position: relative; cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    .kpi-today { border-left-color: #6366f1; }
-    .kpi-week { border-left-color: #0ea5e9; }
-    .kpi-pending { border-left-color: #f59e0b; }
-    .kpi-done { border-left-color: #10b981; }
-    .kpi-icon {
-      width: 48px; height: 48px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; color: #6366f1; background: #eef2ff;
+    .kpi-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
+    .kpi-icon-wrap {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
     }
-    .kpi-today .kpi-icon { color: #6366f1; background: #eef2ff; }
-    .kpi-week .kpi-icon { color: #0ea5e9; background: #e0f2fe; }
-    .kpi-pending .kpi-icon { color: #f59e0b; background: #fef3c7; }
-    .kpi-done .kpi-icon { color: #10b981; background: #d1fae5; }
-    .kpi-body { display: flex; flex-direction: column; gap: 4px; }
-    .kpi-label {
-      font-size: 12px; color: #6b7280; text-transform: uppercase;
-      letter-spacing: 0.5px; font-weight: 600;
+    .kpi-body { flex: 1; }
+    .kpi-label { font-size: 11px; color: #5f6368; font-weight: 500; margin: 0 0 2px; text-transform: uppercase; }
+    .kpi-value { font-size: 24px; font-weight: 600; color: #202124; margin: 0 0 2px; }
+    .kpi-link { font-size: 11px; color: #1a73e8; font-weight: 500; cursor: pointer; }
+    .kpi-link:hover { text-decoration: underline; }
+    .kpi-badge {
+      position: absolute; top: 12px; right: 12px; font-size: 10px; font-weight: 500;
+      padding: 2px 8px; display: flex; align-items: center; gap: 2px;
+      background: #e6f4ea; color: #1e8e3e;
     }
-    .kpi-value {
-      font-size: 28px; font-weight: 700; color: #1f2937;
-    }
+    .badge-up { background: #e6f4ea; color: #1e8e3e; }
+    .badge-down { background: #fce8e6; color: #d93025; }
 
     /* ====== FILTERS ====== */
     .filter-bar {
       display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
     }
     .filter-chip {
-      height: 36px; padding: 0 16px; border-radius: 8px;
-      border: 1px solid #d1d5db; background: white;
-      color: #374151; font-size: 13px; font-weight: 500; cursor: pointer;
+      height: 36px; padding: 0 16px; border-radius: 2px;
+      border: 1px solid #e0e0e0; background: #fff;
+      color: #5f6368; font-size: 14px; font-weight: 500; cursor: pointer;
       display: inline-flex; align-items: center; gap: 6px;
       transition: all 0.2s;
     }
-    .filter-chip:hover { border-color: #6366f1; color: #6366f1; }
+    .filter-chip:hover { background: #f1f3f4; }
     .filter-chip.active {
-      background: #6366f1; color: white; border-color: #6366f1;
+      background: #1a73e8; color: #fff; border-color: #1a73e8;
     }
+    .filter-chip.active:hover { background: #1557b0; border-color: #1557b0; }
 
     /* ====== TABLE ====== */
     .table-card {
@@ -759,7 +739,7 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
     @media (max-width: 900px) {
       .form-grid, .review-grid, .view-grid { grid-template-columns: 1fr; }
       .service-grid { grid-template-columns: repeat(2, 1fr); }
-      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .kpi-row { grid-template-columns: 1fr; }
     }
   `]
 })
@@ -770,6 +750,18 @@ export class LavageComponent implements OnInit {
   allRequests: LavageRequest[] = [];
   filteredRequests: LavageRequest[] = [];
   activeFilter: FilterKey = 'all';
+
+  // Stat cards (matches main dashboard kpi-card data shape)
+  statCards: {
+    label: string; value: string; change: string; trend: 'up' | 'down';
+    link: string; icon: string; color: string; bg: string;
+  }[] = [];
+
+  // Internal counts used by stat cards and filter chips
+  kpiToday = 0;
+  kpiWeek = 0;
+  kpiPending = 0;
+  kpiCompleted = 0;
 
   showWizard = false;
   currentStep = 1;
@@ -803,12 +795,6 @@ export class LavageComponent implements OnInit {
     notes: string; hasLicense: boolean;
   } = this.emptyForm();
 
-  // KPI counters
-  kpiToday = 0;
-  kpiWeek = 0;
-  kpiPending = 0;
-  kpiCompleted = 0;
-
   ngOnInit(): void {
     this.refresh();
   }
@@ -832,6 +818,7 @@ export class LavageComponent implements OnInit {
     const today = new Date();
     const todayStr = this.toDateKey(today);
     const { start, end } = this.weekRange(today);
+    const now = today;
 
     this.kpiToday = this.allRequests.filter(r => this.toDateKey(new Date(r.scheduledDate)) === todayStr).length;
     this.kpiWeek = this.allRequests.filter(r => {
@@ -840,6 +827,43 @@ export class LavageComponent implements OnInit {
     }).length;
     this.kpiPending = this.allRequests.filter(r => r.status === 'Pending').length;
     this.kpiCompleted = this.allRequests.filter(r => r.status === 'Completed').length;
+
+    const upcomingWashes = this.allRequests.filter(
+      r => new Date(r.scheduledDate) >= now && r.status !== 'Completed' && r.status !== 'Cancelled'
+    ).length;
+
+    this.statCards = [
+      {
+        label: 'Lavage Bookings',
+        value: String(this.allRequests.length),
+        change: '1.2%',
+        trend: 'up',
+        link: 'View Bookings',
+        icon: 'highlight',
+        color: '#6366f1',
+        bg: '#eef2ff',
+      },
+      {
+        label: 'Upcoming Washes',
+        value: String(upcomingWashes),
+        change: '8.5%',
+        trend: 'down',
+        link: 'Manage Washes',
+        icon: 'field-time',
+        color: '#06b6d4',
+        bg: '#ecfeff',
+      },
+      {
+        label: 'Available Packages',
+        value: String(LAVAGE_SERVICE_TYPES.length),
+        change: '3.4%',
+        trend: 'up',
+        link: 'View Packages',
+        icon: 'appstore',
+        color: '#ef4444',
+        bg: '#fef2f2',
+      },
+    ];
   }
 
   setFilter(key: FilterKey): void {
