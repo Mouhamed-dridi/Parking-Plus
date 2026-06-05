@@ -108,6 +108,7 @@ export class SidebarComponent {
     { label: 'Drivers', icon: 'idcard', route: '/drivers' },
     { label: 'Booking', icon: 'calendar', route: '/request-car' },
     { label: 'Booking List', icon: 'unordered-list', route: '/booking-list' },
+    { label: 'Lavage', icon: 'highlight', route: '/lavage' },
     { label: 'Maintenance', icon: 'tool', children: [
       { label: 'Repairs', icon: 'tool', route: '/repairs' },
       { label: 'Garage CRM', icon: 'shop', route: '/garage-crm' }

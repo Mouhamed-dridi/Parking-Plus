@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 export interface TrashItem {
   id: string;
-  type: 'driver' | 'car' | 'booking' | 'provider' | 'document';
+  type: 'driver' | 'car' | 'booking' | 'provider' | 'document' | 'lavage';
   name: string;
   data: any;
   deletedAt: Date;
