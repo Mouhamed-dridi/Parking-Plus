@@ -29,33 +29,28 @@ import { DriverService, Driver } from '../../core/services/driver.service';
   ],
   template: `
     <div class="profile-page">
-      <!-- TOP BANNER AREA -->
-      <div class="banner-section">
-        <div class="teal-banner"></div>
-        <div class="profile-header-content">
-          <div class="avatar-outer">
-            <div class="avatar-inner">
-              <img [src]="driver?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Driver" (error)="onAvatarError($event)" />
-            </div>
+      <!-- HEADER -->
+      <button class="btn-back" (click)="goBack()">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span> Back to Drivers
+      </button>
+
+      <div class="profile-header">
+        <div class="profile-identity">
+          <div class="profile-avatar">
+            <img [src]="driver?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Driver" (error)="onAvatarError($event)" />
           </div>
-          <div class="header-main">
-            <div class="name-area">
-              <div class="name-row">
-                <h1>{{ editData.name }}</h1>
-              </div>
-              <p class="role-desc">Senior Driver at <strong>Park+ Logistics</strong></p>
-            </div>
-            <div class="action-row">
-              <button class="solid-btn edit-solid" (click)="showEditModal = true">
-                <span nz-icon nzType="edit" nzTheme="outline"></span>
-                <span>Edit</span>
-              </button>
-              <button class="solid-btn delete-solid" (click)="showDeleteModal = true">
-                <span nz-icon nzType="delete" nzTheme="outline"></span>
-                <span>Delete</span>
-              </button>
-            </div>
+          <div class="profile-name-block">
+            <h1 class="profile-name">{{ editData.name }}</h1>
+            <p class="profile-role">Senior Driver at <strong>Park+ Logistics</strong></p>
           </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-edit" (click)="showEditModal = true">
+            <span nz-icon nzType="edit" nzTheme="outline"></span> Edit
+          </button>
+          <button class="btn-action-del" (click)="showDeleteModal = true">
+            <span nz-icon nzType="delete" nzTheme="outline"></span> Delete
+          </button>
         </div>
       </div>
 
@@ -74,8 +69,8 @@ import { DriverService, Driver } from '../../core/services/driver.service';
         <div class="overview-card">
           <h3>Bio</h3>
           <p>
-            I have about 18+ years of experience in commercial delivery vehicle operation and fleet logistics. 
-            12+ years of experience in international long-haul transport across the MENA region. 
+            I have about 18+ years of experience in commercial delivery vehicle operation and fleet logistics.
+            12+ years of experience in international long-haul transport across the MENA region.
             Most of my past works are mainly in corporate transport and high-priority delivery...
           </p>
         </div>
@@ -251,126 +246,111 @@ import { DriverService, Driver } from '../../core/services/driver.service';
   styles: [`
     .profile-page {
       background: white;
-      min-height: 100vh;
       font-family: 'Inter', sans-serif;
     }
 
-    /* BANNER & HEADER */
-    .banner-section {
-      position: relative;
-      background: #fdfdfd;
-      padding-bottom: 20px;
-    }
-    .teal-banner {
-      height: 160px;
-      background: #0f766e;
-      border-radius: 0 0 16px 16px;
-    }
-    .profile-header-content {
-      max-width: 1200px;
-      margin: -60px auto 0;
-      padding: 0 40px;
-      display: flex;
-      align-items: flex-end;
-      gap: 30px;
-    }
-    .avatar-outer {
-      width: 180px;
-      height: 180px;
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
       background: white;
-      border-radius: 50%;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 20px;
+    }
+    .btn-back:hover { border-color: #6366f1; color: #6366f1; }
+
+    /* HEADER */
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 8px 0 24px;
+      flex-wrap: wrap;
+    }
+    .profile-identity {
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      gap: 20px;
     }
-    .avatar-inner {
-      width: 164px;
-      height: 164px;
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
       overflow: hidden;
+      background: #f1f5f9;
+      border: 3px solid #e0e7ff;
+      flex-shrink: 0;
     }
-    .avatar-inner img {
+    .profile-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    .header-main {
-      flex: 1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 10px;
-    }
-    .name-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .name-row h1 {
+    .profile-name-block { display: flex; flex-direction: column; gap: 4px; }
+    .profile-name {
       margin: 0;
-      font-size: 32px;
-      font-weight: 800;
-      color: #111827;
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+      letter-spacing: -0.3px;
     }
-    .flag-icon {
-      width: 28px;
-      border-radius: 4px;
-    }
-    .role-desc {
-      margin: 5px 0 0;
-      font-size: 16px;
+    .profile-role {
+      margin: 0;
+      font-size: 14px;
       color: #6b7280;
     }
-    .role-desc strong { color: #111827; }
+    .profile-role strong { color: #1f2937; }
 
-    .action-row {
+    .profile-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
     }
-    .solid-btn {
-      height: 48px;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 0 20px;
-      display: flex;
+    .btn-edit {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .edit-solid { background: #111827; }
-    .edit-solid:hover { background: #1f2937; }
-    .delete-solid { background: #ef4444; }
-    .delete-solid:hover { background: #dc2626; }
-
-    .icon-btn {
-      width: 48px;
-      height: 48px;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
       background: white;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #4b5563;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .icon-btn:hover { background: #f9fafb; border-color: #d1d5db; }
+    .btn-edit:hover { border-color: #6366f1; color: #6366f1; }
+    .btn-action-del {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action-del:hover { border-color: #ef4444; color: #ef4444; }
+
     /* TABS */
     .tabs-section {
       border-bottom: 1px solid #f3f4f6;
-      background: white;
+      background: transparent;
+      margin-bottom: 28px;
     }
     .tabs-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 40px;
       display: flex;
       gap: 40px;
     }
@@ -381,9 +361,11 @@ import { DriverService, Driver } from '../../core/services/driver.service';
       color: #6b7280;
       cursor: pointer;
       position: relative;
+      transition: color 0.2s;
     }
+    .tab:hover { color: #6366f1; }
     .tab.active {
-      color: #0f766e;
+      color: #6366f1;
     }
     .tab.active::after {
       content: '';
@@ -392,11 +374,11 @@ import { DriverService, Driver } from '../../core/services/driver.service';
       left: 0;
       right: 0;
       height: 3px;
-      background: #0f766e;
+      background: #6366f1;
       border-radius: 3px 3px 0 0;
     }
     .tab-badge {
-      background: #374151;
+      background: #6366f1;
       color: white;
       font-size: 11px;
       padding: 2px 6px;
@@ -420,8 +402,8 @@ import { DriverService, Driver } from '../../core/services/driver.service';
     }
     .overview-card h3 {
       font-size: 18px;
-      font-weight: 800;
-      color: #111827;
+      font-weight: 700;
+      color: #1f2937;
       margin: 0 0 16px;
     }
     .overview-card p {
@@ -451,7 +433,7 @@ import { DriverService, Driver } from '../../core/services/driver.service';
     .info-value {
       font-size: 15px;
       font-weight: 600;
-      color: #111827;
+      color: #1f2937;
     }
 
     .contact-row { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -489,31 +471,20 @@ import { DriverService, Driver } from '../../core/services/driver.service';
       font-weight: 600;
       letter-spacing: 2px;
       margin-bottom: 8px;
-      color: #333;
+      color: #1f2937;
     }
     .fiche-header h3 {
       font-size: 14px;
-      color: #666;
+      color: #6b7280;
       font-weight: 500;
       margin-bottom: 20px;
     }
     .header-line {
       width: 120px;
       height: 2px;
-      background: #f0f0f0;
+      background: #6366f1;
       margin: 0 auto;
       position: relative;
-    }
-    .header-line::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      background: #ff0000;
-      border-radius: 1px;
     }
     .fiche-image-container {
       margin: 30px auto 10px auto;
@@ -540,9 +511,9 @@ import { DriverService, Driver } from '../../core/services/driver.service';
     .fiche-section h4 {
       font-size: 16px;
       font-weight: 700;
-      color: #333;
+      color: #6366f1;
       padding-bottom: 8px;
-      border-bottom: 2px solid #333;
+      border-bottom: 2px solid #6366f1;
       margin-bottom: 12px;
       letter-spacing: 1px;
     }
@@ -554,26 +525,24 @@ import { DriverService, Driver } from '../../core/services/driver.service';
       font-size: 13px;
     }
     .fiche-row span:first-child {
-      color: #333;
+      color: #374151;
       font-weight: 600;
       text-transform: uppercase;
     }
     .fiche-row span:last-child {
-      color: #999;
+      color: #6b7280;
       font-weight: 500;
     }
 
     @media (max-width: 768px) {
-      .fiche-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
+      .fiche-grid { grid-template-columns: 1fr; gap: 20px; }
+      .info-grid-2col { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 992px) {
-      .profile-header-content { flex-direction: column; align-items: center; text-align: center; margin-top: -90px; }
-      .header-main { flex-direction: column; gap: 20px; }
-      .name-row { justify-content: center; }
+      .profile-header { flex-direction: column; align-items: flex-start; }
+      .profile-actions { width: 100%; }
+      .tabs-container { overflow-x: auto; }
     }
 
     .edit-form { padding: 8px 0; }
@@ -635,6 +604,10 @@ export class DriverProfileComponent implements OnInit {
       this.driverService.save({ ...this.driver, ...this.editData } as Driver);
     }
     this.showEditModal = false;
+  }
+
+  goBack(): void {
+    this.router.navigate(['/drivers']);
   }
 
   confirmDelete(): void {
