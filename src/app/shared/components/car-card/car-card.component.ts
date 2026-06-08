@@ -43,7 +43,10 @@ export interface CarData {
             <span nz-icon nzType="book" nzTheme="outline" class="bookmark-icon"></span>
           </div>
 
-          <h3 class="car-name">{{ car.name }}</h3>
+          <h3 class="car-name">
+            <span nz-icon nzType="car" nzTheme="outline" style="margin-right: 8px;"></span>
+            {{ car.name }}
+          </h3>
 
           <div class="status-row">
             <span class="status-badge" [class.status-free]="car.status === 'Free'" [class.status-road]="car.status === 'In Road'" [class.status-maint]="car.status === 'Maintenance'">
