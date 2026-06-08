@@ -9,8 +9,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CarService, CarDetail } from '../../core/services/car.service';
 import { CarFinanceService, CarFinanceRecord, ASSURANCE_LIST, PROVIDER_LIST } from '../../core/services/car-finance.service';
 import { CarDocumentService, CarDocument, DOCUMENT_TYPE_LIST } from '../../core/services/car-document.service';
-import { TrashService } from '../../core/services/trash.service';
 import { DriverService, Driver } from '../../core/services/driver.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-car-details',
@@ -33,10 +33,10 @@ import { DriverService, Driver } from '../../core/services/driver.service';
       <div class="tabs-section">
         <div class="tabs-container">
           <div class="tab" [class.active]="activeTab === 'fiche'" (click)="setTab('fiche')">Fiche Technique</div>
-          <div class="tab" [class.active]="activeTab === 'maintenance'" (click)="setTab('maintenance')">Maintenance</div>
-          <div class="tab" [class.active]="activeTab === 'trips'" (click)="setTab('trips')">Trips History</div>
-          <div class="tab" [class.active]="activeTab === 'finance'" (click)="setTab('finance')">Finance</div>
-          <div class="tab" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">Documents</div>
+          <div class="tab" [class.active]="activeTab === 'maintenance'" (click)="setTab('maintenance')" *ngIf="shouldShowTab('maintenance')">Maintenance</div>
+          <div class="tab" [class.active]="activeTab === 'trips'" (click)="setTab('trips')" *ngIf="shouldShowTab('trips')">Trips History</div>
+          <div class="tab" [class.active]="activeTab === 'finance'" (click)="setTab('finance')" *ngIf="shouldShowTab('finance')">Finance</div>
+          <div class="tab" [class.active]="activeTab === 'documents'" (click)="setTab('documents')" *ngIf="shouldShowTab('documents')">Documents</div>
           <div class="tab" [class.active]="activeTab === 'driver'" (click)="setTab('driver')">Driver</div>
         </div>
       </div>
@@ -1167,8 +1167,8 @@ export class CarDetailsComponent implements OnInit {
   private carService = inject(CarService);
   private financeService = inject(CarFinanceService);
   private docService = inject(CarDocumentService);
-  private trashService = inject(TrashService);
   private driverService = inject(DriverService);
+  private authService = inject(AuthService);
 
   car: CarDetail | null = null;
   activeTab: string = 'fiche';
@@ -1219,6 +1219,11 @@ export class CarDetailsComponent implements OnInit {
 
   setTab(tab: string): void {
     this.activeTab = tab;
+  }
+
+  shouldShowTab(tab: string): boolean {
+    if (this.authService.isAdmin()) return true;
+    return tab === 'fiche' || tab === 'driver';
   }
 
   goBack(): void {
@@ -1295,13 +1300,6 @@ export class CarDetailsComponent implements OnInit {
   confirmDeleteDocument(): void {
     const doc = this.docToDelete;
     if (doc) {
-      this.trashService.addItem({
-        id: 'document-' + doc.id,
-        type: 'document',
-        name: doc.fileName,
-        data: { ...doc },
-        deletedAt: new Date()
-      });
       this.docService.delete(doc.id);
       this.documents = this.docService.getByCarId(this.car!.id);
     }

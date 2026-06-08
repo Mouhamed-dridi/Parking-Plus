@@ -16,8 +16,8 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
 import { CarService } from '../../core/services/car.service';
-import { TrashService } from '../../core/services/trash.service';
 import { DriverService, Driver } from '../../core/services/driver.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-drivers',
@@ -45,7 +45,7 @@ import { DriverService, Driver } from '../../core/services/driver.service';
               <span nz-icon nzType="appstore" nzTheme="outline"></span>
             </button>
           </div>
-          <button nz-button nzType="primary" class="add-btn" (click)="showAddModal()">
+          <button nz-button nzType="primary" class="add-btn" (click)="showAddModal()" *ngIf="authService.isAdmin()">
             <span nz-icon nzType="plus" nzTheme="outline"></span>
             Add New Driver
           </button>
@@ -97,10 +97,10 @@ import { DriverService, Driver } from '../../core/services/driver.service';
               </td>
               <td (click)="$event.stopPropagation()">
                 <div class="action-btns">
-                  <button nz-button nzType="text" nzSize="default" class="act-btn-edit" (click)="showEditModal(d)">
+                  <button nz-button nzType="text" nzSize="default" class="act-btn-edit" (click)="showEditModal(d)" *ngIf="authService.isAdmin()">
                     <span nz-icon nzType="edit"></span>
                   </button>
-                  <button nz-button nzType="text" nzSize="default" nzDanger class="act-btn-del" (click)="showDeleteConfirm(d.id)">
+                  <button nz-button nzType="text" nzSize="default" nzDanger class="act-btn-del" (click)="showDeleteConfirm(d.id)" *ngIf="authService.isAdmin()">
                     <span nz-icon nzType="delete"></span>
                   </button>
                 </div>
@@ -934,8 +934,8 @@ import { DriverService, Driver } from '../../core/services/driver.service';
 export class DriversComponent implements OnInit {
   private router = inject(Router);
   private carService = inject(CarService);
-  private trashService = inject(TrashService);
   private driverService = inject(DriverService);
+  authService = inject(AuthService);
 
   viewMode: 'list' | 'grid' = 'grid';
   drawerOpen = false;
@@ -964,13 +964,6 @@ export class DriversComponent implements OnInit {
     if (this.deleteTargetId !== null) {
       const driver = this.drivers.find(d => d.id === this.deleteTargetId);
       if (driver) {
-        this.trashService.addItem({
-          id: 'driver-' + driver.id,
-          type: 'driver',
-          name: driver.name,
-          data: { ...driver },
-          deletedAt: new Date()
-        });
         this.driverService.delete(driver.id);
       }
       this.drivers = this.driverService.getAll();

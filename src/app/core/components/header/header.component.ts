@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -19,15 +20,17 @@ import { Router } from '@angular/router';
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-2.5 pl-2 border-l border-[#e0e0e0]">
           <div class="flex flex-col items-end leading-tight">
-            <span class="text-[13px] font-medium text-[#202124]">Admin</span>
-            <span class="text-[11px] text-[#5f6368]">admin</span>
+            <span class="text-[13px] font-medium text-[#202124]">{{ authService.getUserName() }}</span>
+            <span class="text-[11px] text-[#5f6368]">{{ authService.getRole() }}</span>
           </div>
           <div
             class="user-avatar-wrap"
             nz-dropdown
             [nzDropdownMenu]="userMenu"
             nzTrigger="click">
-            <nz-avatar nzSrc="https://randomuser.me/api/portraits/men/32.jpg" class="cursor-pointer" [nzSize]="32"></nz-avatar>
+            <nz-avatar [nzSrc]="authService.getUserAvatar() || undefined" class="cursor-pointer" [nzSize]="32">
+              <span nz-icon nzType="user" *ngIf="!authService.getUserAvatar()" nzTheme="outline"></span>
+            </nz-avatar>
           </div>
         </div>
       </div>
@@ -37,10 +40,10 @@ import { Router } from '@angular/router';
       <div nz-menu>
         <div nz-menu-item class="menu-header">
           <span nz-icon nzType="user" nzTheme="outline"></span>
-          <span>Admin User</span>
+          <span>{{ authService.getUserName() }}</span>
         </div>
         <nz-divider style="margin: 4px 0;"></nz-divider>
-        <div nz-menu-item (click)="goToSettings()">
+        <div nz-menu-item (click)="goToSettings()" *ngIf="authService.isAdmin()">
           <span nz-icon nzType="setting" nzTheme="outline"></span>
           <span>Manage Users</span>
         </div>
@@ -76,6 +79,8 @@ export class HeaderComponent {
   @Input() isCollapsed = false;
   @Output() toggle = new EventEmitter<void>();
 
+  authService = inject(AuthService);
+
   constructor(private router: Router) {}
 
   goToSettings(): void {
@@ -83,6 +88,6 @@ export class HeaderComponent {
   }
 
   logout(): void {
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

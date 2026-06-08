@@ -14,11 +14,11 @@ export interface LavageRequest {
   vehicleName: string;
   vehiclePlate: string;
   vehicleType: LavageVehicleType;
-  serviceType: LavageServiceType;
+  serviceType?: LavageServiceType;
   scheduledDate: string;
   location: string;
   notes: string;
-  hasLicense: boolean;
+  hasLicense?: boolean;
   status: LavageStatus;
   createdAt: Date;
 }

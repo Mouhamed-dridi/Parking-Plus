@@ -38,7 +38,7 @@ export interface CarData {
           
           <div class="driver-info">
             <div class="driver">
-              <span class="driver-name">{{ car.driver.name }}</span>
+              <span class="driver-name">{{ car.driver?.name }}</span>
             </div>
             <span nz-icon nzType="book" nzTheme="outline" class="bookmark-icon"></span>
           </div>

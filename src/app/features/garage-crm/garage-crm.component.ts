@@ -6,7 +6,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { TrashService } from '../../core/services/trash.service';
 
 interface Provider {
   id: string;
@@ -568,8 +567,6 @@ export class GarageCrmComponent {
     website: ''
   };
 
-  private trashService = inject(TrashService);
-
   showEditModal = false;
   editingProvider: Provider | null = null;
   editImagePreview: string | null = null;
@@ -696,14 +693,6 @@ export class GarageCrmComponent {
 
   executeDelete(): void {
     if (!this.deletingProvider) return;
-
-    this.trashService.addItem({
-      id: 'provider-' + this.deletingProvider.id,
-      type: 'provider',
-      name: this.deletingProvider.name,
-      data: { ...this.deletingProvider },
-      deletedAt: new Date()
-    });
 
     this.providers = this.providers.filter(p => p.id !== this.deletingProvider!.id);
     this.cancelDelete();

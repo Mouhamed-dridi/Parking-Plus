@@ -359,7 +359,7 @@ export class DashboardComponent implements OnInit {
     this.buildSplinePaths();
     this.vehicleStatusList = this.carService.getCars().map(c => ({
       name: c.name,
-      driverName: c.driver.name,
+      driverName: c.driver?.name || '',
       status: c.status || 'Free'
     }));
   }

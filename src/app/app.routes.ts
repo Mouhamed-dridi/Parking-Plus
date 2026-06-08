@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './core/components/layout/main-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -14,6 +15,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: 'listing',
@@ -52,19 +54,21 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
       },
       {
         path: 'user-management',
-        loadComponent: () => import('./features/user-management/user-management.component').then(m => m.UserManagementComponent)
+        loadComponent: () => import('./features/user-management/user-management.component').then(m => m.UserManagementComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
       },
       {
         path: 'reports',
-        loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent)
-      },
-      {
-        path: 'trash',
-        loadComponent: () => import('./features/trash/trash.component').then(m => m.TrashComponent)
+        loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
       },
       {
         path: 'repairs',
@@ -80,7 +84,9 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
       }
     ]
   }

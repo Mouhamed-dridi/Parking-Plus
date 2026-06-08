@@ -1,13 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { AuthService } from '../../services/auth.service';
 
 interface MenuItem {
   label: string;
   icon: string;
   route?: string;
-  children?: { label: string; icon: string; route: string }[];
+  adminOnly?: boolean;
+  children?: { label: string; icon: string; route: string; adminOnly?: boolean }[];
 }
 
 @Component({
@@ -27,7 +29,7 @@ interface MenuItem {
       <!-- Section: Menu -->
       <div class="py-2" *ngIf="!isCollapsed">
         <div class="text-[11px] font-bold text-[#5f6368] uppercase tracking-[0.05em] px-4 py-2">Menu</div>
-        <div *ngFor="let item of menuItems" class="flex flex-col">
+        <div *ngFor="let item of visibleMenuItems" class="flex flex-col">
           <a *ngIf="!item.children"
              [routerLink]="item.route"
              routerLinkActive="active-nav"
@@ -49,7 +51,7 @@ interface MenuItem {
               <span nz-icon nzType="chevron-down" nzTheme="outline" class="text-[12px] text-[#9aa0a6]"></span>
             </div>
             <div class="ml-2">
-              <a *ngFor="let child of item.children"
+              <a *ngFor="let child of visibleChildren(item)"
                  [routerLink]="child.route"
                  routerLinkActive="active-nav"
                  #rla2="routerLinkActive"
@@ -64,9 +66,9 @@ interface MenuItem {
       </div>
 
       <!-- Section: System -->
-      <div class="py-2 border-t border-[#e0e0e0]" *ngIf="!isCollapsed">
+      <div class="py-2 border-t border-[#e0e0e0]" *ngIf="!isCollapsed && authService.isAdmin()">
         <div class="text-[11px] font-bold text-[#5f6368] uppercase tracking-[0.05em] px-4 py-2">System</div>
-        <a *ngFor="let item of systemItems"
+        <a *ngFor="let item of visibleSystemItems"
            [routerLink]="item.route"
            routerLinkActive="active-nav"
            #rla3="routerLinkActive"
@@ -98,27 +100,44 @@ interface MenuItem {
 export class SidebarComponent {
   @Input() isCollapsed = false;
 
+  authService = inject(AuthService);
+
   menuItems: MenuItem[] = [
-    { label: 'Dashboard', icon: 'appstore', route: '/dashboard' },
+    { label: 'Dashboard', icon: 'appstore', route: '/dashboard', adminOnly: true },
     { label: 'Vehicles', icon: 'car', children: [
       { label: 'Cars', icon: 'car', route: '/listing' },
       { label: 'Delivery', icon: 'shopping-cart', route: '/delivery-cars' },
       { label: 'Used Cars', icon: 'car', route: '/used-car' },
     ]},
-    { label: 'Drivers', icon: 'idcard', route: '/drivers' },
-    { label: 'Booking', icon: 'calendar', route: '/request-car' },
-    { label: 'Booking List', icon: 'unordered-list', route: '/booking-list' },
+    { label: 'Drivers', icon: 'idcard', route: '/drivers', adminOnly: true },
+    { label: 'Booking', icon: 'calendar', route: '/request-car', adminOnly: true },
+    { label: 'Booking List', icon: 'unordered-list', route: '/booking-list', adminOnly: true },
     { label: 'Lavage', icon: 'highlight', route: '/lavage' },
     { label: 'Maintenance', icon: 'tool', children: [
       { label: 'Repairs', icon: 'tool', route: '/repairs' },
-      { label: 'Garage CRM', icon: 'shop', route: '/garage-crm' }
+      { label: 'Garage CRM', icon: 'shop', route: '/garage-crm' },
     ]},
   ];
 
   systemItems: MenuItem[] = [
-    { label: 'User Management', icon: 'team', route: '/user-management' },
-    { label: 'Reports', icon: 'file-text', route: '/reports' },
-    { label: 'Trash', icon: 'delete', route: '/trash' },
-    { label: 'Settings', icon: 'setting', route: '/settings' },
+    { label: 'User Management', icon: 'team', route: '/user-management', adminOnly: true },
+    { label: 'Reports', icon: 'file-text', route: '/reports', adminOnly: true },
+    { label: 'Trash', icon: 'delete', route: '/trash', adminOnly: true },
+    { label: 'Settings', icon: 'setting', route: '/settings', adminOnly: true },
   ];
+
+  get visibleMenuItems(): MenuItem[] {
+    if (this.authService.isAdmin()) return this.menuItems;
+    return this.menuItems.filter(item => !item.adminOnly);
+  }
+
+  get visibleSystemItems(): MenuItem[] {
+    if (this.authService.isAdmin()) return this.systemItems;
+    return [];
+  }
+
+  visibleChildren(item: MenuItem): MenuItem[] {
+    if (this.authService.isAdmin()) return item.children || [];
+    return (item.children || []).filter(c => !c.adminOnly);
+  }
 }

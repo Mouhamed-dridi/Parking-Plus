@@ -8,8 +8,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { LavageService, LavageRequest, LavageServiceType, LavageStatus, LavageVehicleType, LAVAGE_SERVICE_TYPES, LAVAGE_VEHICLE_TYPES } from '../../core/services/lavage.service';
-import { TrashService } from '../../core/services/trash.service';
+import { LavageService, LavageRequest, LavageStatus, LavageVehicleType, LAVAGE_SERVICE_TYPES, LAVAGE_VEHICLE_TYPES } from '../../core/services/lavage.service';
 
 type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
 
@@ -121,12 +120,6 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
                   <nz-option *ngFor="let d of departments" [nzLabel]="d" [nzValue]="d"></nz-option>
                 </nz-select>
               </div>
-              <div class="form-item full">
-                <label class="toggle-label">
-                  <input type="checkbox" [(ngModel)]="form.hasLicense" name="hasLicense" />
-                  <span>I confirm I have a valid driver's license</span>
-                </label>
-              </div>
             </div>
           </div>
 
@@ -158,27 +151,14 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
             <p class="step-subtitle">Pick a service, date, time and location</p>
 
             <div class="form-grid">
-              <div class="form-item full">
-                <label class="required-label">Service Type</label>
-                <div class="service-grid">
-                  <label class="service-card" *ngFor="let s of serviceTypes" [class.selected]="form.serviceType === s">
-                    <input type="radio" name="serviceType" [value]="s" [(ngModel)]="form.serviceType" />
-                    <div class="service-icon">
-                      <span nz-icon nzType="highlight" nzTheme="outline"></span>
-                    </div>
-                    <div class="service-name">{{ s }}</div>
-                    <div class="service-price">Free</div>
-                  </label>
-                </div>
-              </div>
               <div class="form-item">
                 <label class="required-label">Scheduled Date &amp; Time</label>
                 <input nz-input type="datetime-local" [(ngModel)]="form.scheduledDate" name="scheduledDate" />
               </div>
               <div class="form-item">
                 <label class="required-label">Location</label>
-                <nz-select [(ngModel)]="form.location" nzPlaceHolder="Select a region" name="location" style="width: 100%;">
-                  <nz-option *ngFor="let r of tunisianRegions" [nzLabel]="r" [nzValue]="r"></nz-option>
+                <nz-select [(ngModel)]="form.location" nzPlaceHolder="Select a site" name="location" style="width: 100%;">
+                  <nz-option *ngFor="let s of sites" [nzLabel]="s" [nzValue]="s"></nz-option>
                 </nz-select>
               </div>
               <div class="form-item full">
@@ -208,7 +188,6 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
               </div>
               <div class="review-section full">
                 <h4>Wash</h4>
-                <div class="review-row"><span>Service</span><strong>{{ form.serviceType }}</strong></div>
                 <div class="review-row"><span>Scheduled</span><strong>{{ form.scheduledDate | date:'medium' }}</strong></div>
                 <div class="review-row"><span>Location</span><strong>{{ form.location }}</strong></div>
                 <div class="review-row" *ngIf="form.notes"><span>Notes</span><strong>{{ form.notes }}</strong></div>
@@ -282,7 +261,6 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
                 <th>Ref ID</th>
                 <th>Requester</th>
                 <th>Vehicle</th>
-                <th>Service</th>
                 <th>Scheduled</th>
                 <th>Location</th>
                 <th>Status</th>
@@ -304,23 +282,23 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
                     <span class="secondary">{{ r.vehiclePlate }} · {{ r.vehicleType }}</span>
                   </div>
                 </td>
-                <td><span class="lavage-badge">{{ r.serviceType }}</span></td>
                 <td class="cell-date">{{ r.scheduledDate | date:'MMM d, h:mm a' }}</td>
                 <td>{{ r.location }}</td>
                 <td>
-                  <span class="status-tag" [class]="'status-' + r.status.toLowerCase().replace(' ', '-')">
-                    {{ r.status }}
-                  </span>
+                  <div class="status-select" [class]="'status-' + r.status.toLowerCase().replace(' ', '-')">
+                    <nz-select
+                      [ngModel]="r.status"
+                      (ngModelChange)="onStatusChange(r, $event)"
+                      nzSize="small"
+                      [nzBorderless]="true"
+                      [nzDropdownMatchSelectWidth]="false">
+                      <nz-option *ngFor="let s of statuses" [nzLabel]="s" [nzValue]="s"></nz-option>
+                    </nz-select>
+                  </div>
                 </td>
                 <td class="cell-actions">
                   <button class="btn-action" (click)="viewRequest(r)" title="View">
                     <span nz-icon nzType="eye" nzTheme="outline"></span>
-                  </button>
-                  <button class="btn-action" *ngIf="r.status === 'Pending'" (click)="setStatus(r, 'In Progress')" title="Start">
-                    <span nz-icon nzType="play-circle" nzTheme="outline"></span>
-                  </button>
-                  <button class="btn-action" *ngIf="r.status === 'In Progress'" (click)="setStatus(r, 'Completed')" title="Complete">
-                    <span nz-icon nzType="check" nzTheme="outline"></span>
                   </button>
                   <button class="btn-action btn-action-del" (click)="openDeleteConfirm(r)" title="Delete">
                     <span nz-icon nzType="delete" nzTheme="outline"></span>
@@ -370,7 +348,6 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
             <div class="view-row"><span class="view-label">Vehicle</span><span class="view-value">{{ viewTarget.vehicleName }}</span></div>
             <div class="view-row"><span class="view-label">Plate</span><span class="view-value">{{ viewTarget.vehiclePlate }}</span></div>
             <div class="view-row"><span class="view-label">Vehicle Type</span><span class="view-value">{{ viewTarget.vehicleType }}</span></div>
-            <div class="view-row"><span class="view-label">Service</span><span class="view-value">{{ viewTarget.serviceType }}</span></div>
             <div class="view-row"><span class="view-label">Scheduled</span><span class="view-value">{{ viewTarget.scheduledDate | date:'medium' }}</span></div>
             <div class="view-row"><span class="view-label">Location</span><span class="view-value">{{ viewTarget.location }}</span></div>
             <div class="view-row full" *ngIf="viewTarget.notes"><span class="view-label">Notes</span><span class="view-value">{{ viewTarget.notes }}</span></div>
@@ -664,14 +641,37 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
       font-size: 12px; font-weight: 600;
     }
 
-    .status-tag {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
+    .status-select {
+      display: inline-flex; align-items: center;
+      padding: 0; border-radius: 12px;
       font-size: 12px; font-weight: 600;
+      cursor: pointer;
     }
-    .status-pending { background: #fef3c7; color: #b45309; }
-    .status-in-progress { background: #dbeafe; color: #1e40af; }
-    .status-completed { background: #d1fae5; color: #065f46; }
-    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+    .status-select ::ng-deep .ant-select { min-width: 110px; }
+    .status-select ::ng-deep .ant-select-selector {
+      padding: 3px 10px !important; border-radius: 12px !important;
+      border: 1px solid transparent !important; background: transparent !important;
+      box-shadow: none !important;
+    }
+    .status-select ::ng-deep .ant-select-selection-item {
+      font-size: 12px; font-weight: 600; padding-right: 18px !important;
+    }
+    .status-select ::ng-deep .ant-select-arrow { right: 6px; }
+    .status-select:hover ::ng-deep .ant-select-selector { box-shadow: 0 0 0 1px rgba(0,0,0,0.08) !important; }
+
+    .status-select.status-pending ::ng-deep .ant-select-selection-item,
+    .status-select.status-pending { background: #fef3c7; color: #b45309; }
+    .status-select.status-pending ::ng-deep .ant-select-selector { background: #fef3c7 !important; }
+    .status-select.status-pending ::ng-deep .ant-select-selection-item { color: #b45309 !important; }
+
+    .status-select.status-in-progress ::ng-deep .ant-select-selector { background: #dbeafe !important; }
+    .status-select.status-in-progress ::ng-deep .ant-select-selection-item { color: #1e40af !important; }
+
+    .status-select.status-completed ::ng-deep .ant-select-selector { background: #d1fae5 !important; }
+    .status-select.status-completed ::ng-deep .ant-select-selection-item { color: #065f46 !important; }
+
+    .status-select.status-cancelled ::ng-deep .ant-select-selector { background: #fee2e2 !important; }
+    .status-select.status-cancelled ::ng-deep .ant-select-selection-item { color: #b91c1c !important; }
 
     .cell-actions { white-space: nowrap; }
     .btn-action {
@@ -745,7 +745,6 @@ type FilterKey = 'all' | 'today' | 'week' | 'upcoming' | 'completed';
 })
 export class LavageComponent implements OnInit {
   private lavageService = inject(LavageService);
-  private trashService = inject(TrashService);
 
   allRequests: LavageRequest[] = [];
   filteredRequests: LavageRequest[] = [];
@@ -773,26 +772,21 @@ export class LavageComponent implements OnInit {
   showDeleteModal = false;
   deleteTarget: LavageRequest | null = null;
 
-  serviceTypes = LAVAGE_SERVICE_TYPES;
   vehicleTypes = LAVAGE_VEHICLE_TYPES;
+  statuses: LavageStatus[] = ['Pending', 'In Progress', 'Completed', 'Cancelled'];
 
   departments = [
     'HR', 'Maintenance', 'DG', 'Logistics',
     'Finance', 'IT', 'Sales', 'Marketing', 'Operations', 'Admin',
   ];
 
-  tunisianRegions = [
-    'Tunis', 'Sfax', 'Sousse', 'Nabeul', 'Gabès', 'Bizerte',
-    'Kairouan', 'Monastir', 'Médenine', 'Kasserine', 'Mahdia',
-    'Gafsa', 'Tozeur', 'Béja', 'Jendouba', 'Kef', 'Siliana',
-    'Sidi Bouzid', 'Tataouine', 'Djerba',
-  ];
+  sites = ['Site 1', 'Site 2', 'Site 3'];
 
   form: {
     name: string; email: string; phone: string; department: string;
     vehicleName: string; vehiclePlate: string; vehicleType: LavageVehicleType;
-    serviceType: LavageServiceType; scheduledDate: string; location: string;
-    notes: string; hasLicense: boolean;
+    scheduledDate: string; location: string;
+    notes: string;
   } = this.emptyForm();
 
   ngOnInit(): void {
@@ -803,8 +797,7 @@ export class LavageComponent implements OnInit {
     return {
       name: '', email: '', phone: '', department: '',
       vehicleName: '', vehiclePlate: '', vehicleType: 'Car' as LavageVehicleType,
-      serviceType: 'Standard' as LavageServiceType,
-      scheduledDate: '', location: '', notes: '', hasLicense: false,
+      scheduledDate: '', location: '', notes: '',
     };
   }
 
@@ -932,11 +925,11 @@ export class LavageComponent implements OnInit {
     switch (this.currentStep) {
       case 1:
         return !!this.form.name && !!this.form.email && this.isEmail(this.form.email)
-          && !!this.form.phone && !!this.form.department && this.form.hasLicense;
+          && !!this.form.phone && !!this.form.department;
       case 2:
         return !!this.form.vehicleName && !!this.form.vehiclePlate && !!this.form.vehicleType;
       case 3:
-        return !!this.form.serviceType && !!this.form.scheduledDate
+        return !!this.form.scheduledDate
           && this.isFuture(this.form.scheduledDate) && !!this.form.location;
       case 4:
         return true;
@@ -964,11 +957,9 @@ export class LavageComponent implements OnInit {
       vehicleName: this.form.vehicleName,
       vehiclePlate: this.form.vehiclePlate,
       vehicleType: this.form.vehicleType,
-      serviceType: this.form.serviceType,
       scheduledDate: this.form.scheduledDate,
       location: this.form.location,
       notes: this.form.notes,
-      hasLicense: this.form.hasLicense,
     });
     this.submittedRefId = created.refId;
     this.submitted = true;
@@ -991,6 +982,12 @@ export class LavageComponent implements OnInit {
     this.refresh();
   }
 
+  onStatusChange(r: LavageRequest, status: LavageStatus): void {
+    if (r.status !== status) {
+      this.setStatus(r, status);
+    }
+  }
+
   openDeleteConfirm(r: LavageRequest): void {
     this.deleteTarget = r;
     this.showDeleteModal = true;
@@ -1004,13 +1001,6 @@ export class LavageComponent implements OnInit {
   confirmDelete(): void {
     const r = this.deleteTarget;
     if (r) {
-      this.trashService.addItem({
-        id: 'lavage-' + r.id,
-        type: 'lavage',
-        name: r.refId + ' - ' + r.vehicleName,
-        data: { ...r },
-        deletedAt: new Date(),
-      });
       this.lavageService.delete(r.id);
       this.refresh();
     }

@@ -11,6 +11,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { DriverService, Driver } from '../../core/services/driver.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-driver-profile',
@@ -45,10 +46,10 @@ import { DriverService, Driver } from '../../core/services/driver.service';
           </div>
         </div>
         <div class="profile-actions">
-          <button class="btn-edit" (click)="showEditModal = true">
+          <button class="btn-edit" (click)="showEditModal = true" *ngIf="authService.isAdmin()">
             <span nz-icon nzType="edit" nzTheme="outline"></span> Edit
           </button>
-          <button class="btn-action-del" (click)="showDeleteModal = true">
+          <button class="btn-action-del" (click)="showDeleteModal = true" *ngIf="authService.isAdmin()">
             <span nz-icon nzType="delete" nzTheme="outline"></span> Delete
           </button>
         </div>
@@ -567,6 +568,7 @@ export class DriverProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private driverService = inject(DriverService);
+  authService = inject(AuthService);
 
   activeTab: string = 'overview';
   showDeleteModal = false;
