@@ -104,6 +104,7 @@ export class SidebarComponent {
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'appstore', route: '/dashboard', adminOnly: true },
+    { label: 'Dashboard', icon: 'appstore', route: '/driver-dashboard' },
     { label: 'Vehicles', icon: 'car', children: [
       { label: 'Cars', icon: 'car', route: '/listing' },
       { label: 'Delivery', icon: 'shopping-cart', route: '/delivery-cars' },
@@ -127,7 +128,9 @@ export class SidebarComponent {
   ];
 
   get visibleMenuItems(): MenuItem[] {
-    if (this.authService.isAdmin()) return this.menuItems;
+    if (this.authService.isAdmin()) {
+      return this.menuItems.filter(item => item.route !== '/driver-dashboard');
+    }
     return this.menuItems.filter(item => !item.adminOnly);
   }
 

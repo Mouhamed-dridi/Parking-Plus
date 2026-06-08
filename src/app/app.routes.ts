@@ -55,8 +55,7 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
-        canActivate: [authGuard],
-        data: { roles: ['admin'] }
+        canActivate: [authGuard]
       },
       {
         path: 'user-management',
@@ -87,6 +86,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
         canActivate: [authGuard],
         data: { roles: ['admin'] }
+      },
+      {
+        path: 'driver-dashboard',
+        loadComponent: () => import('./features/driver-dashboard/driver-dashboard.component').then(m => m.DriverDashboardComponent)
       }
     ]
   }

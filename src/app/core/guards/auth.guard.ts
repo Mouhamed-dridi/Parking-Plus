@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const allowedRoles = route.data?.['roles'] as string[] | undefined;
   if (allowedRoles && !allowedRoles.includes(authService.getRole())) {
-    return router.createUrlTree(['/listing']);
+    return router.createUrlTree(['/driver-dashboard']);
   }
 
   return true;

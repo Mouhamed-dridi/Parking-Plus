@@ -13,8 +13,8 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  email = '';
-  password = '';
+  email = 'drv123';
+  password = 'drv123';
   showPassword = false;
   isLoading = false;
   errorMessage = '';
@@ -43,7 +43,7 @@ export class LoginComponent {
     this.isLoading = true;
     setTimeout(() => {
       if (user.role === 'driver') {
-        this.router.navigate(['/listing']);
+        this.router.navigate(['/driver-dashboard']);
       } else {
         this.router.navigate(['/dashboard']);
       }
