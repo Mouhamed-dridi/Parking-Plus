@@ -90,6 +90,10 @@ export const routes: Routes = [
       {
         path: 'driver-dashboard',
         loadComponent: () => import('./features/driver-dashboard/driver-dashboard.component').then(m => m.DriverDashboardComponent)
+      },
+      {
+        path: 'gates',
+        loadComponent: () => import('./features/gates/gates.component').then(m => m.GatesComponent)
       }
     ]
   }

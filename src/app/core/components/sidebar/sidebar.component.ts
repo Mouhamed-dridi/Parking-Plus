@@ -113,6 +113,7 @@ export class SidebarComponent {
     { label: 'Drivers', icon: 'idcard', route: '/drivers', adminOnly: true },
     { label: 'Booking', icon: 'calendar', route: '/request-car', adminOnly: true },
     { label: 'Booking List', icon: 'unordered-list', route: '/booking-list', adminOnly: true },
+    { label: 'Gates', icon: 'field-time', route: '/gates', adminOnly: true },
     { label: 'Lavage', icon: 'highlight', route: '/lavage' },
     { label: 'Maintenance', icon: 'tool', children: [
       { label: 'Repairs', icon: 'tool', route: '/repairs' },
@@ -123,7 +124,6 @@ export class SidebarComponent {
   systemItems: MenuItem[] = [
     { label: 'User Management', icon: 'team', route: '/user-management', adminOnly: true },
     { label: 'Reports', icon: 'file-text', route: '/reports', adminOnly: true },
-    { label: 'Trash', icon: 'delete', route: '/trash', adminOnly: true },
     { label: 'Settings', icon: 'setting', route: '/settings', adminOnly: true },
   ];
 
