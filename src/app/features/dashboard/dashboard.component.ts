@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { CarService } from '../../core/services/car.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface TopVehicle {
   name: string;
@@ -25,7 +26,44 @@ interface VehicleStatusItem {
   template: `
     <div class="dash-container">
 
-      <!-- ══════════════════ HEADER ══════════════════ -->
+      <!-- ══════════════════ OPERATOR DASHBOARD ══════════════════ -->
+      <div class="operator-dash" *ngIf="authService.isOperator()">
+        <div class="dash-header">
+          <div>
+            <h1 class="welcome-title">Welcome back, {{ authService.getUserName() }}</h1>
+            <p class="welcome-sub">Manage gate operations and monitor fleet activity.</p>
+          </div>
+        </div>
+        <div class="action-grid">
+          <div class="action-card" routerLink="/gates">
+            <div class="icon-wrap" style="color:#1a73e8">
+              <span nz-icon nzType="field-time" nzTheme="outline"></span>
+            </div>
+            <span class="card-label">Gate</span>
+          </div>
+          <div class="action-card" routerLink="/drivers">
+            <div class="icon-wrap" style="color:#06b6d4">
+              <span nz-icon nzType="idcard" nzTheme="outline"></span>
+            </div>
+            <span class="card-label">Driver</span>
+          </div>
+          <div class="action-card" routerLink="/listing">
+            <div class="icon-wrap" style="color:#6366f1">
+              <span nz-icon nzType="car" nzTheme="outline"></span>
+            </div>
+            <span class="card-label">Cars</span>
+          </div>
+          <div class="action-card" routerLink="/settings">
+            <div class="icon-wrap" style="color:#f59e0b">
+              <span nz-icon nzType="setting" nzTheme="outline"></span>
+            </div>
+            <span class="card-label">Settings</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ ADMIN DASHBOARD ══════════════════ -->
+      <ng-container *ngIf="!authService.isOperator()">
       <div class="dash-header">
         <div>
           <h1 class="welcome-title">Welcome back, Administrator</h1>
@@ -206,6 +244,8 @@ interface VehicleStatusItem {
         </div>
       </div>
 
+      </ng-container>
+
     </div>
   `,
   styles: [`
@@ -297,10 +337,38 @@ interface VehicleStatusItem {
     .vstatus-pill.pill-free { background: #e6f4ea; color: #1e8e3e; }
     .vstatus-pill.pill-road { background: #e8f0fe; color: #1a73e8; }
     .vstatus-pill.pill-maint { background: #fce8e6; color: #d93025; }
+
+    /* === OPERATOR ACTION CARDS === */
+    .operator-dash { padding-bottom: 24px; }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .action-card {
+      background: white; border: 1px solid #e0e0e0; border-radius: 4px;
+      padding: 24px 20px; display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: all 0.2s ease-in-out;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .action-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: #d2e3fc; transform: translateY(-2px);
+    }
+    .icon-wrap {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .card-label {
+      font-size: 15px; font-weight: 500; color: #3c4043;
+    }
   `]
 })
 export class DashboardComponent implements OnInit {
   private carService = inject(CarService);
+  authService = inject(AuthService);
 
   activeLegend = '';
 

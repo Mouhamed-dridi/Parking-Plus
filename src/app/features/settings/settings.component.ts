@@ -6,29 +6,52 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    NzCardModule,
-    NzSelectModule,
-    NzSwitchModule,
-    NzButtonModule,
-    NzIconModule,
-    NzTypographyModule,
-    NzDividerModule,
+    CommonModule, FormsModule, NzCardModule, NzSelectModule, NzSwitchModule,
+    NzButtonModule, NzIconModule, NzInputModule, NzDividerModule, NzRadioModule,
   ],
   template: `
     <div class="settings-page">
-      <!-- General Settings Card -->
-      <nz-card class="settings-card" nzTitle="General Settings">
+
+      <!-- Basic Settings -->
+      <nz-card class="settings-card" nzTitle="Basic Settings">
         <div class="field-row">
+          <div class="field">
+            <label>Company Name</label>
+            <input nz-input [(ngModel)]="companyName" placeholder="Your company name" />
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input nz-input [(ngModel)]="companyPhone" placeholder="+216 XX XXX XXX" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Email</label>
+            <input nz-input [(ngModel)]="companyEmail" placeholder="contact@company.com" />
+          </div>
+          <div class="field">
+            <label>Address</label>
+            <input nz-input [(ngModel)]="companyAddress" placeholder="Street, City" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Currency</label>
+            <nz-select [(ngModel)]="currency" nzPlaceHolder="Select currency">
+              <nz-option nzLabel="TND - Tunisian Dinar" nzValue="TND"></nz-option>
+              <nz-option nzLabel="EUR - Euro" nzValue="EUR"></nz-option>
+              <nz-option nzLabel="USD - US Dollar" nzValue="USD"></nz-option>
+            </nz-select>
+          </div>
           <div class="field">
             <label>Language</label>
             <nz-select [(ngModel)]="language" nzPlaceHolder="Select language">
@@ -37,10 +60,17 @@ import { ThemeService } from '../../core/services/theme.service';
               <nz-option nzLabel="Arabic" nzValue="ar"></nz-option>
             </nz-select>
           </div>
+        </div>
+      </nz-card>
+
+      <!-- Time & Date -->
+      <nz-card class="settings-card" nzTitle="Time & Date">
+        <div class="field-row">
           <div class="field">
             <label>Time Zone</label>
             <nz-select [(ngModel)]="timeZone" nzPlaceHolder="Select time zone">
               <nz-option nzLabel="UTC" nzValue="UTC"></nz-option>
+              <nz-option nzLabel="Africa/Tunis" nzValue="Africa/Tunis"></nz-option>
               <nz-option nzLabel="Europe/Paris" nzValue="Europe/Paris"></nz-option>
               <nz-option nzLabel="America/New_York" nzValue="America/New_York"></nz-option>
             </nz-select>
@@ -48,16 +78,23 @@ import { ThemeService } from '../../core/services/theme.service';
           <div class="field">
             <label>Date Format</label>
             <nz-select [(ngModel)]="dateFormat" nzPlaceHolder="Select format">
-              <nz-option nzLabel="MM/DD/YYYY" nzValue="MM/DD/YYYY"></nz-option>
               <nz-option nzLabel="DD/MM/YYYY" nzValue="DD/MM/YYYY"></nz-option>
+              <nz-option nzLabel="MM/DD/YYYY" nzValue="MM/DD/YYYY"></nz-option>
               <nz-option nzLabel="YYYY-MM-DD" nzValue="YYYY-MM-DD"></nz-option>
             </nz-select>
+          </div>
+          <div class="field">
+            <label>Time Format</label>
+            <nz-radio-group [(ngModel)]="timeFormat">
+              <label nz-radio nzValue="24h">24h</label>
+              <label nz-radio nzValue="12h">12h (AM/PM)</label>
+            </nz-radio-group>
           </div>
         </div>
       </nz-card>
 
-      <!-- Appearance Card -->
-      <nz-card class="settings-card" nzTitle="Appearance">
+      <!-- Theme -->
+      <nz-card class="settings-card" nzTitle="Theme">
         <div class="field-row">
           <div class="field toggle-field">
             <div class="toggle-label">
@@ -76,194 +113,78 @@ import { ThemeService } from '../../core/services/theme.service';
         </div>
       </nz-card>
 
-      <!-- Software & Updates Card -->
-      <nz-card class="settings-card" nzTitle="Software & Updates">
-        <div class="version-info">
-          <div class="info-row">
-            <span class="info-label">Current Version</span>
-            <span class="info-value">{{currentVersion}}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Last Updated</span>
-            <span class="info-value">{{lastUpdated}}</span>
-          </div>
-        </div>
-        <div class="actions">
-          <button nz-button nzType="default" class="btn-secondary">
-            <span nz-icon nzType="reload" nzTheme="outline"></span>
-            Check for Updates
-          </button>
-          <button nz-button nzType="primary" class="btn-primary">
-            <span nz-icon nzType="download" nzTheme="outline"></span>
-            Update Software
-          </button>
-        </div>
-        <nz-divider style="margin: 16px 0;"></nz-divider>
-        <div class="field toggle-field">
-          <label>Enable Automatic Updates</label>
-          <nz-switch [(ngModel)]="autoUpdates"></nz-switch>
-        </div>
-      </nz-card>
-
+      <!-- Save -->
+      <div class="save-bar">
+        <button nz-button nzType="primary" class="btn-primary" (click)="saveSettings()">
+          <span nz-icon nzType="save" nzTheme="outline"></span> Save Settings
+        </button>
+      </div>
 
     </div>
   `,
   styles: [`
     .settings-page {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+      max-width: 800px; margin: 0 auto; padding: 24px;
+      display: flex; flex-direction: column; gap: 20px;
     }
-
-    .settings-card {
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      border: 1px solid #f0f0f0;
-    }
-
+    .settings-card { border-radius: 2px; border: 1px solid #e0e0e0; }
     .settings-card ::ng-deep .ant-card-head {
-      border-bottom: 1px solid #f5f5f5;
-      padding: 16px 24px;
-      min-height: auto;
+      border-bottom: 1px solid #e0e0e0; padding: 12px 20px; min-height: auto;
     }
-
     .settings-card ::ng-deep .ant-card-head-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1f2937;
+      font-size: 15px; font-weight: 600; color: #202124;
     }
-
-    .settings-card ::ng-deep .ant-card-body {
-      padding: 20px 24px;
-    }
-
+    .settings-card ::ng-deep .ant-card-body { padding: 20px; }
     .field-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
+      display: flex; flex-wrap: wrap; gap: 16px;
     }
-
     .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 180px;
-      flex: 1;
+      display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1;
     }
-
     .field label {
-      font-size: 13px;
-      font-weight: 500;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      font-size: 12px; font-weight: 600; color: #5f6368;
+      text-transform: uppercase; letter-spacing: 0.03em;
     }
-
     .toggle-field {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: row; align-items: center; justify-content: space-between;
     }
-
-    .toggle-field label {
-      text-transform: none;
-      letter-spacing: normal;
-      font-size: 14px;
-      color: #374151;
+    .toggle-field label { text-transform: none; letter-spacing: normal; font-size: 14px; color: #374151; }
+    .toggle-label { display: flex; align-items: center; gap: 8px; }
+    .toggle-label label { text-transform: none; letter-spacing: normal; font-size: 14px; color: #374151; }
+    .label-icon { font-size: 18px; color: #1a73e8; }
+    .save-bar {
+      display: flex; justify-content: flex-end;
     }
-
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toggle-label label {
-      text-transform: none;
-      letter-spacing: normal;
-      font-size: 14px;
-      color: #374151;
-    }
-
-    .label-icon {
-      font-size: 18px;
-      color: #6366f1;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
     .btn-primary {
-      background: #6366f1;
-      border-color: #6366f1;
-      border-radius: 8px;
-      height: 40px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      height: 36px; border-radius: 2px; display: inline-flex; align-items: center; gap: 6px;
     }
-
-    .btn-primary:hover {
-      background: #4f46e5 !important;
-      border-color: #4f46e5 !important;
-    }
-
-    .btn-secondary {
-      border-radius: 8px;
-      height: 40px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-color: #d1d5db;
-    }
-
-    .version-info {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-    }
-
-    .info-label {
-      font-size: 14px;
-      color: #6b7280;
-    }
-
-    .info-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    nz-divider {
-      margin: 16px 0;
-    }
-
-
   `]
 })
 export class SettingsComponent {
+  companyName = 'ParkPlus';
+  companyPhone = '+216 XX XXX XXX';
+  companyEmail = 'contact@parkplus.com';
+  companyAddress = 'Tunis, Tunisia';
+  currency = 'TND';
   language = 'en';
-  timeZone = 'UTC';
-  dateFormat = 'MM/DD/YYYY';
+  timeZone = 'Africa/Tunis';
+  dateFormat = 'DD/MM/YYYY';
+  timeFormat = '24h';
 
   constructor(public themeService: ThemeService) {}
 
-  currentVersion = 'v1.0.0';
-  lastUpdated = new Date().toLocaleDateString();
-  autoUpdates = false;
-
+  saveSettings(): void {
+    console.log('Settings saved', {
+      company: this.companyName,
+      phone: this.companyPhone,
+      email: this.companyEmail,
+      address: this.companyAddress,
+      currency: this.currency,
+      language: this.language,
+      timeZone: this.timeZone,
+      dateFormat: this.dateFormat,
+      timeFormat: this.timeFormat,
+      theme: this.themeService.isDark ? 'dark' : 'light',
+    });
+  }
 }

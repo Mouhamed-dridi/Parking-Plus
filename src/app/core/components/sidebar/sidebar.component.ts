@@ -119,17 +119,29 @@ export class SidebarComponent {
       { label: 'Repairs', icon: 'tool', route: '/repairs' },
       { label: 'Garage CRM', icon: 'shop', route: '/garage-crm' },
     ]},
+    { label: 'Settings', icon: 'setting', route: '/settings' },
   ];
 
   systemItems: MenuItem[] = [
     { label: 'User Management', icon: 'team', route: '/user-management', adminOnly: true },
     { label: 'Reports', icon: 'file-text', route: '/reports', adminOnly: true },
-    { label: 'Settings', icon: 'setting', route: '/settings', adminOnly: true },
   ];
 
   get visibleMenuItems(): MenuItem[] {
     if (this.authService.isAdmin()) {
       return this.menuItems.filter(item => item.route !== '/driver-dashboard');
+    }
+    if (this.authService.isOperator()) {
+      return this.menuItems.filter(item => {
+        const routes = item.route || '';
+        const childrenRoutes = item.children?.map(c => c.route) || [];
+        const allRoutes = [routes, ...childrenRoutes];
+        return allRoutes.some(r =>
+          r === '/dashboard'
+          || r.startsWith('/listing') || r.startsWith('/delivery-cars') || r.startsWith('/used-car')
+          || r === '/drivers' || r === '/gates'
+        );
+      });
     }
     return this.menuItems.filter(item => !item.adminOnly);
   }
@@ -141,6 +153,11 @@ export class SidebarComponent {
 
   visibleChildren(item: MenuItem): MenuItem[] {
     if (this.authService.isAdmin()) return item.children || [];
+    if (this.authService.isOperator()) {
+      // For operator, only show vehicle children (no maintenance sub-items)
+      if (item.label === 'Vehicles') return item.children || [];
+      return [];
+    }
     return (item.children || []).filter(c => !c.adminOnly);
   }
 }

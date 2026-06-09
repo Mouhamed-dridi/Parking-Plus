@@ -43,7 +43,9 @@ export class LoginComponent {
     this.isLoading = true;
     setTimeout(() => {
       if (user.role === 'driver') {
-        this.router.navigate(['/driver-dashboard']);
+        this.router.navigate(['/listing']);
+      } else if (user.role === 'operator') {
+        this.router.navigate(['/dashboard']);
       } else {
         this.router.navigate(['/dashboard']);
       }

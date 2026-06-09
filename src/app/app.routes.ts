@@ -46,16 +46,21 @@ export const routes: Routes = [
       },
       {
         path: 'request-car',
-        loadComponent: () => import('./features/request-car/request-car.component').then(m => m.RequestCarComponent)
+        loadComponent: () => import('./features/request-car/request-car.component').then(m => m.RequestCarComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'driver'] }
       },
       {
         path: 'booking-list',
-        loadComponent: () => import('./features/booking-list/booking-list.component').then(m => m.BookingListComponent)
+        loadComponent: () => import('./features/booking-list/booking-list.component').then(m => m.BookingListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'driver'] }
       },
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'operator'] }
       },
       {
         path: 'user-management',
@@ -71,29 +76,39 @@ export const routes: Routes = [
       },
       {
         path: 'repairs',
-        loadComponent: () => import('./features/repairs/repairs.component').then(m => m.RepairsComponent)
+        loadComponent: () => import('./features/repairs/repairs.component').then(m => m.RepairsComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'driver'] }
       },
       {
         path: 'garage-crm',
-        loadComponent: () => import('./features/garage-crm/garage-crm.component').then(m => m.GarageCrmComponent)
+        loadComponent: () => import('./features/garage-crm/garage-crm.component').then(m => m.GarageCrmComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'driver'] }
       },
       {
         path: 'lavage',
-        loadComponent: () => import('./features/lavage/lavage.component').then(m => m.LavageComponent)
+        loadComponent: () => import('./features/lavage/lavage.component').then(m => m.LavageComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'driver'] }
       },
       {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
         canActivate: [authGuard],
-        data: { roles: ['admin'] }
+        data: { roles: ['admin', 'operator'] }
       },
       {
         path: 'driver-dashboard',
-        loadComponent: () => import('./features/driver-dashboard/driver-dashboard.component').then(m => m.DriverDashboardComponent)
+        loadComponent: () => import('./features/driver-dashboard/driver-dashboard.component').then(m => m.DriverDashboardComponent),
+        canActivate: [authGuard],
+        data: { roles: ['driver'] }
       },
       {
         path: 'gates',
-        loadComponent: () => import('./features/gates/gates.component').then(m => m.GatesComponent)
+        loadComponent: () => import('./features/gates/gates.component').then(m => m.GatesComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin', 'operator'] }
       }
     ]
   }

@@ -10,6 +10,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { CarCardComponent, CarData } from '../../shared/components/car-card/car-card.component';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { CarService, CarDetail } from '../../core/services/car.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-listing',
@@ -22,11 +23,11 @@ import { CarService, CarDetail } from '../../core/services/car.service';
         <p nz-typography class="subtitle">Get you latest update for the last 7 days</p>
       </div>
       <div class="header-actions">
-        <button nz-button nzType="default" class="report-btn" (click)="goToRepairs()">
+        <button nz-button nzType="default" class="report-btn" (click)="goToRepairs()" *ngIf="!authService.isOperator()">
           <span nz-icon nzType="warning" nzTheme="outline"></span>
           Report a Problem
         </button>
-        <button nz-button nzType="primary" class="add-btn" (click)="showAddModal = true">
+        <button nz-button nzType="primary" class="add-btn" (click)="showAddModal = true" *ngIf="!authService.isOperator()">
           <span nz-icon nzType="plus" nzTheme="outline"></span>
           Add Car
         </button>
@@ -65,7 +66,7 @@ import { CarService, CarDetail } from '../../core/services/car.service';
       <div class="empty-state" *ngIf="!isUsedCarPage && cars.length === 0">
         <span nz-icon nzType="car" nzTheme="outline" class="empty-icon"></span>
         <p>No cars in this category yet.</p>
-        <button nz-button nzType="primary" (click)="showAddModal = true">Add the first car</button>
+        <button nz-button nzType="primary" (click)="showAddModal = true" *ngIf="!authService.isOperator()">Add the first car</button>
       </div>
     </div>
 
@@ -373,6 +374,7 @@ export class ListingComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private carService = inject(CarService);
+  authService = inject(AuthService);
 
   cars: CarDetail[] = [];
   usedCars: CarDetail[] = [];

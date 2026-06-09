@@ -552,9 +552,6 @@ import { AuthService } from '../../core/services/auth.service';
       <div *ngIf="activeTab === 'driver'" class="tab-content">
         <div class="documents-header">
           <h2 class="tab-section-title">Assigned Driver</h2>
-          <button class="btn-edit" (click)="openAssignDriverModal()">
-            <span nz-icon nzType="user" nzTheme="outline"></span> Assign Driver
-          </button>
         </div>
         <div class="driver-info-card" *ngIf="assignedDriver; else noDriver">
           <div class="driver-avatar-wrap">
@@ -582,39 +579,6 @@ import { AuthService } from '../../core/services/auth.service';
             <p>No driver currently assigned to this vehicle</p>
           </div>
         </ng-template>
-
-        <!-- Assign Driver Modal -->
-        <div class="modal-overlay" *ngIf="showAssignDriverModal" (click.self)="closeAssignDriverModal()">
-          <div class="modal-card" style="max-width: 480px;">
-            <div class="modal-header">
-              <h3>Assign Driver</h3>
-              <button class="modal-close" (click)="closeAssignDriverModal()">
-                <span nz-icon nzType="close" nzTheme="outline"></span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="form-group">
-                <label>Select Driver</label>
-                <nz-select [(ngModel)]="selectedDriverId" nzPlaceHolder="Choose a driver" style="width: 100%;">
-                  <nz-option *ngFor="let d of allDrivers" [nzValue]="d.id" [nzLabel]="d.name"></nz-option>
-                </nz-select>
-              </div>
-              <div class="form-group" *ngIf="selectedDriverId">
-                <div class="assign-preview">
-                  <img [src]="getSelectedDriver()?.avatar" class="assign-preview-img" />
-                  <div>
-                    <strong>{{ getSelectedDriver()?.name }}</strong>
-                    <p style="margin: 2px 0 0; color: #6b7280; font-size: 13px;">{{ getSelectedDriver()?.role }} — {{ getSelectedDriver()?.email }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn-cancel" (click)="closeAssignDriverModal()">Cancel</button>
-              <button class="btn-primary" (click)="saveAssignDriver()" [disabled]="!selectedDriverId">Save</button>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -1189,12 +1153,7 @@ export class CarDetailsComponent implements OnInit {
   viewDoc: CarDocument = { id: 0, carId: 0, fileName: '', documentType: '', notes: '', uploadDate: '' };
   showDocDeleteConfirm = false;
   docToDelete: CarDocument | null = null;
-
-  // Driver
-  allDrivers: Driver[] = [];
   assignedDriver: Driver | null = null;
-  showAssignDriverModal = false;
-  selectedDriverId: number | null = null;
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -1203,17 +1162,8 @@ export class CarDetailsComponent implements OnInit {
       if (this.car) {
         this.financeRecord = this.financeService.getByCarId(this.car.id) || null;
         this.documents = this.docService.getByCarId(this.car.id);
-        this.loadDriver();
+        this.assignedDriver = this.car.driverId ? this.driverService.getById(this.car.driverId) || null : null;
       }
-    }
-    this.allDrivers = this.driverService.getAll();
-  }
-
-  private loadDriver(): void {
-    if (this.car?.driverId) {
-      this.assignedDriver = this.driverService.getById(this.car.driverId) || null;
-    } else {
-      this.assignedDriver = null;
     }
   }
 
@@ -1223,6 +1173,7 @@ export class CarDetailsComponent implements OnInit {
 
   shouldShowTab(tab: string): boolean {
     if (this.authService.isAdmin()) return true;
+    if (this.authService.isOperator()) return tab === 'fiche';
     return tab === 'fiche' || tab === 'driver';
   }
 
@@ -1304,34 +1255,5 @@ export class CarDetailsComponent implements OnInit {
       this.documents = this.docService.getByCarId(this.car!.id);
     }
     this.closeDocDeleteConfirm();
-  }
-
-  // Driver methods
-  openAssignDriverModal(): void {
-    this.selectedDriverId = this.car?.driverId || null;
-    this.showAssignDriverModal = true;
-  }
-
-  closeAssignDriverModal(): void {
-    this.showAssignDriverModal = false;
-    this.selectedDriverId = null;
-  }
-
-  getSelectedDriver(): Driver | undefined {
-    return this.allDrivers.find(d => d.id === this.selectedDriverId);
-  }
-
-  saveAssignDriver(): void {
-    if (this.car && this.selectedDriverId) {
-      const driver = this.driverService.getById(this.selectedDriverId);
-      if (driver) {
-        this.carService.updateCarDriver(this.car.id, driver.id, driver.name, driver.avatar);
-      }
-    } else if (this.car && this.selectedDriverId === null) {
-      this.carService.updateCarDriver(this.car.id, null, '', '');
-    }
-    this.car = this.carService.getCarById(this.car!.id) || null;
-    this.loadDriver();
-    this.closeAssignDriverModal();
   }
 }

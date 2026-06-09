@@ -44,9 +44,14 @@ interface GateRecord {
           <h1>Gates</h1>
           <span class="count-badge">{{ records.length }}</span>
         </div>
-        <button nz-button nzType="primary" class="create-btn" (click)="showCreateModal = true">
-          <span nz-icon nzType="plus" nzTheme="outline"></span> Create Movement
-        </button>
+        <div class="header-buttons">
+          <button nz-button nzType="default" (click)="exportToExcel()" class="export-btn">
+            <span nz-icon nzType="download" nzTheme="outline"></span> Download Excel
+          </button>
+          <button nz-button nzType="primary" class="create-btn" (click)="showCreateModal = true">
+            <span nz-icon nzType="plus" nzTheme="outline"></span> Create Movement
+          </button>
+        </div>
       </div>
 
       <div class="table-card">
@@ -88,6 +93,7 @@ interface GateRecord {
     <nz-modal
       [(nzVisible)]="showCreateModal"
       nzTitle="Create Movement"
+      nzWidth="640"
       (nzOnCancel)="closeModal()"
       (nzOnOk)="submitForm()"
       [nzOkText]="'Create'"
@@ -170,6 +176,12 @@ interface GateRecord {
     .create-btn {
       height: 36px; border-radius: 2px;
     }
+    .export-btn {
+      height: 36px; border-radius: 2px; border-color: #1a73e8; color: #1a73e8;
+    }
+    .header-buttons {
+      display: flex; gap: 8px;
+    }
     .table-card {
       background: #fff; border: 1px solid #e0e0e0; border-radius: 2px;
     }
@@ -203,6 +215,9 @@ interface GateRecord {
     }
     .form-item label {
       font-size: 13px; font-weight: 600; color: #374151;
+    }
+    .form-item input, .form-item nz-select {
+      height: 40px;
     }
     @media (max-width: 768px) {
       .form-row { flex-direction: column; }
@@ -303,5 +318,20 @@ export class GatesComponent {
       movement: this.form.movement!,
     });
     this.closeModal();
+  }
+
+  exportToExcel(): void {
+    const headers = ['Vehicle Type', 'Series ID', 'Driver CID', 'Driver Name', 'Date', 'Time', 'Driver Type', 'Movement'];
+    const rows = this.records.map(r => [
+      r.vehicleType, r.seriesId, r.driverCid, r.driverName,
+      r.date.toLocaleDateString('en-GB'), r.time, r.driverType, r.movement,
+    ]);
+    const csv = '\uFEFF' + headers.join(',') + '\n' + rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'gates_' + new Date().toISOString().slice(0, 10) + '.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 }
