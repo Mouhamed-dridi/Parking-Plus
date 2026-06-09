@@ -3,24 +3,50 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from '../../../core/services/auth.service';
+
+interface ModeOption {
+  label: string;
+  role: string;
+  username: string;
+  password: string;
+}
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NzIconModule],
+  imports: [CommonModule, FormsModule, RouterModule, NzIconModule, NzSelectModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  email = 'drv123';
-  password = 'drv123';
+  email = '';
+  password = '';
   showPassword = false;
   isLoading = false;
   errorMessage = '';
+  selectedMode: string | null = null;
+
+  modes: ModeOption[] = [
+    { label: 'Admin', role: 'admin', username: 'admin', password: 'admin123' },
+    { label: 'Operator-Gate', role: 'operator', username: 'opt', password: 'opt123' },
+    { label: 'Driver', role: 'driver', username: 'driver', password: 'driver123' },
+  ];
 
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  onModeChange(): void {
+    const mode = this.modes.find(m => m.role === this.selectedMode);
+    if (mode) {
+      this.email = mode.username;
+      this.password = mode.password;
+    } else {
+      this.email = '';
+      this.password = '';
+    }
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -44,8 +70,6 @@ export class LoginComponent {
     setTimeout(() => {
       if (user.role === 'driver') {
         this.router.navigate(['/listing']);
-      } else if (user.role === 'operator') {
-        this.router.navigate(['/dashboard']);
       } else {
         this.router.navigate(['/dashboard']);
       }

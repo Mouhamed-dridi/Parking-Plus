@@ -12,9 +12,9 @@ export interface User {
 }
 
 const USERS: User[] = [
-  { username: 'admin', password: 'admin', role: 'admin', name: 'Admin User', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { username: 'drv123', password: 'drv123', role: 'driver', name: 'Driver', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { username: 'opt123', password: 'opt123', role: 'operator', name: 'Operator', avatar: '' },
+  { username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+  { username: 'driver', password: 'driver123', role: 'driver', name: 'Driver', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
+  { username: 'opt', password: 'opt123', role: 'operator', name: 'Operator', avatar: '' },
 ];
 
 @Injectable({ providedIn: 'root' })
