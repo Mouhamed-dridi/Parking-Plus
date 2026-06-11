@@ -110,7 +110,7 @@ export class SidebarComponent {
       { label: 'Delivery', icon: 'shopping-cart', route: '/delivery-cars' },
       { label: 'Used Cars', icon: 'car', route: '/used-car' },
     ]},
-    { label: 'Drivers', icon: 'idcard', route: '/drivers', adminOnly: true },
+    { label: 'Drivers', icon: 'idcard', route: '/drivers' },
     { label: 'Booking', icon: 'calendar', route: '/request-car', adminOnly: true },
     { label: 'Booking List', icon: 'unordered-list', route: '/booking-list', adminOnly: true },
     { label: 'Gates', icon: 'field-time', route: '/gates', adminOnly: true },
